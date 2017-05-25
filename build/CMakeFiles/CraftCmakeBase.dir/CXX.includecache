@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/common.cpp
+
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/base.cpp
+common.h
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/common.h
+base.h
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/base.h
+
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/base.h
+common.h
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/common.h
+
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/common.h
+defines.h
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/defines.h
+
+/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/src/defines.h
+
