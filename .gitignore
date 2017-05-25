@@ -1,3 +1,6 @@
+# Build stuff
+build
+dist
 .DS_Store
 # Prerequisites
 *.d

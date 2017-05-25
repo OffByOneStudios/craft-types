@@ -1,4 +1,0 @@
-/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/build/CMakeFiles/rebuild_cache.dir
-/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/build/CMakeFiles/edit_cache.dir
-/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/build/CMakeFiles/CraftCmakeBaseTests.dir
-/Users/clarkrinker/src/priv/craft-engine-prototype/deps/base/build/CMakeFiles/CraftCmakeBase.dir
