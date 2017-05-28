@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.7)
 
 
 # This Variable is the Simplest way to ensure your variables will work
