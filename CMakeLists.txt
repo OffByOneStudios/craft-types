@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
+if(TARGET CraftTypes)
+    return()
+endif(TARGET CraftTypes)
 Project(CraftTypes)
 
 # This Variable is the Simplest way to ensure your variables will work
@@ -23,10 +26,10 @@ include(${CRAFT_CMAKE_DIR}/PrecompiledHeader.cmake)
 include(${CRAFT_CMAKE_DIR}/MakeVSFilters.cmake)
 
 # Use This Preprocess Def to Control exports
-add_definitions(-DCRAFT_TYPE_DLL)
+add_definitions(-D${CRAFT_TRIPLE_CROSS})
 
 # Depdendent Projects
-add_subdirectory(${CMAKE_SOURCE_DIR}/../craft-util CraftUtil)
+add_subdirectory(${CRAFT_ENGINE_ROOT_DIR}/deps/craft-util CraftUtil)
 
 # Test culling
 set_target_properties(CraftUtilTests PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD ON)
@@ -66,6 +69,7 @@ add_library(CraftType SHARED
   ${includes}
   common.cpp
 )
+target_compile_definitions(CraftType PRIVATE CRAFT_TYPE_DLL)
 
 add_precompiled_header(CraftType src/types/common.h FORCEINCLUDE)
 
