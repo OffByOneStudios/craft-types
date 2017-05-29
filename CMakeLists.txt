@@ -20,17 +20,15 @@ ENDIF()
 
 # External Cmake Deps
 include(${CRAFT_CMAKE_DIR}/PrecompiledHeader.cmake)
-
+include(${CRAFT_CMAKE_DIR}/MakeVSFilters.cmake)
 
 # Use This Preprocess Def to Control exports
-add_definitions(-DCRAFT_CMAKE_BASE)
+add_definitions(-DCRAFT_TYPE_DLL)
 
 # File Operations
 file(GLOB_RECURSE includes
   src/*.h
   src/*.hpp
-  src/concurrency/*.h
-  src/concurrency/*.hpp
 )
 
 file(GLOB_RECURSE sources
@@ -55,23 +53,24 @@ link_directories(
   ${CRAFT_VENDOR_LIB_DIRECTORY}
 )
 
-add_library(CraftCmakeBase SHARED
+add_library(CraftType SHARED
   ${sources}
   ${includes}
   common.cpp
 )
 
-add_precompiled_header(CraftCmakeBase src/common.h FORCEINCLUDE)
+add_precompiled_header(CraftType src/common.h FORCEINCLUDE)
 
-add_executable(CraftCmakeBaseTests
+add_executable(CraftTypeTests
   ${tests}
 )
 
-target_link_libraries (CraftCmakeBaseTests CraftCmakeBase)
+target_link_libraries (CraftTypeTests CraftType)
 
 # Platform Specific
 if(CRAFT_TRIPLE_CROSS STREQUAL "osx_x64_clang")
   list(APPEND CMAKE_CXX_FLAGS "-std=c++0x -stdlib=libc++ -Wc++11-extensions")
 else()
-
+  set(files ${includes} ${sources} ${docs})
+  VSFILTERS(${files})
 endif()
