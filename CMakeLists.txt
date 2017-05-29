@@ -46,6 +46,7 @@ file(GLOB_RECURSE sources
 )
 
 file(GLOB_RECURSE tests
+  test/*.h
   test/*.cpp
 )
 
