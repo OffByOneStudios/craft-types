@@ -1,21 +1,22 @@
-
-#include "all.h"
-
 #include <stack>
 #include <queue>
 
 #include <spdlog/spdlog.h>
 #include <bandit/bandit.h>
-using namespace bandit;
 
+#include "types/all.h"
+
+#undef CRAFT_TYPE_EXPORTED_MINE
+#define CRAFT_TYPE_EXPORTED_MINE CRAFT_TYPE_EXPORTED_EXPORT
+
+using namespace bandit;
 
 
 // Tell bandit there are tests here.
 go_bandit([](){
   describe("base:", [](){
     it("adds things", [&](){
-        int four = craft::cmake::base::add(2, 2);
-        AssertThat(four, Equals(4));
+        
       });
   });
 });

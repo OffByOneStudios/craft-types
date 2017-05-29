@@ -3,11 +3,11 @@
 
 namespace craft
 {
-	class type_error : public craft_error
+	class type_error : public stdext::exception
 	{
 	public:
 		explicit type_error(const std::string& msg)
-			: craft_error(msg)
+			: stdext::exception(msg)
 		{
 		}
 	};

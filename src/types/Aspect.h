@@ -100,7 +100,7 @@ namespace craft
 protected: \
 	typedef typename ::craft::manager##AspectManager< x > T_Manager; \
 private: \
-	EXPORTED_MINE static ::craft::Feature::_ider _id; \
+	CRAFT_TYPE_EXPORTED_MINE static ::craft::Feature::_ider _id; \
 	friend T_Manager; \
 	friend class ::craft::Types; \
 public: \

@@ -1,5 +1,6 @@
 #pragma once
-#include "craft/common.h"
+#include "common.h"
+#include "core.h"
 
 CRAFT_TYPE_DECLARE(uint32_t);
 CRAFT_TYPE_DECLARE(uint64_t);

@@ -1,4 +1,4 @@
-#include "craft/common.h"
+#include "common.h"
 #include "core.h"
 
 using namespace craft;

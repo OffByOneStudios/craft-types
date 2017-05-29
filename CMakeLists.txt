@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-
+Project(CraftTypes)
 
 # This Variable is the Simplest way to ensure your variables will work
 include(cmake/ResolveCraftRoot.cmake)
@@ -25,6 +25,13 @@ include(${CRAFT_CMAKE_DIR}/MakeVSFilters.cmake)
 # Use This Preprocess Def to Control exports
 add_definitions(-DCRAFT_TYPE_DLL)
 
+# Depdendent Projects
+add_subdirectory(${CMAKE_SOURCE_DIR}/../craft-util CraftUtil)
+
+# Test culling
+set_target_properties(CraftUtilTests PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD ON)
+
+
 # File Operations
 file(GLOB_RECURSE includes
   src/*.h
@@ -43,10 +50,11 @@ file(GLOB_RECURSE docs
   src/*.md
 )
 
-MESSAGE(STATUS "CRAFT_VENDOR_INCLUDE_DIRECTORY" ${CRAFT_VENDOR_INCLUDE_DIRECTORY})
+
 include_directories(
   ${CMAKE_SOURCE_DIR}/src
   ${CRAFT_VENDOR_INCLUDE_DIRECTORY}
+  ${CRAFT_ENGINE_ROOT_DIR}/deps/craft-util/src
 )
 
 link_directories(
@@ -59,12 +67,13 @@ add_library(CraftType SHARED
   common.cpp
 )
 
-add_precompiled_header(CraftType src/common.h FORCEINCLUDE)
+add_precompiled_header(CraftType src/types/common.h FORCEINCLUDE)
 
 add_executable(CraftTypeTests
   ${tests}
 )
 
+target_link_libraries (CraftType CraftUtil)
 target_link_libraries (CraftTypeTests CraftType)
 
 # Platform Specific

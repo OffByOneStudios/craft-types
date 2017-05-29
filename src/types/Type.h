@@ -91,7 +91,7 @@ struct ::craft::type<x> \
 private: \
 	static void s_types_init(::craft::_details::ObjectDefineHelper<x> _); \
 protected: \
-	CRAFT_TYPE_EXPORTED static ::craft::_details::type_impl::_static_init __si; \
+	CRAFT_TYPE_EXPORTED_MINE static ::craft::_details::type_impl::_static_init __si; \
 public: \
 	inline static TypeId typeId() { return __si.id; } \
 	static constexpr bool isExternal = true; \

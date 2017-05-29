@@ -84,7 +84,7 @@ namespace craft
 
 #define CRAFT_OBJECT_DECLARE(x) \
 private: \
-    EXPORTED_MINE static ::craft::_details::type_impl::_static_init __si; \
+    CRAFT_TYPE_EXPORTED_MINE static ::craft::_details::type_impl::_static_init __si; \
     static void craft_s_types_init(::craft::_details::ObjectDefineHelper<x> _); \
 public: \
     static inline ::craft::TypeId craft_s_typeId() { return x::__si.id; } \

@@ -1,10 +1,13 @@
 #pragma once
 #include "common.h"
+#include "core.h"
 
 namespace craft {
 	/******************************************************************************
 	** PObjectContextual
 	******************************************************************************/
+	
+	class Context;
 
 	/* T:
 	Provides an interface for naming things, and reversing those names into actual objects.
