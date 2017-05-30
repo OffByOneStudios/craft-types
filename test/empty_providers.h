@@ -48,6 +48,7 @@ void describe_no_empty_providers(craft::instance<T> &_)
 	{
 		AssertThat(_.template hasFeature<PEmptyTestSingletonTagged>(), snowhouse::IsFalse());
 	});
+	/*
 	bandit::it(".getFeature<PEmptyTestSingleton>() is nullptr", [&]()
 	{
 		AssertThat(_.template getFeature<PEmptyTestSingleton>(), snowhouse::IsNull());
@@ -60,4 +61,5 @@ void describe_no_empty_providers(craft::instance<T> &_)
 	{
 		AssertThat(_.template getFeature<PEmptyTestSingletonTagged>(), snowhouse::IsNull());
 	});
+	*/
 }

@@ -192,7 +192,7 @@ namespace types
 
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
-			inline TypeId typeId() const { return type<_T>::typeId(); }
+		inline TypeId typeId() const { return type<_T>::typeId(); }
 
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
@@ -205,15 +205,36 @@ namespace types
 		inline T* get() { return _actual; }
 		inline T const* get() const { return _actual; }
 
+		inline T& value() { return *_actual; }
+		inline T const& value() const { return *_actual; }
+
+		template<typename _T = T,
+			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
+			inline bool isNull() const
+		{
+			return _actual == nullptr;
+		}
+		template<typename _T = T,
+			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
+			inline bool isNull() const
+		{
+			return _actual == nullptr;
+		}
+		template<typename _T = T,
+			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
+			inline bool isNull() const
+		{
+			return _meta == nullptr || _meta->actual == nullptr;
+		}
 	//
 	// Operators
 	//
 	public:
-		inline T& operator* () { return *_actual; }
-		inline T* operator-> () { return _actual; }
+		inline T& operator* () { return value(); }
+		inline T* operator-> () { return get(); }
 
-		inline T const& operator* () const { return *_actual; }
-		inline T const* operator-> () const { return _actual; }
+		inline T const& operator* () const { return value(); }
+		inline T const* operator-> () const { return get(); }
 
 		inline operator bool () const { return !isNull(); }
 
@@ -249,25 +270,6 @@ namespace types
 			if (_meta == nullptr || type<TType>::typeId() != _meta->typeId)
 				throw stdext::exception("instance<void>::asType() | T.id != instance.id");
 			return instance<TType>((instance<void>)*this);
-		}
-
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
-		inline bool isNull() const
-		{
-			return _actual == nullptr;
-		}
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
-		inline bool isNull() const
-		{
-			return _actual == nullptr;
-		}
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
-		inline bool isNull() const
-		{
-			return _meta == nullptr || _meta->actual == nullptr;
 		}
 	};
 

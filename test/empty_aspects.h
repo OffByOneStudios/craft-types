@@ -33,6 +33,7 @@ void describe_no_empty_aspects(craft::instance<T> &_)
 	{
 		AssertThat(_.template hasFeature<SEmptyTestInstance>(), snowhouse::IsFalse());
 	});
+	/*
 	bandit::it(".getFeature<SEmptyTestFactory>() is nullptr", [&]()
 	{
 		AssertThat(_.template getFeature<SEmptyTestFactory>(), snowhouse::IsNull());
@@ -41,4 +42,5 @@ void describe_no_empty_aspects(craft::instance<T> &_)
 	{
 		AssertThat(_.template getFeature<SEmptyTestInstance>(), snowhouse::IsNull());
 	});
+	*/
 }
