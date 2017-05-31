@@ -118,7 +118,7 @@ namespace craft
 		};
 
 	public:
-		void init();
+		CRAFT_TYPE_EXPORTED void init();
 
 	public:
 		inline IFeatureManager* getManager(FeatureId fid)
