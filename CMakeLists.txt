@@ -31,10 +31,6 @@ add_definitions(-D${CRAFT_TRIPLE_CROSS})
 # Depdendent Projects
 add_subdirectory(${CRAFT_ENGINE_ROOT_DIR}/deps/craft-util CraftUtil)
 
-# Test culling
-set_target_properties(CraftUtilTests PROPERTIES EXCLUDE_FROM_DEFAULT_BUILD ON)
-
-
 # File Operations
 file(GLOB_RECURSE includes
   src/*.h
@@ -74,12 +70,16 @@ target_compile_definitions(CraftType PRIVATE CRAFT_TYPE_DLL)
 
 add_precompiled_header(CraftType src/types/common.h FORCEINCLUDE)
 
+target_link_libraries (CraftType CraftUtil)
+
+if(NOT DEFINED CRAFT_ENGINE_SUBDIRECTORY)
 add_executable(CraftTypeTests
   ${tests}
 )
-
-target_link_libraries (CraftType CraftUtil)
 target_link_libraries (CraftTypeTests CraftType)
+endif()
+
+
 
 # Platform Specific
 if(CRAFT_TRIPLE_CROSS STREQUAL "osx_x64_clang")
