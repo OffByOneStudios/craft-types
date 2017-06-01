@@ -2,6 +2,8 @@
 build
 dist
 .DS_Store
+gen.txt
+
 # Prerequisites
 *.d
 
