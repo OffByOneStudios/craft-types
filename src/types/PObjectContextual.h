@@ -16,7 +16,8 @@ namespace craft {
 	class PObjectContextual abstract
 		: public Provider
 	{
-		CRAFT_PROVIDER_DECLARE(PObjectContextual, "types.context", Singleton)
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PObjectContextual, "types.context", Singleton);
+
 	public:
 		virtual void contextualize(instance<>, std::shared_ptr<Context>) = 0;
 	};

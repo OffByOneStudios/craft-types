@@ -9,7 +9,8 @@ namespace craft {
 	class SContainer abstract
 		: public Aspect
 	{
-		CRAFT_ASPECT_DECLARE(SContainer, "types.container", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SContainer, "types.container", Factory);
+
 	public:
 		struct Description
 		{

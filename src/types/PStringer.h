@@ -14,7 +14,8 @@ namespace craft {
 	class PStringer abstract
 		: public Provider
 	{
-		CRAFT_PROVIDER_DECLARE(PStringer, "types.str", Singleton)
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PStringer, "types.str", Singleton);
+
 	public:
 		virtual std::string toString(instance<> inst) const = 0;
 	};

@@ -14,7 +14,8 @@ namespace craft {
 	class PIdentifier abstract
 		: public Provider
 	{
-		CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id", NamedSingleton)
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id", NamedSingleton);
+
 	public:
 		virtual std::string identifier() const = 0;
 

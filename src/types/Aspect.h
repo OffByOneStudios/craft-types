@@ -97,10 +97,10 @@ namespace craft
 }
 
 #define CRAFT_ASPECT_DECLARE(x, name, manager) \
+	static ::craft::Feature::_ider _id; \
 protected: \
 	typedef typename ::craft::manager##AspectManager< x > T_Manager; \
 private: \
-	CRAFT_TYPE_EXPORTED_MINE static ::craft::Feature::_ider _id; \
 	friend T_Manager; \
 	friend class ::craft::Types; \
 public: \

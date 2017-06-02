@@ -9,7 +9,8 @@ namespace craft {
 	class SObjectFungible abstract
 		: public Aspect
 	{
-		CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", Factory);
+
 	public:
 		/* T:
 		Provides the objectFungible's update when it is wholly mutated or replaced.

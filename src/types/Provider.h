@@ -69,10 +69,10 @@ namespace craft
 }
 
 #define CRAFT_PROVIDER_DECLARE(x, name, manager) \
+	static ::craft::Feature::_ider _id; \
 protected: \
 	typedef typename ::craft::manager##ProviderManager< x > T_Manager; \
 private: \
-	CRAFT_TYPE_EXPORTED_MINE static ::craft::Feature::_ider _id; \
 	friend T_Manager; \
 	friend class ::craft::Types; \
 public: \

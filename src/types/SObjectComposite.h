@@ -9,7 +9,8 @@ namespace craft {
 	class SObjectComposite abstract
 		: public Aspect
 	{
-		CRAFT_ASPECT_DECLARE(SObjectComposite, "types.attrs", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectComposite, "types.attrs", Factory);
+
 	public:
 
 		typedef uintptr_t ListingId;

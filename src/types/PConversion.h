@@ -13,7 +13,8 @@ namespace craft {
 	class PConversion abstract
 		: public Provider
 	{
-		CRAFT_PROVIDER_DECLARE(PConversion, "types.convert", Singleton)
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConversion, "types.convert", Singleton);
+
 	public:
 		virtual std::set<TypeId> const& possibleConversions(instance<> converting, TypeId toType) const = 0;
 		virtual instance<> convertTo(instance<> converting, TypeId toType) const = 0;

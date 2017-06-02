@@ -17,7 +17,8 @@ namespace craft {
 	class PConstructor abstract
 		: public Provider
 	{
-		CRAFT_PROVIDER_DECLARE(PConstructor, "types.constructor", Singleton)
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConstructor, "types.constructor", Singleton);
+
 	public:
 		typedef uintptr_t ListingId;
 

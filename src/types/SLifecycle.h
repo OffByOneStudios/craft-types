@@ -14,7 +14,8 @@ namespace craft {
 	class SLifecycle abstract
 		: public Aspect
 	{
-		CRAFT_ASPECT_DECLARE(SLifecycle, "types.life", Instance);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SLifecycle, "types.life", Instance);
+
 	public:
 	};
 

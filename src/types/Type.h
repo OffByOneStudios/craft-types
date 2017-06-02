@@ -82,7 +82,7 @@ namespace craft
 	};
 }
 
-#define CRAFT_TYPE_DECLARE(x) \
+#define CRAFT_TYPE_DECLARE(_dll, x) \
 template <> \
 struct ::craft::type<x> \
 	: public ::craft::type<void> \
@@ -91,7 +91,7 @@ struct ::craft::type<x> \
 private: \
 	static void s_types_init(::craft::_details::ObjectDefineHelper<x> _); \
 protected: \
-	CRAFT_TYPE_EXPORTED_MINE static ::craft::_details::type_impl::_static_init __si; \
+	_dll static ::craft::_details::type_impl::_static_init __si; \
 public: \
 	inline static TypeId typeId() { return __si.id; } \
 	static constexpr bool isExternal = true; \

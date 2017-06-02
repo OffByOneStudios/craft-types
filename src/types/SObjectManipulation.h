@@ -9,7 +9,8 @@ namespace craft {
 	class SObjectManipulation abstract
 		: public Aspect
 	{
-		CRAFT_ASPECT_DECLARE(SObjectManipulation, "types.funcs", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectManipulation, "types.funcs", Factory);
+
 	public:
 
 		typedef uintptr_t ListingId;
