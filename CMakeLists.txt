@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
-if(TARGET CraftTypes)
+if(TARGET CraftType)
     return()
-endif(TARGET CraftTypes)
+endif(TARGET CraftType)
 Project(CraftTypes)
 
 # This Variable is the Simplest way to ensure your variables will work
@@ -52,7 +52,7 @@ file(GLOB_RECURSE docs
 
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CRAFT_VENDOR_INCLUDE_DIRECTORY}
   ${CRAFT_ENGINE_ROOT_DIR}/deps/craft-util/src
 )
