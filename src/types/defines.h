@@ -22,6 +22,9 @@
 #endif
 
 
+#ifndef _WIN32
+#define abstract
+#endif
 //
 // Engine Compile
 //

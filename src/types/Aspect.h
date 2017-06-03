@@ -90,7 +90,7 @@ namespace craft
 
 		inline virtual bool isMultiUseSafe() const override { return true; }
 
-		inline virtual TAspect* build(IAspectManager* man, void* inst) override { return (((TObject*)(inst))->*_memPtr).getFeature<TAspect>(); }
+		inline virtual TAspect* build(IAspectManager* man, void* inst) override { return (((TObject*)(inst))->*_memPtr).template getFeature<TAspect>(); }
 		inline virtual void destroy(TAspect* aspect) override { }
 	};
 

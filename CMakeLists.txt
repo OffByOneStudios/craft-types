@@ -83,7 +83,7 @@ endif()
 
 # Platform Specific
 if(CRAFT_TRIPLE_CROSS STREQUAL "osx_x64_clang")
-  list(APPEND CMAKE_CXX_FLAGS "-std=c++0x -stdlib=libc++ -Wc++11-extensions")
+  list(APPEND CMAKE_CXX_FLAGS "-std=c++1z -stdlib=libc++ -Wc++11-extensions")
 else()
   set(files ${includes} ${sources} ${docs})
   VSFILTERS(${files})

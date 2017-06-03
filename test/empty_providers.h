@@ -28,26 +28,26 @@ void describe_no_empty_providers(craft::instance<T> &_)
 {
 	bandit::it(".hasFeature<PEmptyTestSingleton>() is false", [&]()
 	{
-		AssertThat(_.hasFeature<PEmptyTestSingleton>(), snowhouse::IsFalse());
+		AssertThat(_.template hasFeature<PEmptyTestSingleton>(), snowhouse::IsFalse());
 	});
 	bandit::it(".hasFeature<PEmptyTestSingletonNamed>() is false", [&]()
 	{
-		AssertThat(_.hasFeature<PEmptyTestSingletonNamed>(), snowhouse::IsFalse());
+		AssertThat(_.template hasFeature<PEmptyTestSingletonNamed>(), snowhouse::IsFalse());
 	});
 	bandit::it(".hasFeature<PEmptyTestSingletonTagged>() is false", [&]()
 	{
-		AssertThat(_.hasFeature<PEmptyTestSingletonTagged>(), snowhouse::IsFalse());
+		AssertThat(_.template hasFeature<PEmptyTestSingletonTagged>(), snowhouse::IsFalse());
 	});
 	bandit::it(".getFeature<PEmptyTestSingleton>() is nullptr", [&]()
 	{
-		AssertThat(_.getFeature<PEmptyTestSingleton>(), snowhouse::IsNull());
+		AssertThat(_.template getFeature<PEmptyTestSingleton>(), snowhouse::IsNull());
 	});
 	bandit::it(".getFeature<PEmptyTestSingleton>() is nullptr", [&]()
 	{
-		AssertThat(_.getFeature<PEmptyTestSingletonNamed>(), snowhouse::IsNull());
+		AssertThat(_.template getFeature<PEmptyTestSingletonNamed>(), snowhouse::IsNull());
 	});
 	bandit::it(".getFeature<PEmptyTestSingleton>() is nullptr", [&]()
 	{
-		AssertThat(_.getFeature<PEmptyTestSingletonTagged>(), snowhouse::IsNull());
+		AssertThat(_.template getFeature<PEmptyTestSingletonTagged>(), snowhouse::IsNull());
 	});
 }

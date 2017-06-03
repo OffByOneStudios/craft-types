@@ -57,12 +57,12 @@ namespace craft
 		//
 		// IAspectManager
 		//
-		inline virtual bool canMakeAspect(TypeId tid)
+		inline virtual bool canMakeAspect(TypeId tid) override
 		{
 			return  _factories.find(tid) != _factories.end();
 		}
 
-		inline virtual Aspect* newAspect(TypeId tid, void* instance)
+		inline virtual Aspect* newAspect(TypeId tid, void* instance) override
 		{
 			auto it_f = _factories.find(tid);
 
@@ -89,7 +89,7 @@ namespace craft
 				return it_i->second.aspect;
 			}
 		}
-		inline virtual void deleteAspect(Aspect* aspect)
+		inline virtual void deleteAspect(Aspect* aspect) override
 		{
 			assert(aspect != nullptr
 				&& "Ensure aspect is not nullptr.");

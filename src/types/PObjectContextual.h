@@ -2,6 +2,8 @@
 #include "common.h"
 #include "core.h"
 
+
+
 namespace craft {
 	/******************************************************************************
 	** PObjectContextual
@@ -31,14 +33,14 @@ namespace craft {
 		: public Implements<PObjectContextual>::For<TType>
 	{
 	public:
-		typedef typename void (TType::*t_context)(std::shared_ptr<Context> c);
+		typedef void (TType::*t_context)(std::shared_ptr<Context> c);
 
 	private:
 		t_context _context_func;
 
 		inline virtual void contextualize(instance<> i, std::shared_ptr<Context> c)
 		{
-			SPDLOG_TRACE(engine()->log, "{0}::contextualize", type<TType>::name());
+			//SPDLOG_TRACE(engine()->log, "{0}::contextualize", type<TType>::name());
 			std::invoke(this->_context_func, i.asType<TType>().get(), c);
 		}
 	public:
