@@ -115,8 +115,8 @@ public:
 
 			while (parent)
 			{
-				auto it = _parentRoot->_primesByFeature.find(value);
-				if (it != _parentRoot->_primesByFeature.end())
+				auto it = parent->_primesByFeature.find(value);
+				if (it != parent->_primesByFeature.end())
 				{
 					_prime = it->second;
 					break;
@@ -169,6 +169,9 @@ public:
 			_cache = set;
 		}
 
+		if (_cache.size() == 1)
+			_prime = *_cache.begin();
+
 		_resolved = true;
 	}
 
@@ -193,6 +196,7 @@ public:
 
 	virtual instance<> prime() const override
 	{
+		resolve();
 		return _prime;
 	}
 };
