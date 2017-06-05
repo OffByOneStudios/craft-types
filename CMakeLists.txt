@@ -24,6 +24,7 @@ ENDIF()
 # External Cmake Deps
 include(${CRAFT_CMAKE_DIR}/PrecompiledHeader.cmake)
 include(${CRAFT_CMAKE_DIR}/MakeVSFilters.cmake)
+include(${CRAFT_CMAKE_DIR}/MakeVSDocs.cmake)
 
 # Use This Preprocess Def to Control exports
 add_definitions(-D${CRAFT_TRIPLE_CROSS})
@@ -87,4 +88,5 @@ if(CRAFT_TRIPLE_CROSS STREQUAL "osx_x64_clang")
 else()
   set(files ${includes} ${sources} ${docs})
   VSFILTERS(${files})
+  GenerateDocs(CraftType)
 endif()
