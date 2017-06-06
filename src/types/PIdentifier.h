@@ -26,6 +26,17 @@ namespace craft {
 	/******************************************************************************
 	** DefaultIdentifier
 	******************************************************************************/
+	template <typename T>
+	class SimpleIdentifier
+		: public Implements<PIdentifier>::For<T>
+	{
+		std::string _name;
+
+	public:
+		inline SimpleIdentifier(std::string const& name): _name(name) { }
+
+		inline virtual std::string identifier() const override { return _name; }
+	};
 
 	namespace _details
 	{
