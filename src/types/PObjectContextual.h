@@ -40,7 +40,7 @@ namespace craft {
 
 		inline virtual void contextualize(instance<> i, std::shared_ptr<Context> c)
 		{
-			//SPDLOG_TRACE(engine()->log, "{0}::contextualize", type<TType>::name());
+			SPDLOG_TRACE(engine()->log, "{0}::contextualize", type<TType>::name());
 			std::invoke(this->_context_func, i.asType<TType>().get(), c);
 		}
 	public:

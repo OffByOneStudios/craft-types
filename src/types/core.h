@@ -46,6 +46,7 @@
 #include "PStringer.h"
 #include "PParse.h"
 #include "PConversion.h"
+#include "PClone.h"
 #include "SLifecycle.h"
 #include "SContainer.h"
 
