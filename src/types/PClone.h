@@ -2,6 +2,8 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
 	/******************************************************************************
 	** PClone
 	******************************************************************************/
@@ -13,7 +15,7 @@ namespace craft {
 	class PClone abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PClone, "types.clone", Singleton);
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PClone, "types.clone", SingletonProviderManager);
 
 	public:
 		virtual instance<> clone(instance<>) = 0;
@@ -43,4 +45,4 @@ namespace craft {
 			}
 		}
 	};
-}
+}}

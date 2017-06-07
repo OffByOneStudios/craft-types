@@ -148,9 +148,9 @@ go_bandit([]()
 			{
 				AssertThat(inst.get(), IsNull());
 			});
-			it("typeId is 0", [&]()
+			it("typeId is None", [&]()
 			{
-				AssertThat(inst.typeId(), Equals(0));
+				AssertThat(inst.typeId(), Equals(types::None));
 			});
 
 			describe("empty providers,", std::bind(describe_no_empty_providers<void>, inst));

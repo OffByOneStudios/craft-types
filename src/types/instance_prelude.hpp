@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	namespace _details
 	{
@@ -111,13 +112,14 @@ namespace craft
 		}
 
 		//
-		// Defined Elsewhere
+		// Defined in instance.hpp
 		//
-		template<typename TFeature>
-		inline TFeature* getFeature() const;
-
-		template<typename TFeature>
-		inline bool hasFeature() const;
+		template<typename TFeature> inline bool hasFeature() const;
+		template<typename TFeature> inline TFeature* getFeature() const;
 	};
+
+}
+
+using ::craft::types::instance;
 
 }

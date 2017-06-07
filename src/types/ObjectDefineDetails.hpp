@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	namespace _details
 	{
@@ -18,7 +19,7 @@ namespace craft
 
 			ObjectDefineInterfacedHelper(ObjectDefineInterfacedHelper const&) = default;
 
-			friend class ::craft::Types;
+			friend class ::craft::types::Types;
 			friend class ObjectDefineHelper<TType>;
 		public:
 			// TODO type check these
@@ -95,7 +96,7 @@ namespace craft
 			ObjectDefineHelper(ObjectDefineHelper const&) = default;
 
 			template <typename T> friend class ObjectDefineHelper;
-			friend class ::craft::Types;
+			friend class ::craft::types::Types;
 		public:
 			template<typename TInterface>
 			inline ObjectDefineInterfacedHelper<TType, TInterface>
@@ -126,4 +127,4 @@ namespace craft
 			}
 		};
 	}
-}
+}}

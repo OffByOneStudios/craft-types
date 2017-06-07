@@ -2,17 +2,25 @@
 #include "common.h"
 
 class SEmptyTestFactory abstract
-	: public craft::Aspect
+	: public craft::types::Aspect
 {
-	CRAFT_ASPECT_DECLARE(SEmptyTestFactory, "types.test.empty.factory", Factory);
+	CRAFT_ASPECT_DECLARE(SEmptyTestFactory, "types.test.empty.factory", craft::types::FactoryAspectManager);
 };
 
 class SEmptyTestInstance abstract
-	: public craft::Aspect
+	: public craft::types::Aspect
 {
-	CRAFT_ASPECT_DECLARE(SEmptyTestInstance, "types.test.empty.instance", Instance);
+	CRAFT_ASPECT_DECLARE(SEmptyTestInstance, "types.test.empty.instance", craft::types::InstanceAspectManager);
 };
 
+template<template<typename> typename T>
+inline void describe_for_empty_aspects(std::string desc)
+{
+	bandit::describe(desc, []() {
+		bandit::describe("SEmptyTestFactory", T<SEmptyTestFactory>());
+		bandit::describe("SEmptyTestInstance", T<SEmptyTestInstance>());
+	});
+};
 
 template<typename T>
 void describe_no_empty_aspects(craft::instance<T> &_)

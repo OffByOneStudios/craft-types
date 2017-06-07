@@ -6,5 +6,6 @@
 
 int main(int argc, char const *argv[])
 {
-  return bandit::run(argc, (char**)argv);
+	craft::types::system().init();
+	return bandit::run(argc, (char**)argv);
 }

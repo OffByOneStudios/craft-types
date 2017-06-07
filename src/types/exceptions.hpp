@@ -1,7 +1,8 @@
 #pragma once
 #include "common.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	class type_error : public stdext::exception
 	{
@@ -11,4 +12,4 @@ namespace craft
 		{
 		}
 	};
-}
+}}

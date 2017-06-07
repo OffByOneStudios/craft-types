@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	/******************************************************************************
 	** Aspect
@@ -94,23 +95,23 @@ namespace craft
 		inline virtual void destroy(TAspect* aspect) override { }
 	};
 
-}
+}}
 
 #define CRAFT_ASPECT_DECLARE(x, name, manager) \
-	static ::craft::Feature::_ider _id; \
+	static ::craft::types::Feature::_static_init __si; \
 protected: \
-	typedef typename ::craft::manager##AspectManager< x > T_Manager; \
+	typedef typename manager < x > T_Manager; \
 private: \
 	friend T_Manager; \
-	friend class ::craft::Types; \
+	friend class ::craft::types::Types; \
 public: \
-	static constexpr auto craft_c_featureKind = ::craft::FeatureKind::Aspect; \
+	static constexpr auto craft_c_featureKind = ::craft::types::FeatureKind::Aspect; \
 	static constexpr auto craft_c_featureName = name; \
-	static inline ::craft::FeatureId craft_s_featureId() { return x::_id.id; } \
+	static inline ::craft::types::FeatureId craft_s_featureId() { return x::__si.id; } \
 protected: \
-	virtual ::craft::IFeatureManager* craft_featureManager() const override \
-	{ return ::craft::types().getManager(x::craft_s_featureId()); } \
+	virtual ::craft::types::IFeatureManager* craft_featureManager() const override \
+	{ return ::craft::types::system().getManager(x::craft_s_featureId()); } \
 private:
 
 #define CRAFT_ASPECT_DEFINE(x) \
-	::craft::Feature::_ider x::_id;
+	::craft::types::Feature::_static_init x::__si([](){ ::craft::types::system().getManager< x >(); });

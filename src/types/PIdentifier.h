@@ -2,6 +2,8 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
 
 	/******************************************************************************
 	** PIdentifier
@@ -14,7 +16,7 @@ namespace craft {
 	class PIdentifier abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id", NamedSingleton);
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id", NamedSingletonProviderManager);
 
 	public:
 		virtual std::string identifier() const = 0;
@@ -66,4 +68,4 @@ namespace craft {
 			inline virtual std::string identifier() const override { return _typename; }
 		};
 	}
-}
+}}

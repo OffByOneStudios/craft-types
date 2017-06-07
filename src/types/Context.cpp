@@ -2,7 +2,8 @@
 #include "./Context.h"
 
 using namespace craft;
-using namespace craft::_details;
+using namespace craft::types;
+using namespace craft::types::_details;
 
 /******************************************************************************
 ** _ContextQueryable
@@ -60,7 +61,7 @@ public:
 			_prime = it->second;
 	}
 
-	_ContextQueryable(std::shared_ptr<_ContextQueryable const> parent, SearchKind kind, uintptr_t value)
+	_ContextQueryable(std::shared_ptr<_ContextQueryable const> parent, SearchKind kind, size_t value)
 		: _ContextQueryable(parent)
 	{
 		_searchKind = kind;
@@ -90,7 +91,7 @@ public:
 			_prime = it->second;
 	}
 
-	_ContextQueryable(std::shared_ptr<Context const> parent, SearchKind kind, uintptr_t value)
+	_ContextQueryable(std::shared_ptr<Context const> parent, SearchKind kind, size_t value)
 		: _ContextQueryable(parent)
 	{
 		_searchKind = kind;
@@ -181,11 +182,11 @@ public:
 	}
 	virtual std::shared_ptr<IContextQueryable> byFeature(FeatureId const& i_id) const override
 	{
-		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Feature, i_id);
+		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Feature, (size_t)i_id);
 	}
 	virtual std::shared_ptr<IContextQueryable> byType(TypeId const& t_id) const override
 	{
-		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, t_id);
+		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, (size_t)t_id);
 	}
 
 	virtual std::set<instance<>> const& objects() const override
@@ -303,11 +304,11 @@ std::shared_ptr<IContextQueryable> Context::byName(std::string const& name) cons
 }
 std::shared_ptr<IContextQueryable> Context::byFeature(FeatureId const& i_id) const
 {
-	return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Feature, i_id);
+	return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Feature, (size_t)i_id);
 }
 std::shared_ptr<IContextQueryable> Context::byType(TypeId const& t_id) const
 {
-	return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, t_id);
+	return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, (size_t)t_id);
 }
 
 std::set<instance<>> const& Context::objects() const

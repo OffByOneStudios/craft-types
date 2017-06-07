@@ -10,7 +10,8 @@
 	have metadata, as the meta data might not be properly destructed.
 */
 
-namespace craft
+namespace craft {
+namespace types
 {
 	/******************************************************************************
 	** Instance Generic, Defines
@@ -20,13 +21,13 @@ namespace craft
 	TFeature* instance<void>::getFeature() const
 	{
 		if (this->_actual == nullptr) return nullptr;
-		return types().get<TFeature>(*this);
+		return system().get<TFeature>(*this);
 	}
 
 	template<typename TFeature>
 	bool instance<void>::hasFeature() const
 	{
-		return types().has<TFeature>(typeId());
+		return system().has<TFeature>(typeId());
 	}
 
 	/******************************************************************************
@@ -147,7 +148,7 @@ namespace craft
 			typename std::enable_if< std::is_base_of<Provider, _T>::value >::type* = nullptr>
 			static inline instance<_T> forType(TypeId type)
 		{
-			auto actual = types().get<_T>(type);
+			auto actual = type.getFeature<_T>();
 
 			return instance<_T>(actual, type);
 		}
@@ -223,13 +224,13 @@ namespace craft
 		template<typename TFeature>
 		inline TFeature* getFeature() const
 		{
-			return types().get<TFeature>((instance<> const&)*this);
+			return system().get<TFeature>((instance<> const&)*this);
 		}
 
 		template<typename TFeature>
 		inline bool hasFeature() const
 		{
-			return types().has<TFeature>(typeId());
+			return system().has<TFeature>(typeId());
 		}
 
 		template<typename TFeature>
@@ -270,142 +271,6 @@ namespace craft
 		}
 	};
 
-	/******************************************************************************
-	** Instance Feature, Main
-	******************************************************************************/
-
-	/* T:
-	This instance type provides access to a typed feature.
-	*/
-
-	/*
-	template<typename TFeature>
-	struct instance<TFeature,
-		typename std::enable_if< craft::type<TFeature>::is_feature >::type >
-	{
-	private:
-		mutable _details::InstanceMetaHeader*    _meta;
-		mutable TFeature*                        _feature;
-
-		template<typename T, typename T_> friend struct instance;
-
-		template<typename T> friend bool operator==(instance<T> const&, instance<T> const&);
-		template<typename T> friend bool operator!=(instance<T> const&, instance<T> const&);
-		template<typename T> friend bool operator<(instance<T> const&, instance<T> const&);
-		template<typename T> friend bool operator>(instance<T> const&, instance<T> const&);
-	//
-	// Constructors
-	//
-	private:
-		inline instance(TFeature* feat, TypeId tid)
-			: _meta(new _details::InstanceMetaHeader(tid, nullptr))
-			, _feature(feat)
-		{
-		}
-	public:
-
-		template<typename TType,
-			typename _TFeature = TFeature,
-			typename std::enable_if< std::is_base_of<Provider, _TFeature>::value >::type* = nullptr>
-		static inline instance<TFeature> make()
-		{
-			auto actual = types().get<TFeature>(type<TType>::typeId());
-
-			return instance<TFeature>(actual, type<TType>::typeId());
-		}
-
-	//
-	// Conversions
-	//
-	public:
-		inline operator instance<void>() const { return instance<void>(_meta); }
-
-		template<typename T, typename std::enable_if< std::is_base_of<Object, T>::value >::type>
-		inline operator instance<T>() const { return asType<T>(); }
-
-
-	//
-	// Helper Features
-	//
-	public:
-		template<typename TFeatureOther>
-		inline TFeatureOther* getFeature() const
-		{
-			if (TFeature::craft_s_featureId() == TFeature::craft_s_featureId())
-				return _feature;
-			return types().get<TFeature>(*this);
-		}
-	};
-	*/
-	/******************************************************************************
-	** Instance Type, Main
-	******************************************************************************/
-
-	/* T:
-	This instance type provides access to an external type
-	*/
-
-	/*
-
-	template<typename TValue>
-	struct instance<TValue,
-		typename std::enable_if< craft::type<TValue>::isExternal >::type >
-	{
-	private:
-		mutable _details::InstanceMetaHeader*    _meta;
-		mutable TValue*                          _value;
-
-		template<typename T, typename T_> friend struct instance;
-
-		template<typename T> friend bool operator==(instance<T> const&, instance<T> const&);
-		template<typename T> friend bool operator!=(instance<T> const&, instance<T> const&);
-		template<typename T> friend bool operator<(instance<T> const&, instance<T> const&);
-		template<typename T> friend bool operator>(instance<T> const&, instance<T> const&);
-
-		//
-		// Constructors
-		//
-	public:
-		inline instance()
-			: _meta(nullptr)
-			, _value(nullptr)
-		{
-		}
-
-		inline instance(instance<void> const& inst)
-			: _meta(inst._meta)
-			, _value((TValue*)inst._actual)
-		{
-		}
-
-		inline instance(TValue* ptr)
-			: _meta(new _details::InstanceMetaHeader(type<TValue>::typeId(), ptr))
-			, _value(ptr)
-		{
-
-		}
-
-		template<typename... TArgs>
-		static inline instance<TValue> make(TArgs&&... args)
-		{
-			TValue* value = new TValue(args...);
-
-			return instance<TValue>(value);
-		}
-
-		//
-		// Conversions
-		//
-	public:
-		inline operator instance<void>() const
-		{
-			if (_meta == nullptr) return instance<void>();
-			return instance<void>(_meta->actual, _meta);
-		}
-
-	};
-	*/
-
 	//
 	// Operators
 	//
@@ -435,4 +300,4 @@ namespace craft
 		if (_that._meta == nullptr) return true;
 		return _this._meta->actual > _that._meta->actual;
 	}
-}
+}}

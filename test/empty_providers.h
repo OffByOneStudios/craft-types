@@ -2,25 +2,35 @@
 #include "common.h"
 
 class PEmptyTestSingleton abstract
-	: public craft::Provider
+	: public craft::types::Provider
 {
-	CRAFT_PROVIDER_DECLARE(PEmptyTestSingleton, "types.test.empty.singleton", Singleton);
+	CRAFT_PROVIDER_DECLARE(PEmptyTestSingleton, "types.test.empty.singleton", craft::types::SingletonProviderManager);
 };
 
 class PEmptyTestSingletonNamed abstract
-	: public craft::Provider
+	: public craft::types::Provider
 {
-	CRAFT_PROVIDER_DECLARE(PEmptyTestSingletonNamed, "types.test.empty.singleton-named", NamedSingleton);
+	CRAFT_PROVIDER_DECLARE(PEmptyTestSingletonNamed, "types.test.empty.singleton-named", craft::types::NamedSingletonProviderManager);
 
 	virtual std::string provider_index() = 0;
 };
 
 class PEmptyTestSingletonTagged abstract
-	: public craft::Provider
+	: public craft::types::Provider
 {
-	CRAFT_PROVIDER_DECLARE(PEmptyTestSingletonTagged, "types.test.empty.singleton-tagged", TaggedSingleton);
+	CRAFT_PROVIDER_DECLARE(PEmptyTestSingletonTagged, "types.test.empty.singleton-tagged", craft::types::TaggedSingletonProviderManager);
 
 	virtual std::vector<std::string> provider_tags() = 0;
+};
+
+template<template<typename> typename T>
+inline void describe_for_empty_providers(std::string desc)
+{
+	bandit::describe(desc, []() {
+		bandit::describe("PEmptyTestSingleton", T<PEmptyTestSingleton>());
+		bandit::describe("PEmptyTestSingletonNamed", T<PEmptyTestSingletonNamed>());
+		bandit::describe("PEmptyTestSingletonTagged", T<PEmptyTestSingletonTagged>());
+	});
 };
 
 template<typename T>

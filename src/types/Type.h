@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	/******************************************************************************
 	** Implements
@@ -80,23 +81,23 @@ namespace craft
 			inline virtual instance<> craft_featuredInstance() override { return _instance; };
 		};
 	};
-}
+}}
 
 #define CRAFT_TYPE_DECLARE(_dll, x) \
 template <> \
-struct ::craft::type<x> \
-	: public ::craft::type<void> \
-	, protected ::craft::_details::type_impl \
+struct ::craft::types::type<x> \
+	: public ::craft::types::type<void> \
+	, protected ::craft::types::_details::type_impl \
 { \
 private: \
-	static void s_types_init(::craft::_details::ObjectDefineHelper<x> _); \
+	static void s_types_init(::craft::types::_details::ObjectDefineHelper<x> _); \
 protected: \
-	_dll static ::craft::_details::type_impl::_static_init __si; \
+	_dll static ::craft::types::_details::type_impl::_static_init __si; \
 public: \
-	inline static TypeId typeId() { return __si.id; } \
+	inline static ::craft::types::TypeId typeId() { return __si.id; } \
 	static constexpr bool isExternal = true; \
 }; \
 
 #define CRAFT_TYPE_DEFINE(x) \
-	::craft::_details::type_impl::_static_init craft::type<x>::__si((::craft::_details::_fn_register_type_init)&::craft::type<x>::s_types_init); \
-	void ::craft::type<x>::s_types_init(::craft::_details::ObjectDefineHelper<x> _)
+	::craft::types::_details::type_impl::_static_init craft::type<x>::__si((::craft::types::_details::_fn_register_type_init)&::craft::types::type<x>::s_types_init); \
+	void ::craft::types::type<x>::s_types_init(::craft::types::_details::ObjectDefineHelper<x> _)

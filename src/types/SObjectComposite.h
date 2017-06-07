@@ -2,6 +2,8 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
 	/******************************************************************************
 	** SObjectComposite
 	******************************************************************************/
@@ -9,7 +11,7 @@ namespace craft {
 	class SObjectComposite abstract
 		: public Aspect
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectComposite, "types.attrs", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectComposite, "types.attrs", FactoryAspectManager);
 
 	public:
 
@@ -160,7 +162,7 @@ namespace craft {
 			l.id = listingId;
 			l.name = name;
 			l.typeId = typeId;
-			l.runtimeTyped = typeId == 0;
+			l.runtimeTyped = typeId == types::None;
 			l.isUpdateable = false;
 			_listing.push_back(l);
 
@@ -207,4 +209,4 @@ namespace craft {
 			delete (Description*)aspect;
 		}
 	};
-}
+}}

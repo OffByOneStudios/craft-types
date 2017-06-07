@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	/******************************************************************************
 	** Object
@@ -80,25 +81,25 @@ namespace craft
 		: public type<void>
 	{
 	};
-}
+}}
 
 #define CRAFT_OBJECT_DECLARE(x) \
-    static ::craft::_details::type_impl::_static_init __si; \
+    static ::craft::types::_details::type_impl::_static_init __si; \
 private: \
-    static void craft_s_types_init(::craft::_details::ObjectDefineHelper<x> _); \
+    static void craft_s_types_init(::craft::types::_details::ObjectDefineHelper<x> _); \
 public: \
-    static inline ::craft::TypeId craft_s_typeId() { return x::__si.id; } \
+    static inline ::craft::types::TypeId craft_s_typeId() { return x::__si.id; } \
 	static inline ::std::string craft_s_typeName() { return #x; } \
-    inline virtual ::craft::TypeId craft_typeId() const override { return craft_s_typeId(); } \
+    inline virtual ::craft::types::TypeId craft_typeId() const override { return craft_s_typeId(); } \
 	inline virtual void* craft_instance() override { return reinterpret_cast<void*>(static_cast<x*>(this)); } \
 private:
 
 #define CRAFT_OBJECT_DEFINE(x) \
-	::craft::_details::type_impl::_static_init x::__si((::craft::_details::_fn_register_type_init)&x::craft_s_types_init); \
-	void x::craft_s_types_init(::craft::_details::ObjectDefineHelper<x> _)
+	::craft::types::_details::type_impl::_static_init x::__si((::craft::types::_details::_fn_register_type_init)&x::craft_s_types_init); \
+	void x::craft_s_types_init(::craft::types::_details::ObjectDefineHelper<x> _)
 
 #define CRAFT_OBJECT_ABSTRACT_DECLARE(x) \
 private: \
-    template<typename T> friend class ::craft::_details::ObjectDefineHelper; \
+    template<typename T> friend class ::craft::types::_details::ObjectDefineHelper; \
 	template<typename T> \
-    inline static void craft_s_types_init(::craft::_details::ObjectDefineHelper<T> _)
+    inline static void craft_s_types_init(::craft::types::_details::ObjectDefineHelper<T> _)

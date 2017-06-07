@@ -1,7 +1,8 @@
 #pragma once
 #include "common.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 
 	// http://stackoverflow.com/questions/3347879/c-downcasting-a-diamond-shape-inherited-object-without-rtti-dynamic-cast
@@ -15,14 +16,26 @@ namespace craft
 		static CRAFT_TYPE_EXPORTED Types& instance();
 
 	private:
-		// Manager Stores
+		//
+		// Storage
+		//
+
+		// Feature Manager Storage
 		std::map<FeatureId, IFeatureManager*> _fmsById;
 		std::map<std::string, IFeatureManager*> _fmsByName;
 
+		//
+		// Initializers
+		//
+
 		// Type Initializers
-		std::map<TypeId, _details::_fn_register_type_init> _initers;
-		friend CRAFT_TYPE_EXPORTED void ::craft::_details::_register_type_init(TypeId, _details::_fn_register_type_init);
-		template<typename T> friend class ::craft::_details::ObjectDefineHelper;
+		std::map<TypeId, _details::_fn_register_type_init> _initersForTypes;
+		friend CRAFT_TYPE_EXPORTED void ::craft::types::_details::_register_type_init(TypeId, _details::_fn_register_type_init);
+		template<typename T> friend class ::craft::types::_details::ObjectDefineHelper;
+
+		// Feature Initializers
+		std::map<FeatureId, _details::_fn_register_feature_init> _initersForFeatures;
+		friend CRAFT_TYPE_EXPORTED void ::craft::types::_details::_register_feature_init(FeatureId, _details::_fn_register_feature_init);
 
 	protected:
 		template<typename TInterface, FeatureKind kind>
@@ -51,26 +64,6 @@ namespace craft
 				auto it = _this->_fmsById.find(TFeature::craft_s_featureId());
 				return (it != _this->_fmsById.end() && ((typename TFeature::T_Manager*)it->second)->hasProvider(type));
 			}
-			/*
-			static inline void add(Types* _this, TypeId type, TFeature* instance)
-			{
-				if (_this->_imsById.find(TFeature::craft_s_interfaceId()) == _this->_imsById.end())
-				{
-					IFeatureManager* n = TFeature::craft_s_interfaceManager();
-					assert(n->im_interface() == TFeature::craft_s_interfaceId());
-					assert(n->im_kind() == InterfaceKind::Singleton);
-					_this->_imsById[TInterface::craft_s_interfaceId()] = n;
-					_this->_imsByName[TInterface::craft_c_interfaceName] = n;
-				}
-
-				im(_this)->im_add(type, instance);
-			}
-			template<typename T>
-			static inline void add(Types* _this, TFeature* instance)
-			{
-				add(_this, T::craft_s_typeId(), instance);
-			}
-			*/
 		};
 
 		template<typename TFeature>
@@ -94,27 +87,6 @@ namespace craft
 				auto it = _this->_fmsById.find(TFeature::craft_s_featureId());
 				return (it != _this->_fmsById.end() && ((typename TFeature::T_Manager*)it->second)->canMakeAspect(type));
 			}
-
-			/*
-			static inline void add(Types* _this, TypeId type, IInterfaceManagerProviderFactory<TInterface>* instance)
-			{
-				if (_this->_imsById.find(TInterface::craft_s_interfaceId()) == _this->_imsById.end())
-				{
-					IFeatureManager* n = TInterface::craft_s_interfaceManager();
-					assert(n->im_interface() == TInterface::craft_s_interfaceId());
-					assert(n->im_kind() == InterfaceKind::Provider);
-					_this->_imsById[TFeature::craft_s_interfaceId()] = n;
-					_this->_imsByName[TFeature::craft_c_interfaceName] = n;
-				}
-
-				im(_this)->im_add(type, instance);
-			}
-			template<typename T>
-			static inline void add(Types* _this, IInterfaceManagerProviderFactory<TInterface>* instance)
-			{
-				add(_this, T::craft_s_typeId(), instance);
-			}
-			*/
 		};
 
 	public:
@@ -125,7 +97,7 @@ namespace craft
 		{
 			auto it = _fmsById.find(fid);
 			if (it == _fmsById.end())
-				throw craft::type_error("Types::getManager() | manager not registered");
+				throw type_error("Types::getManager() | manager not registered");
 			return it->second;
 		}
 
@@ -137,7 +109,7 @@ namespace craft
 			{
 				return (typename TFeature::T_Manager*)getManager(fid);
 			}
-			catch (craft::type_error)
+			catch (type_error)
 			{
 				typename TFeature::T_Manager* tman = new typename TFeature::T_Manager();
 				_fmsById[fid] = tman;
@@ -169,18 +141,35 @@ namespace craft
 		{
 			auto manager = getManager<TFeature>();
 			auto tid = manager->index(name);
-			if (tid == 0) return nullptr;
+			if (tid == types::None) return nullptr;
 			return (TFeature*)manager->getProvider(tid);
 		}
 	};
 
-	inline Types& types()
+	inline Types& system()
 	{
-		return ::craft::Types::instance();
+		return ::craft::types::Types::instance();
 	}
 
 	namespace _details
 	{
 		CRAFT_TYPE_EXPORTED void _register_type_init(TypeId id, _fn_register_type_init _init);
 	}
-}
+
+	template<typename TFeature>
+	inline TFeature* TypeId::getFeature() const
+	{
+		return system().get<TFeature>(*this);
+	}
+
+	template<typename TFeature>
+	inline bool TypeId::hasFeature() const
+	{
+		return system().has<TFeature>(*this);
+	}
+
+	inline IFeatureManager* FeatureId::getManager() const
+	{
+		return system().getManager(*this);
+	}
+}}

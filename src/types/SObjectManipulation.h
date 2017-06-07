@@ -2,6 +2,9 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
+
 	/******************************************************************************
 	** SObjectManipulation
 	******************************************************************************/
@@ -9,7 +12,7 @@ namespace craft {
 	class SObjectManipulation abstract
 		: public Aspect
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectManipulation, "types.funcs", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectManipulation, "types.funcs", FactoryAspectManager);
 
 	public:
 
@@ -262,4 +265,4 @@ namespace craft {
 			delete (Description*)aspect;
 		}
 	};
-}
+}}

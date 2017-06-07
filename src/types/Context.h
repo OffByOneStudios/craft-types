@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	class IContextQueryable abstract
 	{
@@ -113,4 +114,4 @@ namespace craft
 		CRAFT_TYPE_EXPORTED virtual std::set<instance<>> const& objects() const override;
 		CRAFT_TYPE_EXPORTED virtual instance<> prime() const override;
 	};
-}
+}}

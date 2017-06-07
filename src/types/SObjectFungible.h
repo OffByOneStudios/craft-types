@@ -2,6 +2,9 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
+
 	/******************************************************************************
 	** SObjectFungible
 	******************************************************************************/
@@ -9,7 +12,7 @@ namespace craft {
 	class SObjectFungible abstract
 		: public Aspect
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", FactoryAspectManager);
 
 	public:
 		/* T:
@@ -45,4 +48,4 @@ namespace craft {
 	public:
 		CRAFT_TYPE_EXPORTED virtual Signal<void(instance<> origInst, instance<> newInst)>& objectFungible_onUpdate() override;
 	};
-}
+}}

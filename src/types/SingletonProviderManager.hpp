@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 
 	/******************************************************************************
@@ -147,4 +148,4 @@ namespace craft
 			return it->second;
 		}
 	};
-}
+}}

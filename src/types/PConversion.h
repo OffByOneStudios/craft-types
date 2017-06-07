@@ -2,6 +2,8 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
 	/******************************************************************************
 	** PConversion
 	******************************************************************************/
@@ -13,7 +15,7 @@ namespace craft {
 	class PConversion abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConversion, "types.convert", Singleton);
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConversion, "types.convert", SingletonProviderManager);
 
 	public:
 		virtual std::set<TypeId> const& possibleConversions(instance<> converting, TypeId toType) const = 0;
@@ -31,4 +33,4 @@ namespace craft {
 	private:
 		
 	};
-}
+}}

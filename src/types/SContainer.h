@@ -2,6 +2,9 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
+
 	/******************************************************************************
 	** SContainer
 	******************************************************************************/
@@ -9,7 +12,7 @@ namespace craft {
 	class SContainer abstract
 		: public Aspect
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SContainer, "types.container", Factory);
+		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SContainer, "types.container", FactoryAspectManager);
 
 	public:
 		struct Description
@@ -168,4 +171,4 @@ namespace craft {
 		}
 
 	};
-}
+}}

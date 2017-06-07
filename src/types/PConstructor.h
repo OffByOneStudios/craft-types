@@ -2,6 +2,8 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
 
 	/******************************************************************************
 	** PIdentifier
@@ -17,7 +19,7 @@ namespace craft {
 	class PConstructor abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConstructor, "types.constructor", Singleton);
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConstructor, "types.constructor", SingletonProviderManager);
 
 	public:
 		typedef uintptr_t ListingId;
@@ -102,4 +104,4 @@ namespace craft {
 			}
 		};
 	}
-}
+}}

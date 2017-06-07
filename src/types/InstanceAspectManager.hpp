@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	/******************************************************************************
 	** InstanceAspectManager
@@ -69,4 +70,4 @@ namespace craft
 			_overrideInstances[instance] = aspect;
 		}
 	};
-}
+}}

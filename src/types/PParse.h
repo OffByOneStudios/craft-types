@@ -2,6 +2,9 @@
 #include "common.h"
 
 namespace craft {
+namespace types
+{
+
 	/******************************************************************************
 	** PParse
 	******************************************************************************/
@@ -13,7 +16,7 @@ namespace craft {
 	class PParse abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PParse, "types.parse", Singleton);
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PParse, "types.parse", SingletonProviderManager);
 
 	public:
 		virtual instance<> parse(std::string str) const noexcept = 0;
@@ -51,4 +54,4 @@ namespace craft {
 			}
 		}
 	};
-}
+}}

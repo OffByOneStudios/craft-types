@@ -2,7 +2,8 @@
 #include "common.h"
 #include "core.h"
 
-namespace craft
+namespace craft {
+namespace types
 {
 	enum class FeatureKind
 	{
@@ -48,11 +49,13 @@ namespace craft
 
 		// Implementation details
 	protected:
-		struct _ider : Ider<FeatureId>
+		struct _static_init : Ider<FeatureId>
 		{
-			_ider()
+			inline _static_init(_details::_fn_register_feature_init _init)
 				: Ider<FeatureId>(Feature::_id++)
-			{ }
+			{
+				_details::_register_feature_init(_id, _init);
+			}
 		};
 
 	private:
@@ -74,4 +77,4 @@ namespace craft
 		inline static FeatureId featureId() { return TFeature::craft_s_featureId(); }
 		inline static std::string name() { return TFeature::craft_c_featureName; }
 	};
-}
+}}

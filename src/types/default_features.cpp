@@ -1,7 +1,7 @@
 #include "common.h"
 #include "core.h"
 
-using namespace craft;
+using namespace craft::types;
 
 // Core Providers
 CRAFT_PROVIDER_DEFINE(PIdentifier);
