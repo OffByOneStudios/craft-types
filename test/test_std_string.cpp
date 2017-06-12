@@ -66,6 +66,12 @@ go_bandit([]()
 
 		describe("`<Provider: types.parse>`", [&]()
 		{
+			instance<PParse> parser;
+
+			before_each([&]() {
+				parser = inst.asFeature<PParse>();
+			});
+
 			it(".hasFeature<PParse>() is true", [&]()
 			{
 				AssertThat(inst.hasFeature<PParse>(), IsTrue());
@@ -73,12 +79,6 @@ go_bandit([]()
 			it(".getFeature<PParse>() is not nullptr", [&]()
 			{
 				AssertThat(inst.getFeature<PParse>(), !IsNull());
-			});
-
-			instance<PParse> parser;
-
-			before_each([&]() {
-				parser = inst.asFeature<PParse>();
 			});
 
 			it(".parse(\"test\") is not null", [&]()
@@ -131,6 +131,12 @@ go_bandit([]()
 
 			describe("`<Provider: types.str>`", [&]()
 			{
+				instance<PStringer> stringer;
+
+				before_each([&]() {
+					stringer = inst.asFeature<PStringer>();
+				});
+
 				it(".hasFeature<PStringer>() is true", [&]()
 				{
 					AssertThat(inst.hasFeature<PStringer>(), IsTrue());
@@ -138,12 +144,6 @@ go_bandit([]()
 				it(".getFeature<PStringer>() is not nullptr", [&]()
 				{
 					AssertThat(inst.getFeature<PStringer>(), !IsNull());
-				});
-
-				instance<PStringer> stringer;
-
-				before_each([&]() {
-					stringer = inst.asFeature<PStringer>();
 				});
 
 				it(".toString(_) is \"test\"", [&]()
