@@ -210,8 +210,9 @@ Context::Context(
 	std::shared_ptr<Context> parent,
 	instance<> prime
 )
-	: _parent(parent)
-	, _prime(prime)
+	:
+  _prime(prime)
+  , _parent(parent)
 	, _finalized(false)
 {
 
