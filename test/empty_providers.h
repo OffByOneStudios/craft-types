@@ -26,7 +26,7 @@ class PEmptyTestSingletonTagged abstract
 template<template<typename> typename T>
 inline void describe_for_empty_providers(std::string desc)
 {
-	bandit::describe(desc, []() {
+	bandit::describe(desc.c_str(), []() {
 		bandit::describe("PEmptyTestSingleton", T<PEmptyTestSingleton>());
 		bandit::describe("PEmptyTestSingletonNamed", T<PEmptyTestSingletonNamed>());
 		bandit::describe("PEmptyTestSingletonTagged", T<PEmptyTestSingletonTagged>());

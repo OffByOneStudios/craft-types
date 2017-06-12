@@ -100,7 +100,7 @@ namespace types
 #define CRAFT_ASPECT_DECLARE(x, name, manager) \
 	static ::craft::types::Feature::_static_init __si; \
 protected: \
-	typedef typename manager < x > T_Manager; \
+	typedef manager < x > T_Manager; \
 private: \
 	friend T_Manager; \
 	friend class ::craft::types::Types; \

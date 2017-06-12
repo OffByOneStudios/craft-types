@@ -17,7 +17,7 @@ namespace types
 	class PIdentifier abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id", NamedSingletonProviderManager);
+		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id",  NamedSingletonProviderManager);
 
 	public:
 		virtual std::string identifier() const = 0;

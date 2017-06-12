@@ -132,7 +132,7 @@ namespace types
 
 		inline virtual void addSingleton(TypeId tid, TProvider* singleton) override
 		{
-			typename SingletonProviderManager<TProvider>::addSingleton(tid, singleton);
+			SingletonProviderManager<TProvider>::addSingleton(tid, singleton);
 
 			for (auto tag : singleton->provider_tags())
 			{

@@ -16,7 +16,7 @@ class SEmptyTestInstance abstract
 template<template<typename> typename T>
 inline void describe_for_empty_aspects(std::string desc)
 {
-	bandit::describe(desc, []() {
+	bandit::describe(desc.c_str(), []() {
 		bandit::describe("SEmptyTestFactory", T<SEmptyTestFactory>());
 		bandit::describe("SEmptyTestInstance", T<SEmptyTestInstance>());
 	});

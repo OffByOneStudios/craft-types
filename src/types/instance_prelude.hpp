@@ -73,7 +73,7 @@ namespace types
 			, _meta(new _details::InstanceMetaHeader(type<T>::typeId(), ptr))
 		{ }
 
-		inline TypeId typeId() const { return _meta == nullptr ? 0 : _meta->typeId; }
+		inline TypeId typeId() const { return _meta == nullptr ? (TypeId)0 : _meta->typeId; }
 
 		template<typename T, typename std::enable_if< std::is_base_of<Object, T>::value >::type>
 		inline operator instance<T>() const { return asType<T>(); }
