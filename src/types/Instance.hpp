@@ -128,7 +128,7 @@ namespace types
 		template<typename TObject,
 			typename _T = T,
 			typename std::enable_if< type<_T>::isFeature
-                && type<TObject>::isObject
+                && (type<TObject>::isObject || type<TObject>::isExternal)
 			>::type* = nullptr >
 		inline instance(instance<TObject> const& inst)
 			: _actual(inst.template getFeature<_T>())
@@ -242,7 +242,15 @@ namespace types
 	// Helper Features
 	//
 	public:
-		template<typename TFeature>
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_featureKind == ::craft::types::FeatureKind::Provider >::type* = nullptr>
+		inline TFeature* getFeature() const
+		{
+			return system().get<TFeature>(type<T>::typeId());
+		}
+
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_featureKind != ::craft::types::FeatureKind::Provider >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
 			return system().get<TFeature>((instance<> const&)*this);

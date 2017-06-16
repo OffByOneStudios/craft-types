@@ -7,6 +7,7 @@ using namespace bandit;
 using namespace snowhouse;
 
 using namespace craft;
+using namespace craft::types;
 
 go_bandit([]()
 {
