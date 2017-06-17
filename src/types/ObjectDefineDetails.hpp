@@ -122,8 +122,8 @@ namespace types
 				if (_parent != nullptr) return;
 
 				auto const id = type<TType>::typeId();
-				if (!_types.has<PIdentifier>(id)) use<PIdentifier>().template singleton<_details::DefaultIdentifier>();
-				if (!_types.has<PConstructor>(id)) use<PConstructor>().template singleton<_details::DefaultConstructor>();
+				if (!_types.has<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
+				if (!_types.has<PConstructor>(id)) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
 		};
 	}
