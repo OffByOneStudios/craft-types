@@ -83,6 +83,8 @@ public: \
 public: \
 	virtual ::craft::types::IFeatureManager* craft_featureManager() const override \
 	{ return ::craft::types::system().getManager(x::craft_s_featureId()); } \
+	inline static T_Manager* craft_s_featureManager() \
+	{ return (T_Manager*)::craft::types::system().getManager(x::craft_s_featureId()); } \
 private:
 
 #define CRAFT_PROVIDER_DEFINE(x) \
