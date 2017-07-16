@@ -15,22 +15,23 @@ namespace types
 	{
 	protected:
 		std::map<void*, TAspect*> _overrideInstances;
+
 	public:
 		virtual ~InstanceAspectManager() = default;
 
 		//
-		// IProviderManager
+		// IAspectManager
 		//
-		inline virtual bool canMakeAspect(TypeId tid)
+		inline virtual bool hasAspect(TypeId tid, void* instance)
 		{
-			return FactoryAspectManager<TAspect>::canMakeAspect(tid);
+			return _overrideInstances.find(instance) != _overrideInstances.end() || FactoryAspectManager<TAspect>::hasAspect(tid, instance);
 		}
-		inline virtual Aspect* newAspect(TypeId tid, void* instance)
+		inline virtual Aspect* getAspect(TypeId tid, void* instance)
 		{
 			auto it = _overrideInstances.find(instance);
 			if (it == _overrideInstances.end())
 			{
-				return FactoryAspectManager<TAspect>::newAspect(tid, instance);
+				return FactoryAspectManager<TAspect>::getAspect(tid, instance);
 			}
 			else
 			{
@@ -56,7 +57,7 @@ namespace types
 		}
 
 		//
-		// SingletonProviderManager
+		// InstanceAspectManager
 		//
 		inline virtual void addInstanceAspect(void* instance, TAspect* aspect)
 		{

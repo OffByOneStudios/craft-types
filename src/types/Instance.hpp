@@ -27,7 +27,7 @@ namespace types
 	template<typename TFeature>
 	bool instance<void>::hasFeature() const
 	{
-		return system().has<TFeature>(typeId());
+		return system().has<TFeature>(*this);
 	}
 
 	/******************************************************************************
@@ -242,15 +242,7 @@ namespace types
 	// Helper Features
 	//
 	public:
-		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_featureKind == ::craft::types::FeatureKind::Provider >::type* = nullptr>
-		inline TFeature* getFeature() const
-		{
-			return system().get<TFeature>(type<T>::typeId());
-		}
-
-		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_featureKind != ::craft::types::FeatureKind::Provider >::type* = nullptr>
+		template<typename TFeature>
 		inline TFeature* getFeature() const
 		{
 			return system().get<TFeature>((instance<> const&)*this);
@@ -259,7 +251,7 @@ namespace types
 		template<typename TFeature>
 		inline bool hasFeature() const
 		{
-			return system().has<TFeature>(typeId());
+			return system().has<TFeature>((instance<> const&)*this);
 		}
 
 		template<typename TFeature>

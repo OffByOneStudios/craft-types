@@ -35,7 +35,7 @@ namespace types
 		inline TypeId operator ++(int i) { size_t v = id; id++; return v; }
 
 		//
-		// Defined in Types.hpp
+		// Defined in Types.h
 		//
 		template<typename TFeature> inline bool hasFeature() const;
 		template<typename TFeature> inline TFeature* getFeature() const;

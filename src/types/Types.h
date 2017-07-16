@@ -64,6 +64,10 @@ namespace types
 				auto it = _this->_fmsById.find(TFeature::craft_s_featureId());
 				return (it != _this->_fmsById.end() && ((typename TFeature::T_Manager*)it->second)->hasProvider(type));
 			}
+			static inline bool has(Types* _this, ::craft::instance<> const& inst)
+			{
+				return has(_this, inst.typeId());
+			}
 		};
 
 		template<typename TFeature>
@@ -79,13 +83,19 @@ namespace types
 
 			static inline TFeature* get(Types* _this, ::craft::instance<> const& inst)
 			{
-				return (TFeature*)fm(_this)->newAspect(inst.typeId(), (void *)inst.get());
+				return (TFeature*)fm(_this)->getAspect(inst.typeId(), (void *)inst.get());
 			}
 
 			static inline bool has(Types* _this, TypeId type)
 			{
 				auto it = _this->_fmsById.find(TFeature::craft_s_featureId());
-				return (it != _this->_fmsById.end() && ((typename TFeature::T_Manager*)it->second)->canMakeAspect(type));
+				return (it != _this->_fmsById.end() && ((typename TFeature::T_Manager*)it->second)->hasAspect(type, nullptr));
+			}
+
+			static inline bool has(Types* _this, ::craft::instance<> const& inst)
+			{
+				auto it = _this->_fmsById.find(TFeature::craft_s_featureId());
+				return (it != _this->_fmsById.end() && ((typename TFeature::T_Manager*)it->second)->hasAspect(inst.typeId(), (void *)inst.get()));
 			}
 		};
 
@@ -135,8 +145,14 @@ namespace types
 			return impl<TFeature, TFeature::craft_c_featureKind>::has(this, type);
 		}
 
+		template<typename TFeature>
+		inline bool has(::craft::instance<> const& obj)
+		{
+			return impl<TFeature, TFeature::craft_c_featureKind>::has(this, obj);
+		}
+
 		template<typename TFeature,
-			typename std::enable_if<  std::is_base_of<IIndexedProviderManager, typename TFeature::T_Manager>::value  >::type* = nullptr>
+			typename std::enable_if< std::is_base_of<IIndexedProviderManager, typename TFeature::T_Manager>::value >::type* = nullptr>
 		inline TFeature* getIndex(std::string name)
 		{
 			auto manager = getManager<TFeature>();

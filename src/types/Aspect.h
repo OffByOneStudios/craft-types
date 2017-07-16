@@ -37,8 +37,8 @@ namespace types
 		//
 		// IAspectManager
 		//
-		virtual bool canMakeAspect(TypeId tid) = 0;
-		virtual Aspect* newAspect(TypeId tid, void* instance) = 0;
+		virtual bool hasAspect(TypeId tid, void* instance) = 0;
+		virtual Aspect* getAspect(TypeId tid, void* instance) = 0;
 		virtual void deleteAspect(Aspect* aspect) = 0;
 	};
 

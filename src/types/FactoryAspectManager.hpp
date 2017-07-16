@@ -58,12 +58,12 @@ namespace types
 		//
 		// IAspectManager
 		//
-		inline virtual bool canMakeAspect(TypeId tid) override
+		inline virtual bool hasAspect(TypeId tid, void* instance) override
 		{
 			return  _factories.find(tid) != _factories.end();
 		}
 
-		inline virtual Aspect* newAspect(TypeId tid, void* instance) override
+		inline virtual Aspect* getAspect(TypeId tid, void* instance) override
 		{
 			auto it_f = _factories.find(tid);
 
