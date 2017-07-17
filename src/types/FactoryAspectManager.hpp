@@ -68,7 +68,7 @@ namespace types
 			auto it_f = _factories.find(tid);
 
 			if (it_f == _factories.end())
-				throw stdext::exception("FactoryAspectManager::newAspect() | TypeId not found");
+				throw stdext::exception("FactoryAspectManager.getAspect() for `{0}` Type `{1}` not found", this->featureId().toString(), tid.toString());
 
 			auto factory = it_f->second;
 

@@ -56,7 +56,7 @@ namespace types
 		{
 			auto it = _singletons.find(tid);
 			if (it == _singletons.end())
-				throw stdext::exception("SingletonProviderManager::getProvider() | TypeId not found");
+				throw stdext::exception("SingletonProviderManager.getProvider() for `{0}` Type `{1}` not found", this->featureId().toString(), tid.toString());
 			return it->second;
 		}
 		inline virtual void releaseProvider(Provider* provider) override
