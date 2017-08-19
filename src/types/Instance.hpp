@@ -242,7 +242,15 @@ namespace types
 	// Helper Features
 	//
 	public:
-		template<typename TFeature>
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_featureKind != FeatureKind::Aspect >::type* = nullptr>
+		inline TFeature* getFeature() const
+		{
+			return system().get<TFeature>(type<T>::typeId());
+		}
+
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_featureKind == FeatureKind::Aspect >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
 			return system().get<TFeature>((instance<> const&)*this);
@@ -251,7 +259,10 @@ namespace types
 		template<typename TFeature>
 		inline bool hasFeature() const
 		{
-			return system().has<TFeature>((instance<> const&)*this);
+			if (isNull())
+				return system().has<TFeature>(type<T>::typeId());
+			else
+				return system().has<TFeature>((instance<> const&)*this);
 		}
 
 		template<typename TFeature>
