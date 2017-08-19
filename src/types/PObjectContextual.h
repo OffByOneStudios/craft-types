@@ -41,9 +41,9 @@ namespace types
 
 		inline virtual void contextualize(instance<> i, std::shared_ptr<Context> c)
 		{
-			#ifdef CRAFT_TRACE
-        SPDLOG_TRACE(engine()->log, "{0}::contextualize", type<TType>::name());
-      #endif
+		#ifdef CRAFT_TRACE
+			SPDLOG_TRACE(engine()->log, "{0}::contextualize", type<TType>::name());
+		#endif
 			std::invoke(this->_context_func, i.asType<TType>().get(), c);
 		}
 	public:
