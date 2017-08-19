@@ -121,7 +121,7 @@ namespace types
 
 			template<typename T, typename>
 			friend struct type;
-		protected:
+		public:
 			struct _static_init : Ider<TypeId>
 			{
 				inline _static_init(_details::_fn_register_type_init _init)
