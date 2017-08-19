@@ -5,6 +5,12 @@ using namespace craft;
 using namespace craft::types;
 using namespace craft::types::_details;
 
+CRAFT_OBJECT_DEFINE(craft::types::Context)
+{
+
+	_.defaults();
+}
+
 /******************************************************************************
 ** _ContextQueryable
 ******************************************************************************/

@@ -33,8 +33,11 @@ namespace types
 
 	class Context
 		: public std::enable_shared_from_this<Context>
+		, public virtual Object
 		, public IContextQueryable
 	{
+		CRAFT_OBJECT_DECLARE(craft::types::Context);
+
 		std::set<instance<>> _all;
 		instance<> _prime;
 
