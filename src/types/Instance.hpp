@@ -67,7 +67,7 @@ namespace types
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
 		inline instance(instance<void> const& inst)
-			: _actual((_T*)inst._actual)
+			: _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
 			, _meta(inst._meta)
 		{
 		}
@@ -75,7 +75,7 @@ namespace types
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
 			inline instance(instance<void> const& inst)
-			: _actual((_T*)inst._actual)
+			: _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
 			, _meta(inst._meta)
 		{
 		}
