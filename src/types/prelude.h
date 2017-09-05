@@ -25,14 +25,10 @@ namespace types
 	** Type Id Helper
 	******************************************************************************/
 
-	struct TypeId
+	struct TypeId final
+		: stdext::IdValue<TypeId, size_t>
 	{
-		size_t id;
-
-		inline TypeId() : id(0) { }
-		inline TypeId(size_t const& v) : id(v) { }
-		inline operator size_t() const { return id; }
-		inline TypeId operator ++(int i) { size_t v = id; id++; return v; }
+		using IdValue::IdValue;
 
 		//
 		// Defined in Types.h
@@ -41,17 +37,12 @@ namespace types
 		template<typename TFeature> inline TFeature* getFeature() const;
 
 		//
-		// Defined in to_string.h
+		// Defined in to_string.cpp
 		//
 		CRAFT_TYPE_EXPORTED std::string toString(bool verbose = true) const;
 	};
 
 	const static TypeId None = 0;
-
-	inline bool operator <(TypeId const& _this, TypeId const& _that) { return _this.id < _that.id; }
-	inline bool operator >(TypeId const& _this, TypeId const& _that) { return _this.id > _that.id; }
-	inline bool operator ==(TypeId const& _this, TypeId const& _that) { return _this.id == _that.id; }
-	inline bool operator !=(TypeId const& _this, TypeId const& _that) { return _this.id != _that.id; }
 
 	inline std::ostream & operator<<(std::ostream & s, TypeId const & v) { s << v.toString(); return s; }
 
@@ -60,13 +51,9 @@ namespace types
 	******************************************************************************/
 
 	struct FeatureId
+		: stdext::IdValue<FeatureId, size_t>
 	{
-		size_t id;
-
-		inline FeatureId() : id(0) { }
-		inline FeatureId(size_t const& v) : id(v) { }
-		inline operator size_t() const { return id; }
-		inline FeatureId operator ++(int i) { size_t v = id; id++; return v; }
+		using IdValue::IdValue;
 
 		//
 		// Defined in Types.hpp
@@ -80,11 +67,6 @@ namespace types
 	};
 
 	const static FeatureId NoFeature = 0;
-
-	inline bool operator <(FeatureId const& _this, FeatureId const& _that) { return _this.id < _that.id; }
-	inline bool operator >(FeatureId const& _this, FeatureId const& _that) { return _this.id > _that.id; }
-	inline bool operator ==(FeatureId const& _this, FeatureId const& _that) { return _this.id == _that.id; }
-	inline bool operator !=(FeatureId const& _this, FeatureId const& _that) { return _this.id != _that.id; }
 
 	inline std::ostream & operator<<(std::ostream & s, FeatureId const & v) { s << v.toString(); return s; }
 
@@ -125,7 +107,7 @@ namespace types
 			struct _static_init : Ider<TypeId>
 			{
 				inline _static_init(_details::_fn_register_type_init _init)
-					: Ider<TypeId>(type_impl::_id++)
+					: Ider<TypeId>(type_impl::_id.increment())
 				{
 					_details::_register_type_init(_id, _init);
 				}

@@ -52,7 +52,7 @@ namespace types
 		struct _static_init : Ider<FeatureId>
 		{
 			inline _static_init(_details::_fn_register_feature_init _init)
-				: Ider<FeatureId>(Feature::_id++)
+				: Ider<FeatureId>(Feature::_id.increment())
 			{
 				_details::_register_feature_init(_id, _init);
 			}
