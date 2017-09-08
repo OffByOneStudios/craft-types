@@ -239,6 +239,23 @@ namespace types
 		inline operator bool () const { return !isNull(); }
 
 	//
+	// Stringing
+	//
+	public:
+		template<typename _T = T,
+			typename std::enable_if< !type<_T>::isFeature >::type* = nullptr>
+		inline std::string toString(bool verbose = false) const
+		{
+			return instance<void>::toString(*this, typeId(), verbose);
+		}
+		template<typename _T = T,
+			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
+			inline std::string toString(bool verbose = false) const
+		{
+			return instance<void>::toString(*this, type<T>::featureId(), verbose);
+		}
+
+	//
 	// Helper Features
 	//
 	public:
@@ -284,6 +301,7 @@ namespace types
 		}
 	};
 
+
 	//
 	// Operators
 	//
@@ -313,4 +331,7 @@ namespace types
 		if (_that._meta == nullptr) return true;
 		return _this._meta->actual > _that._meta->actual;
 	}
+
+	template<typename T>
+	inline std::ostream & operator<<(std::ostream & s, instance<T> const & v) { s << v.toString(); return s; }
 }}
