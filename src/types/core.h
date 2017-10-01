@@ -22,7 +22,7 @@
 // Templated defines
 //
 
-#include "instance.hpp"
+#include "Instance.hpp"
 
 #include "SingletonProviderManager.hpp"
 
