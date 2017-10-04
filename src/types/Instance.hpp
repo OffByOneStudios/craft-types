@@ -236,7 +236,7 @@ namespace types
 		inline T const& operator* () const { return value(); }
 		inline T const* operator-> () const { return get(); }
 
-		inline operator bool () const { return !isNull(); }
+		inline explicit operator bool () const { return !isNull(); }
 
 	//
 	// Stringing
