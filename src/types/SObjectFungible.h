@@ -18,8 +18,8 @@ namespace types
 		/* T:
 		Provides the objectFungible's update when it is wholly mutated or replaced.
 
-		* New object: when newInst != nullptr.
-		* Replaced  : when newInst == nullptr.
+		* New object : when newInst != nullptr.
+		* Mutated    : when newInst == nullptr.
 
 		May be null to not support fungibility on a per instance basis.
 		*/
@@ -29,7 +29,7 @@ namespace types
 	// Helpers
 	//
 	public:
-		inline virtual void objectFungible_emitUpdated(instance<> newInst)
+		inline virtual void objectFungible_emitUpdated(instance<> newInst = nullptr)
 		{
 			objectFungible_onUpdate().emit(instance<>(this, this->craft_featuredTypeId()), newInst);
 		}

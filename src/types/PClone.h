@@ -18,7 +18,7 @@ namespace types
 		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PClone, "types.clone", SingletonProviderManager);
 
 	public:
-		virtual instance<> clone(instance<>) = 0;
+		virtual instance<> clone(instance<>) const noexcept = 0;
 	};
 
 	/******************************************************************************
@@ -30,7 +30,7 @@ namespace types
 		: public Implements<PClone>::For<T>
 	{
 	public:
-		inline virtual instance<> parse(instance<> in) const noexcept override
+		inline virtual instance<> clone(instance<> in) const noexcept override
 		{
 			try
 			{
