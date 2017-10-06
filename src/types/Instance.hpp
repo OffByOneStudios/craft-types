@@ -263,7 +263,7 @@ namespace types
 			typename std::enable_if< TFeature::craft_c_featureKind != FeatureKind::Aspect >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
-			return system().get<TFeature>(type<T>::typeId());
+			return system().get<TFeature>(typeId());
 		}
 
 		template<typename TFeature,
@@ -277,7 +277,7 @@ namespace types
 		inline bool hasFeature() const
 		{
 			if (isNull())
-				return system().has<TFeature>(type<T>::typeId());
+				return system().has<TFeature>(typeId());
 			else
 				return system().has<TFeature>((instance<> const&)*this);
 		}
