@@ -76,6 +76,8 @@ protected: \
 private: \
 	friend T_Manager; \
 	friend class ::craft::types::Types; \
+private: \
+    static void __craft_s_types_init(); \
 public: \
 	static constexpr auto craft_c_featureKind = ::craft::types::FeatureKind::Provider; \
 	static constexpr auto craft_c_featureName = name; \
@@ -88,4 +90,9 @@ public: \
 private:
 
 #define CRAFT_PROVIDER_DEFINE(x) \
-	::craft::types::Feature::_static_init x::__si([](){ ::craft::types::system().getManager< x >(); });
+    void x::__craft_s_types_init() { ::craft::types::system().getManager< x >(); } \
+	::craft::types::Feature::_static_init x::__si(&x::__craft_s_types_init);
+
+#define CRAFT_PROVIDER_DEFINE_INIT(x) \
+	::craft::types::Feature::_static_init x::__si(&x::__craft_s_types_init); \
+	void x::__craft_s_types_init()

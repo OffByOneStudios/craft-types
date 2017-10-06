@@ -114,7 +114,7 @@ namespace types
 				typename std::enable_if< !(type<TParent>::isObject) >::type* = nullptr>
 				inline void parent()
 			{
-				TParent::template craft_s_types_init<TType>(ObjectDefineHelper(_types, this));
+				TParent::template __craft_s_types_init<TType>(ObjectDefineHelper(_types, this));
 			}
 
 			inline void defaults()
