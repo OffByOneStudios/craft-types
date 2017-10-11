@@ -22,7 +22,7 @@ namespace types
 	};
 
 	/******************************************************************************
-	** ObjectConversion
+	** DefaultCopyConstructor
 	******************************************************************************/
 
 	template <typename T>
@@ -35,6 +35,39 @@ namespace types
 			try
 			{
 				instance<T> ret = instance<T>::make(*in.asType<T>());
+
+				return (instance<>)ret;
+			}
+			catch (...)
+			{
+				// TODO, create and return an error type wrapping the exception
+				return instance<>();
+			}
+		}
+	};
+
+	/******************************************************************************
+	** FunctionalCopyConstructor
+	******************************************************************************/
+
+	template <typename T>
+	class FunctionalCopyConstructor
+		: public Implements<PClone>::For<T>
+	{
+		std::function<instance<T>(instance<T>)> _clone;
+	public:
+		
+		inline FunctionalCopyConstructor(std::function<instance<T>(instance<T>)> clone)
+			: _clone(clone)
+		{
+
+		}
+
+		inline virtual instance<> clone(instance<> in) const noexcept override
+		{
+			try
+			{
+				instance<T> ret = _clone(in.asType<T>());
 
 				return (instance<>)ret;
 			}
