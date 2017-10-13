@@ -34,7 +34,7 @@ namespace types
 		inline bool isType()
 		{
 			const TypeId that_type = types::type<TType>::typeId();
-			return that_type != None && *this == that_type;
+			return that_type.id != 0 && *this == that_type;
 		}
 
 		//
