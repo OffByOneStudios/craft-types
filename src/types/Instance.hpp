@@ -84,7 +84,7 @@ namespace types
 			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
 		inline instance(instance<void> const& inst)
 			: _actual(inst.getFeature<_T>())
-			, _meta(new _details::InstanceMetaHeader(inst._meta->typeId, _actual, type<_T>::featureId()))
+			, _meta(inst._actual == nullptr ? nullptr : new _details::InstanceMetaHeader(inst._meta->typeId, _actual, type<_T>::featureId()))
 		{
 		}
 
