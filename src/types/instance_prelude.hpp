@@ -13,7 +13,6 @@ namespace types
 				: typeId(tid)
 				, actual(actual)
 				, gcInfo(gcInfo)
-				, featureId(featureId)
 			{
 
 			}
@@ -21,7 +20,6 @@ namespace types
 			TypeId typeId;
 			void* actual;
 			void* gcInfo;
-			FeatureId featureId;
 		};
 	}
 

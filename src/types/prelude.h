@@ -30,6 +30,13 @@ namespace types
 	{
 		using IdValue::IdValue;
 
+		template<typename TType>
+		inline bool isType()
+		{
+			const TypeId that_type = types::type<TType>::typeId();
+			return that_type != None && *this == that_type;
+		}
+
 		//
 		// Defined in Types.h
 		//
