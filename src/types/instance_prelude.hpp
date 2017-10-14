@@ -80,6 +80,8 @@ namespace types
 		{ }
 
 		inline instance(instance<void> && inst)
+			: _actual(nullptr)
+			, _meta(nullptr)
 		{
 			std::swap(_actual, inst._actual);
 			std::swap(_meta, inst._meta);
@@ -102,7 +104,7 @@ namespace types
 		inline instance(_details::InstanceMetaHeader* meta)
 			// By supporting nullptr we get nullptr conversion
 			: _actual(meta == nullptr ? nullptr : meta->actual)
-			, _meta(_meta->safe_inc())
+			, _meta(meta->safe_inc())
 		{ }
 
 		inline instance(void* ptr, TypeId tid)

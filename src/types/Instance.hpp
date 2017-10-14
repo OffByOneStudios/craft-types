@@ -76,6 +76,8 @@ namespace types
 		{ }
 
 		inline instance(instance<T> && inst)
+			: _actual(nullptr)
+			, _meta(nullptr)
 		{
 			std::swap(_actual, inst._actual);
 			std::swap(_meta, inst._meta);
@@ -337,8 +339,8 @@ namespace types
 	template<typename T>
 	inline bool operator==(instance<T> const& _this, instance<T> const& _that)
 	{
-		if (_this._meta == nullptr || _that._meta == nullptr) return _this._meta == _that._meta;
-		return _this._meta->actual == _that._meta->actual;
+		if (_this._actual == nullptr || _that._actual == nullptr) return _this._actual == _that._actual;
+		return _this._actual == _that._actual;
 	}
 
 	template<typename T>
@@ -348,16 +350,16 @@ namespace types
 	template<typename T>
 	inline bool operator<(instance<T> const& _this, instance<T> const& _that)
 	{
-		if (_that._meta == nullptr) return false; // thAT or both null
-		if (_this._meta == nullptr) return true;
-		return _this._meta->actual < _that._meta->actual;
+		if (_that._actual == nullptr) return false; // thAT or both null
+		if (_this._actual == nullptr) return true;
+		return _this._actual < _that._actual;
 	}
 	template<typename T>
 	inline bool operator>(instance<T> const& _this, instance<T> const& _that)
 	{
-		if (_this._meta == nullptr) return false; // thIS or both null
-		if (_that._meta == nullptr) return true;
-		return _this._meta->actual > _that._meta->actual;
+		if (_this._actual == nullptr) return false; // thIS or both null
+		if (_that._actual == nullptr) return true;
+		return _this._actual > _that._actual;
 	}
 
 	template<typename T>
