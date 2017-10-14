@@ -55,7 +55,7 @@ namespace types
 	{
 		inline virtual TypeId craft_featuredTypeId() const override { return this->craft_typeId(); }
 
-		inline virtual instance<> craft_featuredInstance() override { return instance<>::acquire(this); }
+		inline virtual instance<> craft_featuredInstance() override { return instance<void>(craft_instance(), craft_typeId()); }
 
 
 		/******************************************************************************

@@ -32,17 +32,9 @@ namespace types
 	public:
 		inline virtual instance<> clone(instance<> in) const noexcept override
 		{
-			try
-			{
-				instance<T> ret = instance<T>::make(*in.asType<T>());
+			instance<T> ret = instance<T>::make(*in.asType<T>());
 
-				return (instance<>)ret;
-			}
-			catch (...)
-			{
-				// TODO, create and return an error type wrapping the exception
-				return instance<>();
-			}
+			return (instance<>)ret;
 		}
 	};
 

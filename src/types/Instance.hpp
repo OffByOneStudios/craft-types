@@ -21,13 +21,13 @@ namespace types
 	TFeature* instance<void>::getFeature() const
 	{
 		if (this->_actual == nullptr) return nullptr;
-		return system().get<TFeature>(*this);
+		return system().get<TFeature>(_meta->restore());
 	}
 
 	template<typename TFeature>
 	bool instance<void>::hasFeature() const
 	{
-		return system().has<TFeature>(*this);
+		return system().has<TFeature>(_meta->restore());
 	}
 
 	/******************************************************************************
@@ -59,11 +59,43 @@ namespace types
 	// Constructors
 	//
 	public:
+		// Rule of 5 plus default constructor
 		inline instance()
 			: _actual(nullptr)
 			, _meta(nullptr)
 		{ }
 
+		inline ~instance()
+		{
+			_meta->safe_dec();
+		}
+
+		inline instance(instance<T> const& inst)
+			: _actual(inst._actual)
+			, _meta(inst._meta)
+		{ }
+
+		inline instance(instance<T> && inst)
+		{
+			std::swap(_actual, inst._actual);
+			std::swap(_meta, inst._meta);
+		}
+
+		inline instance<T>& operator=(instance<T> const& _that)
+		{
+			_actual = _that._actual;
+			_meta = _that._meta;
+			return *this;
+		}
+
+		inline instance<T>& operator=(instance<T> && _that)
+		{
+			std::swap(_actual, _that._actual);
+			std::swap(_meta, _that._meta);
+			return *this;
+		}
+
+		// Void instances
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
 		inline instance(instance<void> const& inst)
@@ -84,7 +116,14 @@ namespace types
 			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
 		inline instance(instance<void> const& inst)
 			: _actual(inst.getFeature<_T>())
-			, _meta(inst._actual == nullptr ? nullptr : new _details::InstanceMetaHeader(inst._meta->typeId, _actual, type<_T>::featureId()))
+			, _meta(inst._meta)
+		{
+		}
+
+		// From pointers:
+		inline instance(void* const& ptr, TypeId const& tid)
+			: _actual((T*)ptr)
+			, _meta(new _details::InstanceMetaHeader(tid, ptr))
 		{
 		}
 
@@ -106,25 +145,13 @@ namespace types
 
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
-			inline instance(_T* const& ptr, TypeId type)
+			inline instance(_T* const& ptr, _details::InstanceMetaHeader* const& meta)
 			: _actual(ptr)
-			, _meta(new _details::InstanceMetaHeader(type, ptr, ::craft::type<_T>::featureId()))
+			, _meta(meta)
 		{
 		}
 
-		/*
-		template<typename TObject,
-			typename _T = T,
-			typename std::enable_if< craft::type<_T>::isFeature
-				&& std::is_base_of<Object, TObject>::value >::type* = nullptr >
-		inline instance(TObject* const& ptr)
-		{
-			instance<TObject> inst = ptr;
-			_meta = inst._meta;
-			_actual = inst.template getFeature<_T>();
-		}
-		*/
-
+		// from other instance
 		template<typename TObject,
 			typename _T = T,
 			typename std::enable_if< type<_T>::isFeature
@@ -230,6 +257,7 @@ namespace types
 	// Operators
 	//
 	public:
+
 		inline T& operator* () { return value(); }
 		inline T* operator-> () { return get(); }
 
@@ -246,13 +274,13 @@ namespace types
 			typename std::enable_if< !type<_T>::isFeature >::type* = nullptr>
 		inline std::string toString(bool verbose = false) const
 		{
-			return instance<void>::toString(*this, typeId(), verbose);
+			return instance<void>::toString(_meta->restore(), typeId(), verbose);
 		}
 		template<typename _T = T,
 			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
 			inline std::string toString(bool verbose = false) const
 		{
-			return instance<void>::toString(*this, type<T>::featureId(), verbose);
+			return instance<void>::toString(_meta->restore(), type<T>::featureId(), verbose);
 		}
 
 	//
@@ -270,7 +298,7 @@ namespace types
 			typename std::enable_if< TFeature::craft_c_featureKind == FeatureKind::Aspect >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
-			return system().get<TFeature>((instance<> const&)*this);
+			return system().get<TFeature>(_meta->restore());
 		}
 
 		template<typename TFeature>
@@ -279,13 +307,13 @@ namespace types
 			if (isNull())
 				return system().has<TFeature>(typeId());
 			else
-				return system().has<TFeature>((instance<> const&)*this);
+				return system().has<TFeature>(_meta->restore());
 		}
 
 		template<typename TFeature>
 		inline instance<TFeature> asFeature() const
 		{
-			return instance<TFeature>(*this);
+			return instance<TFeature>(_meta->restore());
 		}
 
 		template<typename TType,
@@ -297,7 +325,7 @@ namespace types
 		{
 			if (_meta == nullptr || type<TType>::typeId() != _meta->typeId)
 				throw stdext::exception("instance<void>::asType() | T.id != instance.id");
-			return instance<TType>((instance<void>)*this);
+			return instance<TType>(_meta->restore());
 		}
 	};
 

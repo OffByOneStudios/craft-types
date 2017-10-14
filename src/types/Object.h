@@ -93,7 +93,7 @@ public: \
     inline virtual ::craft::types::TypeId craft_typeId() const override { return craft_s_typeId(); } \
 	inline virtual void* craft_instance() override { return reinterpret_cast<void*>(static_cast<x*>(this)); } \
 private: \
-    inline ::craft::types::instance<x> craft_instance_from_this() { return ::craft::types::instance<x>(this); } \
+    inline ::craft::types::instance<x> craft_instance_from_this() { return ::craft::types::instance<x>(craft_instance(), craft_typeId()); } \
 private:
 
 #define CRAFT_OBJECT_DEFINE(x) \
