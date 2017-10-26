@@ -71,7 +71,7 @@ namespace types
 
 #define CRAFT_PROVIDER_DECLARE(x, name, manager) \
 	static ::craft::types::Feature::_static_init __si; \
-protected: \
+public: \
 	typedef manager < x > T_Manager; \
 private: \
 	friend T_Manager; \
