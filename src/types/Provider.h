@@ -66,7 +66,7 @@ namespace types
 		//
 		virtual std::set<TypeId> filter(std::string const&) const = 0;
 	};
-	
+
 }}
 
 #define CRAFT_PROVIDER_DECLARE(x, name, manager) \

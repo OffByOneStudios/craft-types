@@ -125,7 +125,7 @@ namespace types
 		inline operator instance<T>() const { return asType<T>(); }
 
 		template<typename T, typename std::enable_if< std::is_base_of<Feature, T>::value && !std::is_base_of<Object, T>::value>::type>
-		inline operator instance<T>() const { return asFeature(); }
+		inline operator instance<T>() const { return asFeature<T>(); }
 
 		inline operator bool() const { return !isNull(); }
 

@@ -105,3 +105,4 @@ private: \
     template<typename T> friend class ::craft::types::_details::ObjectDefineHelper; \
 	template<typename T> \
     inline static void __craft_s_types_init(::craft::types::_details::ObjectDefineHelper<T> _)
+		

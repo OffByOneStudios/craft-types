@@ -84,19 +84,21 @@ namespace types
 }}
 
 #define CRAFT_TYPE_DECLARE(_dll, x) \
+namespace craft { namespace types { \
 template <> \
-struct ::craft::types::type<x> \
-	: public ::craft::types::type<void> \
-	, protected ::craft::types::_details::type_impl \
+struct type<x> \
+	: public type<void> \
+	, protected _details::type_impl \
 { \
 private: \
-	static void s_types_init(::craft::types::_details::ObjectDefineHelper<x> _); \
+	static void s_types_init(_details::ObjectDefineHelper<x> _); \
 protected: \
-	_dll static ::craft::types::_details::type_impl::_static_init __si; \
+	_dll static _details::type_impl::_static_init __si; \
 public: \
-	inline static ::craft::types::TypeId typeId() { return __si.id; } \
+	inline static TypeId typeId() { return __si.id; } \
 	static constexpr bool isExternal = true; \
 }; \
+}} \
 
 #define CRAFT_TYPE_DEFINE(x) \
 	::craft::types::_details::type_impl::_static_init craft::type<x>::__si((::craft::types::_details::_fn_register_type_init)&::craft::types::type<x>::s_types_init); \
