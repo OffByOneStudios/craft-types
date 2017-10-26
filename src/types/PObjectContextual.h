@@ -9,7 +9,7 @@ namespace types
 	/******************************************************************************
 	** PObjectContextual
 	******************************************************************************/
-	
+
 	class Context;
 
 	/* T:
@@ -52,7 +52,7 @@ namespace types
 #ifdef CRAFT_TRACE
 			SPDLOG_TRACE(engine()->log, "{0}::[types.context]expand", type<TType>::name());
 #endif
-			return std::invoke(this->_expand_func, i.asType<TType>().get());
+			return (i.asType<TType>().get()->*(this->_expand_func))();
 		}
 
 		inline virtual void contextualize(instance<> i, std::shared_ptr<Context> c)
@@ -62,7 +62,7 @@ namespace types
 #ifdef CRAFT_TRACE
 			SPDLOG_TRACE(engine()->log, "{0}::[types.context]contextualize", type<TType>::name());
 #endif
-			std::invoke(this->_context_func, i.asType<TType>().get(), c);
+ 		  (i.asType<TType>().get()->*(this->_context_func))(c);
 		}
 
 		inline virtual void finalize(instance<> i, std::shared_ptr<Context> c)
@@ -72,7 +72,7 @@ namespace types
 #ifdef CRAFT_TRACE
 			SPDLOG_TRACE(engine()->log, "{0}::[types.context]finalize", type<TType>::name());
 #endif
-			std::invoke(this->_context_func, i.asType<TType>().get(), c);
+			(i.asType<TType>().get()->*(this->_context_func))(c);
 		}
 	public:
 
