@@ -33,6 +33,6 @@ CRAFT_TYPE_DEFINE(bool)
 	});
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<bool> _this) 
 	{ 
-		return (_this.get()) ? "true" : "false";
+		return (*_this) ? "true" : "false";
 	});
 }
