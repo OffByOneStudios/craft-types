@@ -105,7 +105,7 @@ namespace types
 
 		inline virtual void addSingleton(TypeId tid, TProvider* singleton) override
 		{
-    	SingletonProviderManager<TProvider>::addSingleton(tid, singleton);
+			SingletonProviderManager<TProvider>::addSingleton(tid, singleton);
 			_index[singleton->provider_index()] = tid;
 		}
 

@@ -57,8 +57,8 @@ namespace types
 			std::vector<std::string> _parts;
 			stdext::split(s, "::", std::back_inserter(_parts));
 			auto end = std::remove_if(_parts.begin(), _parts.end(), [](std::string i) {
-        return i.size() == 0;
-    });
+				return i.size() == 0;
+			});
 
 			return stdext::join('.', _parts.begin(), end);
 		}
