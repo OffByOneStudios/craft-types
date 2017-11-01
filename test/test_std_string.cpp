@@ -67,10 +67,10 @@ go_bandit([]()
 
 		describe("`<Provider: types.parse>`", [&]()
 		{
-			instance<PParse> parser;
+			PParse* parser;
 
 			before_each([&]() {
-				parser = inst.asFeature<PParse>();
+				parser = inst.getFeature<PParse>();
 			});
 
 			it(".hasFeature<PParse>() is true", [&]()

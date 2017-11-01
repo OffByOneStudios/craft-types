@@ -165,7 +165,7 @@ go_bandit([]()
 				auto inst = types::instance<StupidObjectContextual>::make().asFeature<SEmptyTestInstance>();
 				ctx->promote<SEmptyTestInstance>(inst);
 
-				AssertThat(ctx->byType(types::type<StupidObjectContextual>::typeId())->prime().get(), Equals(inst.get()));
+				AssertThat(ctx->byFeature(SEmptyTestInstance::craft_s_featureId())->prime().get(), Equals(inst.get()));
 			});
 		});
 	});
