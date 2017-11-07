@@ -21,5 +21,9 @@
 #include <type_traits>
 #include <functional>
 
+
+// Vendor
+#include "mpir/mpir.h"
+#include "mpir/mpirxx.h"
 // Deps
 #include "util/all.h"

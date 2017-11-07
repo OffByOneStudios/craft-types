@@ -1,0 +1,18 @@
+id: CraftEngine.Deps.Type
+name: Craft Types
+version: "1.0.0"
+repo: http://github.com/OffByOneStudios/craft-type
+dependencies:
+  - CraftEngine.Deps.Util
+
+vendor-dependencies: 
+  win_x64_vc140:
+    - mpir
+    - mpirxx
+  osx_x64_clang:
+    - mpir
+    - mpirxx
+  debian_x64_gcc:
+    - mpir
+    - mpirxx
+    

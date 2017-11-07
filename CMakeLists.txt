@@ -80,6 +80,8 @@ target_link_libraries (CraftTypeTests CraftType)
 endif()
 
 
+#Vendor Dependencies
+include(cmake/vendor/${CRAFT_TRIPLE_CROSS}.cmake)
 
 # Platform Specific
 if(CRAFT_TRIPLE_CROSS STREQUAL "osx_x64_clang")

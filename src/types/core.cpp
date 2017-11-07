@@ -23,22 +23,29 @@ Types::Types()
 
 }
 
+namespace _details
+{
+	std::once_flag _types_init;
+}
+
 void Types::init()
 {
-	assert(_initersForFeatures.size() != 0);
-	assert(_initersForTypes.size() != 0);
+	std::call_once(::_details::_types_init, [=]() {
+		assert(_initersForFeatures.size() != 0);
+		assert(_initersForTypes.size() != 0);
 
-	for (auto i : _initersForFeatures)
-	{
-		i.second();
-	}
-	_initersForFeatures.clear();
+		for (auto i : _initersForFeatures)
+		{
+			i.second();
+		}
+		_initersForFeatures.clear();
 
-	for (auto i : _initersForTypes)
-	{
-		i.second(*this);
-	}
-	_initersForTypes.clear();
+		for (auto i : _initersForTypes)
+		{
+			i.second(*this);
+		}
+		_initersForTypes.clear();
+	});
 }
 
 unsigned char __offset_table[craft::types::_details::_offset_table_size] = {};
