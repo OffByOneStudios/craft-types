@@ -17,7 +17,7 @@ namespace types
 	class SLifecycle abstract
 		: public Aspect
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SLifecycle, "types.life", InstanceAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_ASPECT_DECLARE(SLifecycle, "types.life", InstanceAspectManager);
 
 	public:
 	};

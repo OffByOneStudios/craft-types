@@ -13,7 +13,7 @@ namespace types
 		: protected _details::type_impl
 	{
 	public:
-		CRAFT_TYPE_EXPORTED virtual ~Object();
+		CRAFT_TYPES_EXPORTED virtual ~Object();
 		virtual void* craft_instance() = 0;
 		virtual TypeId craft_typeId() const = 0;
 	};

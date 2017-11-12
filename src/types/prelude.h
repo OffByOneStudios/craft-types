@@ -46,7 +46,7 @@ namespace types
 		//
 		// Defined in to_string.cpp
 		//
-		CRAFT_TYPE_EXPORTED std::string toString(bool verbose = true) const;
+		CRAFT_TYPES_EXPORTED std::string toString(bool verbose = true) const;
 	};
 
 	const static TypeId None = 0;
@@ -70,7 +70,7 @@ namespace types
 		//
 		// Defined in to_string.h
 		//
-		CRAFT_TYPE_EXPORTED std::string toString(bool verbose = true) const;
+		CRAFT_TYPES_EXPORTED std::string toString(bool verbose = true) const;
 	};
 
 	const static FeatureId NoFeature = 0;
@@ -97,16 +97,16 @@ namespace types
 		class ObjectDefineHelper;
 
 		typedef void(*_fn_register_type_init)(ObjectDefineHelper<void> _);
-		void CRAFT_TYPE_EXPORTED _register_type_init(TypeId, _fn_register_type_init);
+		void CRAFT_TYPES_EXPORTED _register_type_init(TypeId, _fn_register_type_init);
 
 		typedef void(*_fn_register_feature_init)();
-		void CRAFT_TYPE_EXPORTED _register_feature_init(FeatureId, _fn_register_feature_init);
+		void CRAFT_TYPES_EXPORTED _register_feature_init(FeatureId, _fn_register_feature_init);
 
 		struct type_impl
 		{
 			// This must be zero width
 		private:
-			CRAFT_TYPE_EXPORTED static TypeId _id;
+			CRAFT_TYPES_EXPORTED static TypeId _id;
 
 			template<typename T, typename>
 			friend struct type;

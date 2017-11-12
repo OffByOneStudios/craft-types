@@ -13,7 +13,7 @@ namespace types
 		Types();
 
 	public:
-		static CRAFT_TYPE_EXPORTED Types& instance();
+		static CRAFT_TYPES_EXPORTED Types& instance();
 
 	private:
 		//
@@ -30,12 +30,12 @@ namespace types
 
 		// Type Initializers
 		std::map<TypeId, _details::_fn_register_type_init> _initersForTypes;
-		friend CRAFT_TYPE_EXPORTED void ::craft::types::_details::_register_type_init(TypeId, _details::_fn_register_type_init);
+		friend CRAFT_TYPES_EXPORTED void ::craft::types::_details::_register_type_init(TypeId, _details::_fn_register_type_init);
 		template<typename T> friend class ::craft::types::_details::ObjectDefineHelper;
 
 		// Feature Initializers
 		std::map<FeatureId, _details::_fn_register_feature_init> _initersForFeatures;
-		friend CRAFT_TYPE_EXPORTED void ::craft::types::_details::_register_feature_init(FeatureId, _details::_fn_register_feature_init);
+		friend CRAFT_TYPES_EXPORTED void ::craft::types::_details::_register_feature_init(FeatureId, _details::_fn_register_feature_init);
 
 	protected:
 		template<typename TInterface, FeatureKind kind>
@@ -100,7 +100,7 @@ namespace types
 		};
 
 	public:
-		CRAFT_TYPE_EXPORTED void init();
+		CRAFT_TYPES_EXPORTED void init();
 
 	public:
 		inline IFeatureManager* getManager(FeatureId fid)
@@ -169,7 +169,7 @@ namespace types
 
 	namespace _details
 	{
-		CRAFT_TYPE_EXPORTED void _register_type_init(TypeId id, _fn_register_type_init _init);
+		CRAFT_TYPES_EXPORTED void _register_type_init(TypeId id, _fn_register_type_init _init);
 	}
 
 	template<typename TFeature>

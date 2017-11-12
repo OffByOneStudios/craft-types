@@ -19,7 +19,7 @@ namespace types
 	class PConstructor abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PConstructor, "types.constructor", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_PROVIDER_DECLARE(PConstructor, "types.constructor", SingletonProviderManager);
 
 	public:
 		typedef uintptr_t ListingId;

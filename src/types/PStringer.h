@@ -16,7 +16,7 @@ namespace types
 	class PStringer abstract
 		: public Provider
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_PROVIDER_DECLARE(PStringer, "types.str", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_PROVIDER_DECLARE(PStringer, "types.str", SingletonProviderManager);
 
 	public:
 		virtual std::string toString(instance<> inst) const = 0;

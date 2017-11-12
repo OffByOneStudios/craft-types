@@ -55,17 +55,17 @@ namespace types
 
 		friend class _details::_ContextQueryable;
 	public:
-		CRAFT_TYPE_EXPORTED Context(
+		CRAFT_TYPES_EXPORTED Context(
 			std::shared_ptr<Context> parent = std::shared_ptr<Context>(),
 			instance<> prime = nullptr
 		);
 
-		CRAFT_TYPE_EXPORTED std::shared_ptr<Context> copy() const;
-		CRAFT_TYPE_EXPORTED std::shared_ptr<Context> parent() const;
+		CRAFT_TYPES_EXPORTED std::shared_ptr<Context> copy() const;
+		CRAFT_TYPES_EXPORTED std::shared_ptr<Context> parent() const;
 
-		CRAFT_TYPE_EXPORTED void addOnName(std::string const& name, instance<> obj);
-		CRAFT_TYPE_EXPORTED void addOnType(TypeId t_id, instance<> obj);
-		CRAFT_TYPE_EXPORTED void addOnFeature(FeatureId i_id, instance<> obj);
+		CRAFT_TYPES_EXPORTED void addOnName(std::string const& name, instance<> obj);
+		CRAFT_TYPES_EXPORTED void addOnType(TypeId t_id, instance<> obj);
+		CRAFT_TYPES_EXPORTED void addOnFeature(FeatureId i_id, instance<> obj);
 		template<typename T,
 			typename std::enable_if<type<T>::isObject>::type* = nullptr>
 		inline void add(instance<T> obj)
@@ -79,9 +79,9 @@ namespace types
 			this->addOnFeature(type<T>::featureId(), obj);
 		}
 
-		CRAFT_TYPE_EXPORTED void promoteOnName(std::string const& name, instance<> obj);
-		CRAFT_TYPE_EXPORTED void promoteOnType(TypeId t_id, instance<> obj);
-		CRAFT_TYPE_EXPORTED void promoteOnFeature(FeatureId i_id, instance<> obj);
+		CRAFT_TYPES_EXPORTED void promoteOnName(std::string const& name, instance<> obj);
+		CRAFT_TYPES_EXPORTED void promoteOnType(TypeId t_id, instance<> obj);
+		CRAFT_TYPES_EXPORTED void promoteOnFeature(FeatureId i_id, instance<> obj);
 		template<typename T,
 			typename std::enable_if<type<T>::isObject>::type* = nullptr>
 			inline void promote(instance<T> obj)
@@ -95,12 +95,12 @@ namespace types
 			this->promoteOnFeature(type<T>::featureId(), obj);
 		}
 
-		CRAFT_TYPE_EXPORTED void finalize();
-		CRAFT_TYPE_EXPORTED bool finalized() const;
+		CRAFT_TYPES_EXPORTED void finalize();
+		CRAFT_TYPES_EXPORTED bool finalized() const;
 
-		CRAFT_TYPE_EXPORTED virtual std::shared_ptr<IContextQueryable> byName(std::string const&) const override;
-		CRAFT_TYPE_EXPORTED virtual std::shared_ptr<IContextQueryable> byType(TypeId const&) const override;
-		CRAFT_TYPE_EXPORTED virtual std::shared_ptr<IContextQueryable> byFeature(FeatureId const&) const override;
+		CRAFT_TYPES_EXPORTED virtual std::shared_ptr<IContextQueryable> byName(std::string const&) const override;
+		CRAFT_TYPES_EXPORTED virtual std::shared_ptr<IContextQueryable> byType(TypeId const&) const override;
+		CRAFT_TYPES_EXPORTED virtual std::shared_ptr<IContextQueryable> byFeature(FeatureId const&) const override;
 		template<typename T,
 			typename std::enable_if<type<T>::isObject>::type* = nullptr>
 			inline std::shared_ptr<IContextQueryable> by()
@@ -114,7 +114,7 @@ namespace types
 			return this->byFeature(type<T>::featureId());
 		}
 
-		CRAFT_TYPE_EXPORTED virtual std::set<instance<>> const& objects() const override;
-		CRAFT_TYPE_EXPORTED virtual instance<> prime() const override;
+		CRAFT_TYPES_EXPORTED virtual std::set<instance<>> const& objects() const override;
+		CRAFT_TYPES_EXPORTED virtual instance<> prime() const override;
 	};
 }}

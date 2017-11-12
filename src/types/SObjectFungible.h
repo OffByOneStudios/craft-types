@@ -12,7 +12,7 @@ namespace types
 	class SObjectFungible abstract
 		: public Aspect
 	{
-		CRAFT_TYPE_EXPORTED CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", FactoryAspectManager);
 
 	public:
 		/* T:
@@ -46,6 +46,6 @@ namespace types
 		Signal<void(instance<> origInst, instance<> newInst)> _fungible_signal;
 
 	public:
-		CRAFT_TYPE_EXPORTED virtual Signal<void(instance<> origInst, instance<> newInst)>& objectFungible_onUpdate() override;
+		CRAFT_TYPES_EXPORTED virtual Signal<void(instance<> origInst, instance<> newInst)>& objectFungible_onUpdate() override;
 	};
 }}

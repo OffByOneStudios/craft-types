@@ -157,9 +157,9 @@ namespace types
 			return _actual == _meta->actual;
 		}
 
-		static CRAFT_TYPE_EXPORTED std::string toString(instance<void> const&, bool verbose = false);
-		static CRAFT_TYPE_EXPORTED std::string toString(instance<void> const&, TypeId tid, bool verbose = false);
-		static CRAFT_TYPE_EXPORTED std::string toString(instance<void> const&, FeatureId fid, bool verbose = false);
+		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, bool verbose = false);
+		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, TypeId tid, bool verbose = false);
+		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, FeatureId fid, bool verbose = false);
 
 		inline std::string toString(bool verbose = false) const
 		{

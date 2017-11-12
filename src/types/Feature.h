@@ -59,7 +59,7 @@ namespace types
 		};
 
 	private:
-		CRAFT_TYPE_EXPORTED static FeatureId _id;
+		CRAFT_TYPES_EXPORTED static FeatureId _id;
 	};
 
 	/******************************************************************************
