@@ -18,8 +18,8 @@ if(NOT ${l} EQUAL 0)
 target_link_libraries(CraftEngineDepsTypes debug ${CRAFT_TYPES_DEBUG_LIBS})
 endif()
 
-list(LENGTH CRAFT_BUILD_RELEASE_LIBS l)
+list(LENGTH CRAFT_TYPES_RELEASE_LIBS l)
 if(NOT ${l} EQUAL 0)
-target_link_libraries(CraftBuild optimized ${CRAFT_TYPES_RELEASE_LIBS})
+target_link_libraries(CraftEngineDepsTypes optimized ${CRAFT_TYPES_RELEASE_LIBS})
 endif()
 
