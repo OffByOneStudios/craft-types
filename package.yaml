@@ -22,7 +22,7 @@ platform-dependencies:
   osx_x64_clang: []
   debian_x64_gcc: []
   
-platform-flags:
+platform-compiler-flags:
   win_x64_vc140: []
   osx_x64_clang: 
     - "-std=c++1z"
@@ -32,8 +32,11 @@ platform-flags:
     - "-std=gnu++1z"
     - "-pthread"
     - "-fpermissive"
-  
 
+platform-link-flags:
+  win_x64_vc140:
+    - "/ignore:4099"
+    
 files:
   library:
     - src/**/*.*
