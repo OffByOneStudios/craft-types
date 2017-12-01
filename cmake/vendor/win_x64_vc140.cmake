@@ -7,19 +7,20 @@ SET(CRAFT_TYPES_RELEASE_LIBS "")
 vendor_resolve_lib(mpir CRAFT_TYPES_LIBS CRAFT_TYPES_DEBUG_LIBS CRAFT_TYPES_RELEASE_LIBS)
 vendor_resolve_lib(mpirxx CRAFT_TYPES_LIBS CRAFT_TYPES_DEBUG_LIBS CRAFT_TYPES_RELEASE_LIBS)
 
+message(1 ${CRAFT_TYPES_LIBS})
+message(2 ${CRAFT_TYPES_DEBUG_LIBS})
+message(3 ${CRAFT_TYPES_RELEASE_LIBS})
 
-list(LENGTH CRAFT_TYPES_LIBS l)
-if(NOT ${l} EQUAL 0)
-target_link_libraries(CraftEngineDepsTypes ${CRAFT_TYPES_LIBS})
-endif()
 
-list(LENGTH CRAFT_TYPES_DEBUG_LIBS l)
-if(NOT ${l} EQUAL 0)
-target_link_libraries(CraftEngineDepsTypes debug ${CRAFT_TYPES_DEBUG_LIBS})
-endif()
+foreach(lib ${CRAFT_TYPES_LIBS})
+  target_link_libraries(CraftEngineDepsTypes ${lib})
+endforeach()
 
-list(LENGTH CRAFT_TYPES_RELEASE_LIBS l)
-if(NOT ${l} EQUAL 0)
-target_link_libraries(CraftEngineDepsTypes optimized ${CRAFT_TYPES_RELEASE_LIBS})
-endif()
+foreach(lib ${CRAFT_TYPES_DEBUG_LIBS})
+  target_link_libraries(CraftEngineDepsTypes debug ${lib})
+endforeach()
+
+foreach(lib ${CRAFT_TYPES_RELEASE_LIBS})
+  target_link_libraries(CraftEngineDepsTypes optimized ${lib})
+endforeach()
 
