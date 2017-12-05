@@ -9,6 +9,10 @@ namespace types
 	** Aspect
 	******************************************************************************/
 
+	/* Per Instance interfaces
+	
+	Aspects require an instaniated object
+	*/
 	class Aspect abstract
 		: public Feature
 	{

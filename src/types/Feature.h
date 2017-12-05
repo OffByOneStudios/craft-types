@@ -39,6 +39,9 @@ namespace types
 	** Feature
 	******************************************************************************/
 
+	/* An *Interface* in the type system
+
+	*/
 	class Feature abstract
 	{
 	public:

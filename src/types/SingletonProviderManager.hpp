@@ -14,6 +14,7 @@ namespace types
 	class SingletonProviderManager
 		: public IProviderManager
 	{
+	protected:
 		std::map<TypeId, TProvider*> _singletons;
 	public:
 		virtual ~SingletonProviderManager() = default;
@@ -146,6 +147,42 @@ namespace types
 			if (it == _tags.end())
 				return { };
 			return it->second;
+		}
+	};
+
+	/******************************************************************************
+	** InitializedSingletonProviderManager
+	******************************************************************************/
+
+	template<typename TProvider>
+	class InitializedSingletonProviderManager
+		: public SingletonProviderManager<TProvider>
+	{
+		virtual ~InitializedSingletonProviderManager() = default;
+
+		bool _is_inited;
+	public:
+		inline void init()
+		{
+			if (!_is_inited)
+			{
+				_is_inited = true;
+				for (auto f : this->_singletons)
+				{
+					 auto pro = f.second;
+					 pro->init();
+				}
+			}
+		}
+
+		inline virtual void addSingleton(TypeId tid, TProvider* singleton) override
+		{
+			SingletonProviderManager<TProvider>::addSingleton(tid, singleton);
+
+			if (_is_inited)
+			{
+				singleton->init();
+			}
 		}
 	};
 }}

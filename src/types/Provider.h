@@ -9,6 +9,10 @@ namespace types
 	** Provider
 	******************************************************************************/
 
+	/* Interface for types
+
+	Analogous to a collection of static methods
+	*/
 	class Provider abstract
 		: public Feature
 	{
