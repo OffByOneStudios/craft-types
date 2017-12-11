@@ -1,11 +1,12 @@
-id: CraftEngine.Deps.Types
+id: Types
+namespace: OffByOneStudios
 name: Craft Types
 version: "1.0.0"
 repo: https://github.com/OffByOneStudios/craft-types
 
 dependencies:
-  - CraftEngine.Deps.Util
-  
+  - Util
+
 vendor-dependencies:
   win_x64_vc140:
     - mpir
@@ -21,14 +22,14 @@ platform-dependencies:
   win_x64_vc140: []
   osx_x64_clang: []
   debian_x64_gcc: []
-  
+
 platform-compiler-flags:
   win_x64_vc140: []
-  osx_x64_clang: 
+  osx_x64_clang:
     - "-std=c++1z"
     - "-stdlib=libc++"
     - "-Wc++11-extensions"
-  debian_x64_gcc: 
+  debian_x64_gcc:
     - "-std=gnu++1z"
     - "-pthread"
     - "-fpermissive"
@@ -36,7 +37,7 @@ platform-compiler-flags:
 platform-link-flags:
   win_x64_vc140:
     - "/ignore:4099"
-    
+
 files:
   library:
     - src/**/*.*
@@ -44,4 +45,3 @@ files:
     - test/**/*.*
   entry:
     - entry/**/*.*
-

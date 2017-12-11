@@ -2,6 +2,11 @@
 #include "common.h"
 #include "core.h"
 
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-undefined-compare"
+#endif
 namespace craft {
 namespace types
 {
@@ -182,3 +187,7 @@ namespace types
 using ::craft::types::instance;
 
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
