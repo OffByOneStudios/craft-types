@@ -12,7 +12,7 @@ namespace types
 		virtual std::shared_ptr<IContextQueryable> byFeature(FeatureId const&) const = 0;
 		virtual std::shared_ptr<IContextQueryable> byType(TypeId const&) const = 0;
 
-		virtual std::set<instance<>> const& objects() const = 0;
+		virtual std::set<instance<>> objects() const = 0;
 		virtual instance<> prime() const = 0;
 
 		inline instance<> only() const
@@ -114,7 +114,7 @@ namespace types
 			return this->byFeature(type<T>::featureId());
 		}
 
-		CRAFT_TYPES_EXPORTED virtual std::set<instance<>> const& objects() const override;
+		CRAFT_TYPES_EXPORTED virtual std::set<instance<>> objects() const override;
 		CRAFT_TYPES_EXPORTED virtual instance<> prime() const override;
 	};
 }}

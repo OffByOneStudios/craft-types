@@ -195,7 +195,7 @@ public:
 		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, (size_t)t_id);
 	}
 
-	virtual std::set<instance<>> const& objects() const override
+	virtual std::set<instance<>> objects() const override
 	{
 		resolve();
 		return _cache;
@@ -318,7 +318,7 @@ std::shared_ptr<IContextQueryable> Context::byType(TypeId const& t_id) const
 	return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, (size_t)t_id);
 }
 
-std::set<instance<>> const& Context::objects() const
+std::set<instance<>> Context::objects() const
 {
 	return _all;
 }
