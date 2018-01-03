@@ -51,6 +51,39 @@ namespace types
 				);
 			}
 
+			template<class TSingleton>
+			inline TSingleton* configureSingleton()
+			{
+				auto res = new TSingleton();
+				_types.getManager<TFeature>()->addSingleton(
+					type<TType>::typeId(),
+					res
+				);
+				return res;
+			}
+
+			template<template <typename> class TSingleton>
+			inline TSingleton<TType>* configureSingleton()
+			{
+				auto res = new TSingleton<TType>();
+				_types.getManager<TFeature>()->addSingleton(
+					type<TType>::typeId(),
+					res
+				);
+				return res;
+			}
+
+			template<template <typename> class TSingleton, typename... TArgs>
+			inline TSingleton<TType>* configureSingleton(TArgs... args)
+			{
+				auto res = new TSingleton<TType>(args...);
+				_types.getManager<TFeature>()->addSingleton(
+					type<TType>::typeId(),
+					res
+				);
+				return res;
+			}
+
 			inline void byCasting()
 			{
 				_types.getManager<TFeature>()->addFactory(
