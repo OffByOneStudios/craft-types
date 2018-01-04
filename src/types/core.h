@@ -68,6 +68,7 @@
 
 #include "default_types_c.h"
 #include "default_types_cpp.h"
+#include "default_types_mpir.h"
 
 // TODO:
 // * Rework objects to manage their own instance meta stuff (rather than from_raw) via SLifecycle
