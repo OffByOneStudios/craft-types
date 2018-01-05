@@ -1,4 +1,5 @@
 # Build stuff
+common.cpp
 cmake/*
 CMakeLists.txt
 build
