@@ -53,11 +53,11 @@ void describe_no_empty_providers(craft::instance<T> &_)
 	{
 		AssertThat(_.template getFeature<PEmptyTestSingleton>(), snowhouse::IsNull());
 	});
-	bandit::it(".getFeature<PEmptyTestSingleton>() is nullptr", [&]()
+	bandit::it(".getFeature<PEmptyTestSingletonNamed>() is nullptr", [&]()
 	{
 		AssertThat(_.template getFeature<PEmptyTestSingletonNamed>(), snowhouse::IsNull());
 	});
-	bandit::it(".getFeature<PEmptyTestSingleton>() is nullptr", [&]()
+	bandit::it(".getFeature<PEmptyTestSingletonTagged>() is nullptr", [&]()
 	{
 		AssertThat(_.template getFeature<PEmptyTestSingletonTagged>(), snowhouse::IsNull());
 	});

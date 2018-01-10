@@ -2,6 +2,7 @@
 
 #include "empty_aspects.h"
 #include "empty_providers.h"
+#include "basic_object.h"
 
 using namespace bandit;
 using namespace snowhouse;
@@ -69,6 +70,43 @@ go_bandit([]()
 
 			describe("empty providers,", std::bind(describe_no_empty_providers<void>, inst));
 			describe("empty aspects,", std::bind(describe_no_empty_aspects<void>, inst));
+		});
+
+		describe("with TestBasicObject,", [&]()
+		{
+			instance<TestBasicObject> t_inst;
+
+			before_each([&]() {
+				t_inst = instance<TestBasicObject>::make();
+				inst = t_inst;
+			});
+
+			it("isNull is false", [&]()
+			{
+				AssertThat(inst.isNull(), IsFalse());
+			});
+			it("bool conversion is true", [&]()
+			{
+				AssertThat(static_cast<bool>(inst), IsTrue());
+			});
+			it("get is not nullptr", [&]()
+			{
+				AssertThat(inst.get(), !IsNull());
+			});
+			it(".typeId() is type<std::string>::typeId()", [&]()
+			{
+				AssertThat(inst.typeId(), Equals(type<TestBasicObject>::typeId()));
+			});
+			it(".typeId() is ::craft_s_typeId()", [&]()
+			{
+				AssertThat(inst.typeId(), Equals(TestBasicObject::craft_s_typeId()));
+			});
+
+			describe("empty providers,", std::bind(describe_no_empty_providers<void>, inst));
+			describe("empty aspects,", std::bind(describe_no_empty_aspects<void>, inst));
+
+			describe("empty providers,", std::bind(describe_no_empty_providers<TestBasicObject>, t_inst));
+			describe("empty aspects,", std::bind(describe_no_empty_aspects<TestBasicObject>, t_inst));
 		});
 	});
 });
