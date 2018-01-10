@@ -7,9 +7,12 @@ namespace types
 	class type_error : public stdext::exception
 	{
 	public:
-		explicit type_error(const std::string& msg)
-			: stdext::exception(msg)
-		{
-		}
+		using stdext::exception::exception;
+	};
+
+	class type_error_uninitialized : public type_error
+	{
+	public:
+		using type_error::type_error;
 	};
 }}

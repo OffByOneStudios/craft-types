@@ -107,7 +107,7 @@ namespace types
 		{
 			auto it = _fmsById.find(fid);
 			if (it == _fmsById.end())
-				throw type_error("Types::getManager() | manager not registered");
+				throw type_error_uninitialized("Types::getManager() | manager not registered");
 			return it->second;
 		}
 
