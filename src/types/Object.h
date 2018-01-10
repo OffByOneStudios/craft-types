@@ -14,7 +14,7 @@ namespace types
 	{
 	public:
 		CRAFT_TYPES_EXPORTED virtual ~Object();
-		virtual void* craft_instance() = 0;
+		virtual void* craft_instance() const = 0;
 		virtual TypeId craft_typeId() const = 0;
 	};
 
@@ -91,9 +91,9 @@ public: \
     static inline ::craft::types::TypeId craft_s_typeId() { return x::__si.id; } \
 	static inline ::std::string craft_s_typeName() { return #x; } \
     inline virtual ::craft::types::TypeId craft_typeId() const override { return craft_s_typeId(); } \
-	inline virtual void* craft_instance() override { return reinterpret_cast<void*>(static_cast<x*>(this)); } \
+	inline virtual void* craft_instance() const override { return reinterpret_cast<void*>(static_cast<x*>(const_cast<x*>(this))); } \
 private: \
-    inline ::craft::types::instance<x> craft_instance_from_this() { return ::craft::types::instance<x>(craft_instance(), craft_typeId()); } \
+    inline ::craft::types::instance<x> craft_instance_from_this() const { return ::craft::types::instance<x>(craft_instance(), craft_typeId()); } \
 private:
 
 #define CRAFT_OBJECT_DEFINE(x) \
