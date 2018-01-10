@@ -1,6 +1,6 @@
-#include "common.h"
+#include "../common.h"
 
-#include "core.h"
+#include "../core.h"
 #include "default_types_cpp.h"
 
 // stdlib

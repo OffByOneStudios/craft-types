@@ -1,4 +1,4 @@
-#include "common.h"
+#include "../common.h"
 
 #include "default_types_mpir.h"
 

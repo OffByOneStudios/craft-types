@@ -35,25 +35,25 @@
 // Feature helpers
 //
 
-#include "Context.h"
+#include "boot/Context.h"
 
 //
 // Built in features
 //
 
-#include "PIdentifier.h"
-#include "PConstructor.h"
-#include "PStringer.h"
-#include "PParse.h"
-#include "PConversion.h"
-#include "PClone.h"
-#include "SLifecycle.h"
-#include "SContainer.h"
+#include "boot/PIdentifier.h"
+#include "boot/PConstructor.h"
+#include "boot/PStringer.h"
+#include "boot/PParse.h"
+#include "boot/PConversion.h"
+#include "boot/PClone.h"
+#include "boot/SLifecycle.h"
+#include "boot/SContainer.h"
 
-#include "PObjectContextual.h"
-#include "SObjectComposite.h"
-#include "SObjectManipulation.h"
-#include "SObjectFungible.h"
+#include "boot/PObjectContextual.h"
+#include "boot/SObjectComposite.h"
+#include "boot/SObjectManipulation.h"
+#include "boot/SObjectFungible.h"
 
 //
 // Helpers
@@ -66,9 +66,9 @@
 // Built in types
 //
 
-#include "default_types_c.h"
-#include "default_types_cpp.h"
-#include "default_types_mpir.h"
+#include "boot/default_types_c.h"
+#include "boot/default_types_cpp.h"
+#include "boot/default_types_mpir.h"
 
 // TODO:
 // * Rework objects to manage their own instance meta stuff (rather than from_raw) via SLifecycle
