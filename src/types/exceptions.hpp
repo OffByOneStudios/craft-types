@@ -15,4 +15,16 @@ namespace types
 	public:
 		using type_error::type_error;
 	};
+
+	class type_graph_error : public type_error
+	{
+	public:
+		using type_error::type_error;
+	};
+
+	class type_graph_not_implemented_error : public type_graph_error
+	{
+	public:
+		using type_graph_error::type_graph_error;
+	};
 }}

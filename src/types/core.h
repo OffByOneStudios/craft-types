@@ -2,6 +2,12 @@
 #include "common.h"
 
 //
+// Components Subsystems
+//
+
+#include "graph/graph.h"
+
+//
 // Forward declares
 //
 

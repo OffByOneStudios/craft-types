@@ -1,13 +1,14 @@
 id: Types
 namespace: OffByOneStudios
-shortname: Craft Types
+name: Craft Types
 version: "1.0.0"
 repo: https://github.com/OffByOneStudios/craft-types
 
 dependencies:
   - Util
+
 vendor-dependencies:
-  x86_64-pc-windows-msvccoff:
+  win_x64_vc140:
     - mpir
     - mpirxx
   osx_x64_clang:
@@ -18,12 +19,12 @@ vendor-dependencies:
     - mpirxx
 
 platform-dependencies:
-  x86_64-pc-windows-msvccoff: []
+  win_x64_vc140: []
   osx_x64_clang: []
   debian_x64_gcc: []
 
 platform-compiler-flags:
-  x86_64-pc-windows-msvccoff: []
+  win_x64_vc140: []
   osx_x64_clang:
     - "-std=c++1z"
     - "-stdlib=libc++"
@@ -34,7 +35,7 @@ platform-compiler-flags:
     - "-fpermissive"
 
 platform-link-flags:
-  x86_64-pc-windows-msvccoff:
+  win_x64_vc140:
     - "/ignore:4099"
 
 files:
