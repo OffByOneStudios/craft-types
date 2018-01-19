@@ -155,9 +155,9 @@ public:
 
 		Context* _cheat = ((Context*)_parentRoot.get());
 		std::set<instance<>> const& set(
-			(_searchKind == SearchKind::Name) 
+			(_searchKind == SearchKind::Name)
 			? _cheat->_objectsByName[_searchName]
-			: ((_searchKind == SearchKind::Type) 
+			: ((_searchKind == SearchKind::Type)
 				? _cheat->_objectsByType[_searchType]
 				: _cheat->_objectsByFeature[_searchFeature])
 		);
@@ -297,7 +297,7 @@ void Context::finalize()
 {
 	if (_parent && !_parent->finalized())
 		throw stdext::exception("Parent context not finalized.");
-		
+
 	_finalized = true;
 }
 bool Context::finalized() const

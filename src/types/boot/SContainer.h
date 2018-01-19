@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "../common.h"
 
 namespace craft {
 namespace types
@@ -82,7 +82,7 @@ namespace types
 			inline Container(ContainerViaStds* parent, instance<TType> inst)
 				: Implements<SContainer>::For<TType>(inst)
 				, _parent(parent)
-				, _map((_parent->_member_map != nullptr) 
+				, _map((_parent->_member_map != nullptr)
 					? &(inst.get()->*(_parent->_member_map))
 					: nullptr)
 				, _vector((_parent->_member_vector != nullptr)

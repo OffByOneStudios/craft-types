@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "../common.h"
 
 namespace craft {
 namespace types
@@ -31,6 +31,6 @@ namespace types
 		: public Implements<PConversion>::For<TType>
 	{
 	private:
-		
+
 	};
 }}

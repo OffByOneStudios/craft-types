@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "../common.h"
 
 namespace craft {
 namespace types
@@ -48,7 +48,7 @@ namespace types
 	{
 		std::function<instance<T>(instance<T>)> _clone;
 	public:
-		
+
 		inline FunctionalCopyConstructor(std::function<instance<T>(instance<T>)> clone)
 			: _clone(clone)
 		{

@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "../common.h"
 
 namespace craft {
 namespace types
@@ -69,7 +69,7 @@ namespace types
 			_hasDefault = false;
 		}
 		// end
-			
+
 
 	public:
 		inline DefaultConstructor()
@@ -90,7 +90,7 @@ namespace types
 
 			if (id < 0 || id >= _listings.size())
 				throw new type_error("Bad listing index.");
-				
+
 			PConstructor::Listing const& con = _listings[id];
 
 			if (con.argTypes.size() == args.size())
