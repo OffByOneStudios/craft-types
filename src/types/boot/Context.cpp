@@ -212,21 +212,53 @@ public:
 ** Context
 ******************************************************************************/
 
-Context::Context(
-	std::shared_ptr<Context> parent,
-	instance<> prime
-)
-	:
-  _prime(prime)
-  , _parent(parent)
-	, _finalized(false)
+Context::Context(instance<> prime)
+{
+	_tree_depth = 0;
+	_prime = prime;
+	_finalized = false;
+}
+
+std::shared_ptr<Context> Context::makeChildContext(std::shared_ptr<Context> parent, instance<> prime)
 {
 
+	if (!parent)
+	{
+		throw stdext::exception("Parent must be defined in this static constructor");
+	}
+
+	std::shared_ptr<Context> res = std::make_shared<Context>(prime);
+	res->_parent = parent;
+	res->_tree_depth = parent->_tree_depth + 1;
+	parent->_children.push_back(res);
+
+	return res;
+}
+
+
+std::shared_ptr<Context> Context::makeMentorContext(std::shared_ptr<Context> mentor, instance<> prime)
+{
+
+	if (!mentor)
+	{
+		throw stdext::exception("Parent must be defined in this static constructor");
+	}
+	if (!mentor->finalized())
+	{
+		throw stdext::exception("Mentor must be finalized");
+	}
+
+	std::shared_ptr<Context> res = std::make_shared<Context>(prime);
+	res->_parent = mentor;
+	res->_tree_depth = 1;
+
+	return res;
 }
 
 std::shared_ptr<Context> Context::copy() const
 {
-	auto res = std::make_shared<Context>(this->_parent);
+	auto res = std::make_shared<Context>(_prime);
+	res->_parent = this->_parent;
 
 	res->_all = this->_all;
 
@@ -326,4 +358,59 @@ std::set<instance<>> Context::objects() const
 instance<> Context::prime() const
 {
 	return _prime;
+}
+
+void Context::recurse_expand(std::map<instance<>, bool>& expanded)
+{
+	
+	if (_prime && (expanded.find(_prime) == expanded.end()))
+	{
+		_prime.getFeature<PObjectContextual>()->expand(_prime, shared_from_this());
+		expanded[_prime] = true;
+	}
+	for (auto a : _all)
+	{
+		if (expanded.find(a) == expanded.end())
+		{
+			a.getFeature<PObjectContextual>()->expand(a, shared_from_this());
+			expanded[a] = true;
+		}
+	}
+
+	for (auto c : _children)
+	{
+		c->recurse_expand(expanded);
+	}
+}
+
+void Context::recurse_contextualize()
+{
+	if (_prime)
+	{
+		_prime.getFeature<PObjectContextual>()->contextualize(_prime, shared_from_this());
+	}
+
+	for (auto a : _all)
+	{
+		a.getFeature<PObjectContextual>()->contextualize(a, shared_from_this());
+	}
+
+	finalize();
+
+	for (auto c : _children)
+	{
+		c->recurse_contextualize();
+	}
+}
+
+void Context::fishtacos()
+{
+	std::map<instance<>, bool> expanded;
+	recurse_expand(expanded);
+	recurse_contextualize();
+
+	// Recurse
+	
+
+	
 }
