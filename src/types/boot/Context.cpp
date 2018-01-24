@@ -148,19 +148,36 @@ public:
 
 	mutable bool _resolved;
 
+
+	inline std::set<instance<>> resolve_objects(Context* c, SearchKind kind) const
+	{
+		return (kind == SearchKind::Name)
+			? c->_objectsByName[_searchName]
+			: ((kind == SearchKind::Type)
+				? c->_objectsByType[_searchType]
+				: c->_objectsByFeature[_searchFeature]);
+	}
+
+	inline void resolve_children(Context* c, std::set<instance<>>& res, SearchKind kind) const
+	{
+		auto t = resolve_objects(c, _searchKind);
+		std::copy(t.begin(), t.end(), std::inserter(res, res.begin()));
+		for (auto child : c->_children)
+		{
+			resolve_children(child.get(), res, kind);
+		}
+	}
+
 	void resolve() const
 	{
 		if (_resolved)
 			return;
 
 		Context* _cheat = ((Context*)_parentRoot.get());
-		std::set<instance<>> const& set(
-			(_searchKind == SearchKind::Name)
-			? _cheat->_objectsByName[_searchName]
-			: ((_searchKind == SearchKind::Type)
-				? _cheat->_objectsByType[_searchType]
-				: _cheat->_objectsByFeature[_searchFeature])
-		);
+		
+		
+		std::set<instance<>> set;
+		resolve_children(_cheat, set, _searchKind);
 
 		if (!_parentIsRoot)
 		{
@@ -282,7 +299,11 @@ void Context::addOnName(std::string const& name, instance<> obj)
 	if (finalized()) throw stdext::exception("Context is finalized, cannot add.");
 
 	_objectsByName[name].insert(obj);
-	_all.insert(obj);
+
+	if (std::find(_all.begin(), _all.end(), obj) == _all.end())
+	{	
+		_all.push_back(obj);
+	}	
 }
 
 void Context::addOnType(TypeId t_id, instance<> obj)
@@ -290,7 +311,10 @@ void Context::addOnType(TypeId t_id, instance<> obj)
 	if (finalized()) throw stdext::exception("Context is finalized, cannot add.");
 
 	_objectsByType[t_id].insert(obj);
-	_all.insert(obj);
+	if (std::find(_all.begin(), _all.end(), obj) == _all.end())
+	{
+		_all.push_back(obj);
+	}
 }
 
 void Context::addOnFeature(FeatureId i_id, instance<> obj)
@@ -298,7 +322,10 @@ void Context::addOnFeature(FeatureId i_id, instance<> obj)
 	if (finalized()) throw stdext::exception("Context is finalized, cannot add.");
 
 	_objectsByFeature[i_id].insert(obj);
-	_all.insert(obj);
+	if (std::find(_all.begin(), _all.end(), obj) == _all.end())
+	{
+		_all.push_back(obj);
+	}
 }
 
 void Context::promoteOnName(std::string const& name, instance<> obj)
@@ -327,8 +354,8 @@ void Context::promoteOnFeature(FeatureId i_id, instance<> obj)
 
 void Context::finalize()
 {
-	if (_parent && !_parent->finalized())
-		throw stdext::exception("Parent context not finalized.");
+	/*if (_parent && !_parent->finalized())
+		throw stdext::exception("Parent context not finalized.");*/
 
 	_finalized = true;
 }
@@ -352,7 +379,7 @@ std::shared_ptr<IContextQueryable> Context::byType(TypeId const& t_id) const
 
 std::set<instance<>> Context::objects() const
 {
-	return _all;
+	return std::set<instance<>>(_all.begin(), _all.end());
 }
 
 instance<> Context::prime() const
@@ -368,8 +395,11 @@ void Context::recurse_expand(std::map<instance<>, bool>& expanded)
 		_prime.getFeature<PObjectContextual>()->expand(_prime, shared_from_this());
 		expanded[_prime] = true;
 	}
-	for (auto a : _all)
+	for (size_t i = 0; i < _all.size(); i++)
 	{
+		auto a = _all[i];
+		if (!a.hasFeature<PObjectContextual>()) continue;
+
 		if (expanded.find(a) == expanded.end())
 		{
 			a.getFeature<PObjectContextual>()->expand(a, shared_from_this());
@@ -383,31 +413,40 @@ void Context::recurse_expand(std::map<instance<>, bool>& expanded)
 	}
 }
 
-void Context::recurse_contextualize()
+void Context::recurse_contextualize(std::map<instance<>, bool>& expanded)
 {
 	if (_prime)
 	{
 		_prime.getFeature<PObjectContextual>()->contextualize(_prime, shared_from_this());
 	}
 
-	for (auto a : _all)
+	for (size_t i = 0; i < _all.size(); i++)
 	{
+		auto a = _all[i];
+		if (!a.hasFeature<PObjectContextual>()) continue;
+
+		if (expanded.find(a) == expanded.end())
+		{
+			a.getFeature<PObjectContextual>()->expand(a, shared_from_this());
+			expanded[a] = true;
+		}
+
 		a.getFeature<PObjectContextual>()->contextualize(a, shared_from_this());
 	}
 
-	finalize();
-
 	for (auto c : _children)
 	{
-		c->recurse_contextualize();
+		c->recurse_contextualize(expanded);
 	}
+
+	finalize();
 }
 
 void Context::fishtacos()
 {
 	std::map<instance<>, bool> expanded;
 	recurse_expand(expanded);
-	recurse_contextualize();
+	recurse_contextualize(expanded);
 
 	// Recurse
 	

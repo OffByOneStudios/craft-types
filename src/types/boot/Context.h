@@ -38,7 +38,7 @@ namespace types
 	{
 		CRAFT_OBJECT_DECLARE(craft::types::Context);
 
-		std::set<instance<>> _all;
+		std::vector<instance<>> _all;
 		instance<> _prime;
 
 		std::map<TypeId, std::set<instance<>>> _objectsByType;
@@ -125,7 +125,7 @@ namespace types
 
 	private:
 		void recurse_expand(std::map<instance<>, bool>& expanded);
-		void recurse_contextualize();
+		void recurse_contextualize(std::map<instance<>, bool>& expanded);
 
 	public:
 		CRAFT_TYPES_EXPORTED void fishtacos();
