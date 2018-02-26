@@ -89,7 +89,7 @@ namespace types
 				id -= 1;
 
 			if (id < 0 || id >= _listings.size())
-				throw new type_error("Bad listing index.");
+				throw type_error("Bad listing index.");
 
 			PConstructor::Listing const& con = _listings[id];
 

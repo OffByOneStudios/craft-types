@@ -54,7 +54,7 @@ namespace types
 		inline virtual void contextualize(instance<> i, std::shared_ptr<Context> c)
 		{
 			if (_context_func == nullptr) return;
- 		  (i.asType<TType>().get()->*(this->_context_func))(c);
+			(i.asType<TType>().get()->*(this->_context_func))(c);
 		}
 
 		inline virtual void finalize(instance<> i, std::shared_ptr<Context> c)
