@@ -30,7 +30,7 @@ namespace types {
 		template<typename T>
 		static CppNativeActualType* make()
 		{
-			static_assert(!std::is_compound<T>::value, "Is compound, should probably not be given it's own type.");
+			static_assert(std::is_compound<T>::value, "Is compound, should probably not be given a native cpp type.");
 			static_assert(!std::is_abstract<T>::value, "Is abstract, use CppNativeAbstractType instead.");
 			
 			auto ret = new CppNativeActualType();

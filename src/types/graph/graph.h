@@ -5,14 +5,12 @@
 
 namespace craft {
 namespace types {
-	class TypeGraphSystem;
+	class TypeGraph;
 
 	class SubtypeAlgorithmState;
 	class ValidationAlgorithmState;
 	class ValidationWithSubtypingAlgorithmState;
 }}
-
-#include "TypeId.hpp"
 
 #include "SType.hpp"
 

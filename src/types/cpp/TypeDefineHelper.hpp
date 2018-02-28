@@ -7,20 +7,23 @@ namespace types
 {
 	namespace _details
 	{
+		/* Helper with a specific compiler time feature referenced
+		
+		*/
 		template<typename TType, typename TFeature>
-		class ObjectDefineInterfacedHelper
+		class TypeDefineHelper_WithFeature
 		{
 		private:
 			Types& _types;
 
-			ObjectDefineInterfacedHelper(Types& types)
+			TypeDefineHelper_WithFeature(Types& types)
 				: _types(types)
 			{ }
 
-			ObjectDefineInterfacedHelper(ObjectDefineInterfacedHelper const&) = default;
+			TypeDefineHelper_WithFeature(TypeDefineHelper_WithFeature const&) = default;
 
 			friend class ::craft::types::Types;
-			friend class ObjectDefineHelper<TType>;
+			friend class TypeDefineHelper<TType>;
 		public:
 			// TODO type check these
 
@@ -115,25 +118,25 @@ namespace types
 		};
 
 		template<typename TType>
-		class ObjectDefineHelper
+		class TypeDefineHelper
 		{
 		private:
 			Types& _types;
-			ObjectDefineHelper* _parent;
+			TypeDefineHelper* _parent;
 
-			ObjectDefineHelper(Types& types, ObjectDefineHelper* parent = nullptr)
+			TypeDefineHelper(Types& types, TypeDefineHelper* parent = nullptr)
 				: _types(types), _parent(parent)
 			{
 			}
 
-			ObjectDefineHelper(ObjectDefineHelper const&) = default;
+			TypeDefineHelper(TypeDefineHelper const&) = default;
 
 			template <typename T> friend class ObjectDefineHelper;
 			friend class ::craft::types::Types;
 		public:
 			template<typename TInterface>
-			inline ObjectDefineInterfacedHelper<TType, TInterface>
-				use () { return ObjectDefineInterfacedHelper<TType, TInterface>(_types); }
+			inline TypeDefineHelper_WithFeature<TType, TInterface>
+				use () { return TypeDefineHelper_WithFeature<TType, TInterface>(_types); }
 
 		public:
 
@@ -147,7 +150,7 @@ namespace types
 				typename std::enable_if< !(type<TParent>::isObject) >::type* = nullptr>
 				inline void parent()
 			{
-				TParent::template __craft_s_types_init<TType>(ObjectDefineHelper(_types, this));
+				TParent::template __craft_s_types_init<TType>(TypeDefineHelper(_types, this));
 			}
 
 			inline void defaults()

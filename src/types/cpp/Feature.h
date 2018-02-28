@@ -21,7 +21,7 @@ namespace types
 		virtual ~IFeatureManager() = default;
 
 		virtual FeatureKind featureKind() const = 0;
-		virtual FeatureId featureId() const = 0;
+		virtual TypeId featureId() const = 0;
 		virtual std::string featureName() const = 0;
 
 		// T:
@@ -48,21 +48,7 @@ namespace types
 		virtual ~Feature() = default;
 
 		virtual IFeatureManager* craft_featureManager() const = 0;
-		virtual TypeId craft_featuredTypeId() const = 0;
-
-		// Implementation details
-	protected:
-		struct _static_init : Ider<FeatureId>
-		{
-			inline _static_init(_details::_fn_register_feature_init _init)
-				: Ider<FeatureId>(Feature::_id.increment())
-			{
-				_details::_register_feature_init(_id, _init);
-			}
-		};
-
-	private:
-		CRAFT_TYPES_EXPORTED static FeatureId _id;
+		virtual TypeId craft_typeId() const = 0;
 	};
 
 	/******************************************************************************
@@ -77,7 +63,7 @@ namespace types
 	{
 		static constexpr bool isFeature = true;
 
-		inline static FeatureId featureId() { return TFeature::craft_s_featureId(); }
-		inline static std::string name() { return TFeature::craft_c_featureName; }
+		inline static TypeId typeId() { return TFeature::craft_s_typeId(); }
+		inline static std::string name() { return TFeature::craft_c_name; }
 	};
 }}

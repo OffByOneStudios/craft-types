@@ -86,7 +86,7 @@ namespace types
 #define CRAFT_OBJECT_DECLARE(x) \
     static ::craft::types::_details::type_impl::_static_init __si; \
 private: \
-    static void __craft_s_types_init(::craft::types::_details::ObjectDefineHelper<x> _); \
+    static void __craft_s_types_init(::craft::types::_details::TypeDefineHelper<x> _); \
 public: \
     static inline ::craft::types::TypeId craft_s_typeId() { return x::__si.id; } \
 	static inline ::std::string craft_s_typeName() { return #x; } \
@@ -98,11 +98,11 @@ private:
 
 #define CRAFT_OBJECT_DEFINE(x) \
 	::craft::types::_details::type_impl::_static_init x::__si((::craft::types::_details::_fn_register_type_init)&x::__craft_s_types_init); \
-	void x::__craft_s_types_init(::craft::types::_details::ObjectDefineHelper<x> _)
+	void x::__craft_s_types_init(::craft::types::_details::TypeDefineHelper<x> _)
 
 #define CRAFT_OBJECT_ABSTRACT_DECLARE(x) \
 private: \
-    template<typename T> friend class ::craft::types::_details::ObjectDefineHelper; \
+    template<typename T> friend class ::craft::types::_details::TypeDefineHelper; \
 	template<typename T> \
-    inline static void __craft_s_types_init(::craft::types::_details::ObjectDefineHelper<T> _)
+    inline static void __craft_s_types_init(::craft::types::_details::TypeDefineHelper<T> _)
 		

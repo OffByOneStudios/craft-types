@@ -1,10 +1,25 @@
 #pragma once
 #include "common.h"
 
+// Forward Declarations
+namespace craft {
+namespace types
+{
+	class Identifiers;
+	inline Identifiers& identifiers();
+
+	class TypeGraph;
+	inline TypeGraph& graph();
+
+	class CppSystem;
+	inline CppSystem& system();
+}}
+
 //
 // Components Subsystems
 //
 
+#include "identifiers.h"
 #include "graph/graph.h"
 
 //
@@ -13,6 +28,8 @@
 
 #include "prelude.h"
 #include "exceptions.hpp"
+
+#include "cpp_interface.h"
 
 #include "Feature.h"
 #include "Object.h"

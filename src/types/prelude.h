@@ -21,30 +21,6 @@ namespace types
 	class Provider;
 	class Aspect;
 
-	/******************************************************************************
-	** Feature Id Helper
-	******************************************************************************/
-
-	struct FeatureId
-		: stdext::IdValue<FeatureId, size_t>
-	{
-		using IdValue::IdValue;
-
-		//
-		// Defined in Types.hpp
-		//
-		inline IFeatureManager* getManager() const;
-
-		//
-		// Defined in to_string.h
-		//
-		CRAFT_TYPES_EXPORTED std::string toString(bool verbose = true) const;
-	};
-
-	const static FeatureId NoFeature = 0;
-
-	inline std::ostream & operator<<(std::ostream & s, FeatureId const & v) { s << v.toString(); return s; }
-
 	//
 	// Detail Formward Declarations
 	//
@@ -62,13 +38,12 @@ namespace types
 		}
 
 		template<typename T>
-		class ObjectDefineHelper;
+		class TypeDefineHelper;
 
-		typedef void(*_fn_register_type_init)(ObjectDefineHelper<void> _);
-		void CRAFT_TYPES_EXPORTED _register_type_init(TypeId, _fn_register_type_init);
+		CRAFT_TYPES_EXPORTED TypeGraphSystem* _cpp_init_graph();
 
-		typedef void(*_fn_register_feature_init)();
-		void CRAFT_TYPES_EXPORTED _register_feature_init(FeatureId, _fn_register_feature_init);
+		typedef void(*_fn_register_type_init)(TypeDefineHelper<void> _);
+		CRAFT_TYPES_EXPORTED void _register_type_init(TypeId, _fn_register_type_init);
 
 		struct type_impl
 		{
@@ -104,7 +79,6 @@ namespace types
 		static constexpr bool isFeature = false;
 
 		inline static TypeId typeId() { return 0; }
-		inline static FeatureId featureId() { return 0; }
 		inline static std::string name() { return ""; }
 	};
 }

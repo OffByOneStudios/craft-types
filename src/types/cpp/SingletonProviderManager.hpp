@@ -22,7 +22,7 @@ namespace types
 		//
 		// IFeatureManager
 		//
-		virtual FeatureId featureId() const override
+		virtual TypeId featureId() const override
 		{
 			return TProvider::craft_s_featureId();
 		}
@@ -83,7 +83,7 @@ namespace types
 		//
 		// Template IFeatureManager
 		//
-		inline virtual void add(TypeId tid, FeatureId fid, TProvider* object)
+		inline virtual void add(TypeId tid, TypeId fid, TProvider* object)
 		{
 			assert(TProvider::craft_s_featureId() == fid
 				&& "Ensure advertised features match.");
