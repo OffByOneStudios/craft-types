@@ -151,6 +151,23 @@ namespace types
 			return impl<TFeature, TFeature::craft_c_featureKind>::has(this, obj);
 		}
 
+		inline bool typeHasFeature(TypeId type, FeatureId feature)
+		{
+			auto manager = getManager(feature);
+
+			switch (manager->featureKind())
+			{
+			case FeatureKind::Aspect:
+				return ((IAspectManager*)manager)->hasAspect(type, nullptr);
+				break;
+			case FeatureKind::Provider:
+				return ((IProviderManager*)manager)->hasProvider(type);
+				break;
+			default:
+				throw stdext::exception("Unknown provider kind.");
+			}
+		}
+
 		template<typename TFeature,
 			typename std::enable_if< std::is_base_of<IIndexedProviderManager, typename TFeature::T_Manager>::value >::type* = nullptr>
 		inline TFeature* getIndex(std::string name)
