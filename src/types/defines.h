@@ -21,10 +21,14 @@
 #endif
 #endif
 
+//
+// Compiler fixups
+//
 
-#ifndef _WIN32
+#if !defined(_MSC_VER) || defined(__clang__)
 #define abstract
 #endif
+
 //
 // Engine Compile
 //
