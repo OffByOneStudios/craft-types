@@ -2,6 +2,21 @@
 
 #include "default_types_c.h"
 
+CRAFT_TYPE_DEFINE(int8_t)
+{
+	_.use<PIdentifier>().singleton<SimpleIdentifier>("int8");
+	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<int8_t>::make(std::stoi(s)); });
+	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<int8_t> _this) { return std::to_string(*_this); });
+	_.use<PConstructor>().singleton<DefaultConstructor>();
+}
+CRAFT_TYPE_DEFINE(int16_t)
+{
+	_.use<PIdentifier>().singleton<SimpleIdentifier>("int16");
+	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<int16_t>::make(std::stol(s)); });
+	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<int16_t> _this) { return std::to_string(*_this); });
+	_.use<PConstructor>().singleton<DefaultConstructor>();
+
+}
 CRAFT_TYPE_DEFINE(int32_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("int32");
@@ -17,6 +32,21 @@ CRAFT_TYPE_DEFINE(int64_t)
 	_.use<PConstructor>().singleton<DefaultConstructor>();
 }
 
+CRAFT_TYPE_DEFINE(uint8_t)
+{
+	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint8");
+	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<uint8_t>::make(std::stoi(s)); });
+	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<uint8_t> _this) { return std::to_string(*_this); });
+	_.use<PConstructor>().singleton<DefaultConstructor>();
+}
+CRAFT_TYPE_DEFINE(uint16_t)
+{
+	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint16");
+	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<uint16_t>::make(std::stol(s)); });
+	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<uint16_t> _this) { return std::to_string(*_this); });
+	_.use<PConstructor>().singleton<DefaultConstructor>();
+
+}
 CRAFT_TYPE_DEFINE(uint32_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint32");
