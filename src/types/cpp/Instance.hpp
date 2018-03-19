@@ -1,6 +1,6 @@
 #pragma once
-#include "common.h"
-#include "core.h"
+#include "../common.h"
+#include "../core.h"
 
 /* T:
 	This is a collection of classes which provide a struct, similar to `std::shared_ptr` which
@@ -20,14 +20,15 @@ namespace types
 	template<typename TFeature>
 	TFeature* instance<void>::getFeature() const
 	{
-		if (this->_actual == nullptr) return nullptr;
-		return system().get<TFeature>(_meta->restore());
+		if (this->_meta == nullptr) return nullptr;
+		return system().typeGetFeature<TFeature>(*this);
 	}
 
 	template<typename TFeature>
 	bool instance<void>::hasFeature() const
 	{
-		return system().has<TFeature>(_meta->restore());
+		if (this->_meta == nullptr) return false;
+		return system().typeHasFeature<TFeature>(_meta->typeId);
 	}
 
 	/******************************************************************************
@@ -42,8 +43,8 @@ namespace types
 	{
 	/* Data section, 2 pointers wide. */
 	private:
-		mutable T*                               _actual;
-		mutable _details::InstanceMetaHeader*    _meta;
+		mutable T*					_actual;
+		mutable InstanceHeader*		_meta;
 
 		template<typename TOther, typename T_> friend struct instance;
 
@@ -67,12 +68,12 @@ namespace types
 
 		inline ~instance()
 		{
-			_meta->safe_dec();
+			InstanceHeader::safe_dec(_meta);
 		}
 
 		inline instance(instance<T> const& inst)
 			: _actual(inst._actual)
-			, _meta(inst._meta)
+			, _meta(InstanceHeader::safe_inc(inst._meta))
 		{ }
 
 		inline instance(instance<T> && inst)
@@ -86,7 +87,8 @@ namespace types
 		inline instance<T>& operator=(instance<T> const& _that)
 		{
 			_actual = _that._actual;
-			_meta = _that._meta;
+			InstanceHeader::safe_dec(_meta);
+			_meta = InstanceHeader::safe_inc(_that._meta);
 			return *this;
 		}
 
@@ -98,108 +100,112 @@ namespace types
 		}
 
 		// Void instances
+
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
 		inline instance(instance<void> const& inst)
 			: _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
-			, _meta(inst._meta)
+			, _meta(InstanceHeader::safe_inc(inst._meta))
 		{
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
-			inline instance(instance<void> const& inst)
+			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr>
+		inline instance(instance<void> const& inst)
 			: _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
-			, _meta(inst._meta)
+			, _meta(InstanceHeader::safe_inc(inst._meta))
 		{
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
 		inline instance(instance<void> const& inst)
 			: _actual(inst.getFeature<_T>())
-			, _meta(inst._meta)
+			, _meta(InstanceHeader::safe_inc(inst._meta))
 		{
 		}
 
 		// From pointers:
-		inline instance(void* const& ptr, TypeId const& tid)
-			: _actual((T*)ptr)
-			, _meta(new _details::InstanceMetaHeader(tid, ptr))
-		{
-		}
 
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
 		inline instance(_T* const& ptr)
 			: _actual(ptr)
-			, _meta(new _details::InstanceMetaHeader(type<_T>::typeId(), ptr))
+			, _meta(InstanceHeader::safe_inc(static_cast<Object*>(ptr)->header))
 		{
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::kind == CppTypeKindEnum::LegacyProvider >::type* = nullptr>
 			inline instance(_T* const& ptr)
 			: _actual(ptr)
-			, _meta(new _details::InstanceMetaHeader(type<_T>::typeId(), ptr))
+			, _meta(nullptr)
 		{
 		}
 
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
-			inline instance(_T* const& ptr, _details::InstanceMetaHeader* const& meta)
-			: _actual(ptr)
-			, _meta(meta)
-		{
-		}
+		// From other instance
 
-		// from other instance
 		template<typename TObject,
 			typename _T = T,
-			typename std::enable_if< type<_T>::isFeature
-                && (type<TObject>::isObject || type<TObject>::isExternal)
+			typename std::enable_if< cpptype<_T>::isLegacyFeature
+                && (cpptype<TObject>::isObject || cpptype<TObject>::isRawType)
 			>::type* = nullptr >
 		inline instance(instance<TObject> const& inst)
 			: _actual(inst.template getFeature<_T>())
-			, _meta(inst._meta)
+			, _meta(InstanceHeader::safe_inc(inst._meta))
 		{
+		}
+
+		template<typename TObject,
+			typename _T = T,
+			typename std::enable_if< cpptype<_T>::isLegacyFeature
+				&& (cpptype<TObject>::isObject || cpptype<TObject>::isRawType)
+			>::type* = nullptr >
+		inline instance<T>& operator=(instance<TObject> const& _that)
+		{
+			_actual = _that.template getFeature<_T>();
+			InstanceHeader::safe_dec(_meta);
+			_meta = InstanceHeader::safe_inc(_that._meta);
+			return *this;
 		}
 
 		template<typename TType,
 			typename _T = T,
-			typename std::enable_if< std::is_base_of<Provider, _T>::value >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::kind == CppTypeKindEnum::LegacyProvider >::type* = nullptr>
 		static inline instance<_T> forType()
 		{
-			return forType(type<TType>::typeId());
+			return forType(cpptype<TType>::typeDesc());
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< std::is_base_of<Provider, _T>::value >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::kind == CppTypeKindEnum::LegacyProvider >::type* = nullptr>
 			static inline instance<_T> forType(TypeId type)
 		{
 			auto actual = type.getFeature<_T>();
 
-			return instance<_T>(actual, type);
+			return instance<_T>(actual);
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isObject  >::type* = nullptr,
+			typename std::enable_if< cpptype<_T>::isObject  >::type* = nullptr,
 			typename... TArgs>
 		static inline instance<_T> make(TArgs&&... args)
 		{
-			_T* actual = new _T(args...);
+			_T* actual = new _T(std::forward<TArgs>(args)...);
+			actual->craft_setupInstance();
 
 			return instance<_T>(actual);
 		}
 
 		template<typename _T = T,
-			typename std::enable_if<  type<_T>::isExternal >::type* = nullptr,
+			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr,
 			typename... TArgs>
 			static inline instance<_T> make(TArgs&&... args)
 		{
-			_T* actual = new _T(args...);
+			_T* actual = new _T(std::forward<TArgs>(args)...);
+			InstanceHeader* header = new InstanceHeader(cpptype<_T>::typeDesc(), actual, 0);
 
-			return instance<_T>(actual);
+			return instance<_T>(header);
 		}
 
 	//
@@ -215,19 +221,9 @@ namespace types
 	// Core Features
 	//
 	public:
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
-		inline TypeId typeId() const { return type<_T>::typeId(); }
-
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
-		inline TypeId typeId() const { return type<_T>::typeId(); }
-
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
 		inline TypeId typeId() const
 		{
-			if (_meta == nullptr) return 0;
+			if (_meta == nullptr) return cpptype<T>::typeDesc();
 			return _meta->typeId;
 		}
 
@@ -238,19 +234,19 @@ namespace types
 		inline T const& value() const { return *_actual; }
 
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isObject >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
 			inline bool isNull() const
 		{
 			return _actual == nullptr;
 		}
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isExternal >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr>
 			inline bool isNull() const
 		{
 			return _actual == nullptr;
 		}
 		template<typename _T = T,
-			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
 			inline bool isNull() const
 		{
 			return _meta == nullptr || _meta->actual == nullptr;
@@ -272,62 +268,67 @@ namespace types
 	// Stringing
 	//
 	public:
-		template<typename _T = T,
-			typename std::enable_if< !type<_T>::isFeature >::type* = nullptr>
 		inline std::string toString(bool verbose = false) const
 		{
-			return instance<void>::toString(_meta->restore(), typeId(), verbose);
-		}
-		template<typename _T = T,
-			typename std::enable_if< type<_T>::isFeature >::type* = nullptr>
-			inline std::string toString(bool verbose = false) const
-		{
-			return instance<void>::toString(_meta->restore(), type<T>::featureId(), verbose);
+			return instance<void>::toString(instance<>(_meta), typeId(), verbose);
 		}
 
 	//
 	// Helper Features
 	//
 	public:
-		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_featureKind != FeatureKind::Aspect >::type* = nullptr>
-		inline TFeature* getFeature() const
+		template<typename TOtherType>
+		inline bool isType() const
 		{
-			return system().get<TFeature>(typeId());
+			return typeId().isType<TOtherType>();
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_featureKind == FeatureKind::Aspect >::type* = nullptr>
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
-			return system().get<TFeature>(_meta->restore());
+			return system().typeGetFeature<TFeature>(typeId());
 		}
 
-		template<typename TFeature>
-		inline bool hasFeature() const
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+		inline TFeature* getFeature() const
 		{
-			if (isNull())
-				return system().has<TFeature>(typeId());
-			else
-				return system().has<TFeature>(_meta->restore());
+			if (this->_meta == nullptr) return nullptr;
+			return system().typeGetFeature<TFeature>(instance<>(_meta));
+		}
+
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			inline bool hasFeature() const
+		{
+			return system().typeHasFeature<TFeature>(typeId());
+		}
+
+		template<typename TFeature,
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			inline bool hasFeature() const
+		{
+			if (this->_meta == nullptr) return nullptr;
+			return system().typeHasFeature<TFeature>(instance<>(_meta));
 		}
 
 		template<typename TFeature>
 		inline instance<TFeature> asFeature() const
 		{
-			return instance<TFeature>(_meta->restore());
+			return instance<TFeature>(instance<>(_meta));
 		}
 
 		template<typename TType,
 			typename _T = T,
-			typename std::enable_if< craft::type<_T>::isFeature
-				&& (type<TType>::isObject || type<TType>::isExternal)
+			typename std::enable_if< cpptype<_T>::isLegacyFeature
+				&& (cpptype<TType>::isObject || cpptype<TType>::isRawType)
 			>::type* = nullptr>
 		inline instance<TType> asType() const
 		{
-			if (_meta == nullptr || type<TType>::typeId() != _meta->typeId)
+			if (_meta == nullptr || cpptype<TType>::typeDesc().asId() != _meta->typeId)
 				throw stdext::exception("instance<void>::asType() | T.id != instance.id");
-			return instance<TType>(_meta->restore());
+			return instance<TType>(instance<>(_meta));
 		}
 	};
 

@@ -1,7 +1,7 @@
 
 #include "basic_object.h"
 
-CRAFT_OBJECT_DEFINE(TestBasicObject)
+CRAFT_DEFINE(TestBasicObject)
 {
 	_.defaults();
 }

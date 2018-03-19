@@ -1,6 +1,6 @@
 #pragma once
-#include "common.h"
-#include "core.h"
+#include "../common.h"
+#include "../core.h"
 
 
 #ifdef __clang__
@@ -10,37 +10,38 @@
 namespace craft {
 namespace types
 {
-	namespace _details
+	template<typename TType = void, typename T_ = void> struct instance;
+
+	/******************************************************************************
+	** InstanceHeader
+	******************************************************************************/
+
+	struct InstanceHeader
 	{
-		struct InstanceMetaHeader
+		TypeId typeId;
+		void* actual;
+		uintptr_t gcInfo;
+
+		InstanceHeader(TypeId tid, void* actual, void* gcInfo = nullptr)
+			: typeId(tid)
+			, actual(actual)
+			, gcInfo((uintptr_t)gcInfo)
 		{
-			InstanceMetaHeader(TypeId tid, void* actual, void* gcInfo = nullptr)
-				: typeId(tid)
-				, actual(actual)
-				, gcInfo((uintptr_t)gcInfo)
-			{
 
-			}
+		}
 
-			TypeId typeId;
-			void* actual;
-			uintptr_t gcInfo;
-
-			inline instance<> restore();
-			inline InstanceMetaHeader* safe_inc()
-			{
-				if (this != nullptr)
-					gcInfo++;
-				return this;
-			}
-			inline InstanceMetaHeader* safe_dec()
-			{
-				if (this != nullptr)
-					gcInfo--;
-				return this;
-			}
-		};
-	}
+		static inline InstanceHeader* safe_inc(InstanceHeader* this_)
+		{
+			if (this_ != nullptr)
+				this_->gcInfo++;
+			return this_;
+		}
+		static inline void safe_dec(InstanceHeader* this_)
+		{
+			if (this_ != nullptr)
+				this_->gcInfo--;
+		}
+	};
 
 	/******************************************************************************
 	** Instance Generic, Declare
@@ -55,8 +56,8 @@ namespace types
 	{
 		/* Data section, 2 pointers wide. */
 	private:
-		mutable void*                            _actual;
-		mutable _details::InstanceMetaHeader*    _meta;
+		mutable void*               _actual;
+		mutable InstanceHeader*     _meta;
 
 		template<typename T, typename T_> friend struct instance;
 
@@ -76,12 +77,12 @@ namespace types
 
 		inline ~instance()
 		{
-			_meta->safe_dec();
+			InstanceHeader::safe_dec(_meta);
 		}
 
 		inline instance(instance<void> const& inst)
 			: _actual(inst._actual)
-			, _meta(inst._meta->safe_inc())
+			, _meta(InstanceHeader::safe_inc(inst._meta))
 		{ }
 
 		inline instance(instance<void> && inst)
@@ -95,7 +96,7 @@ namespace types
 		inline instance<void>& operator=(instance<void> const& _that)
 		{
 			_actual = _that._actual;
-			_meta = _that._meta->safe_inc();
+			_meta = InstanceHeader::safe_inc(_that._meta);
 			return *this;
 		}
 		inline instance<void>& operator=(instance<void> && _that)
@@ -105,51 +106,34 @@ namespace types
 			return *this;
 		}
 
-		// Helper constructors
-		inline instance(_details::InstanceMetaHeader* meta)
-			// By supporting nullptr we get nullptr conversion
+		// Restore constructor
+		inline instance(InstanceHeader* meta)
+			// By supporting nullptr we get nullptr conversion (for a single pointer)
 			: _actual(meta == nullptr ? nullptr : meta->actual)
-			, _meta(meta->safe_inc())
-		{ }
-
-		inline instance(void* ptr, TypeId tid)
-			: _actual(ptr)
-			, _meta((new _details::InstanceMetaHeader(tid, ptr))->safe_inc())
-		{ }
-
-		template<typename T, typename std::enable_if< type<T>::isObject >::type* = nullptr>
-		inline instance(T* ptr)
-			: _actual((void*)ptr)
-			, _meta((new _details::InstanceMetaHeader(type<T>::typeId(), ptr))->safe_inc())
+			, _meta(InstanceHeader::safe_inc(meta))
 		{ }
 
 		// Other features:
 		inline TypeId typeId() const { return _meta == nullptr ? (TypeId)0 : _meta->typeId; }
 
-		template<typename T, typename std::enable_if< std::is_base_of<Object, T>::value >::type>
-		inline operator instance<T>() const { return asType<T>(); }
-
-		template<typename T, typename std::enable_if< std::is_base_of<Feature, T>::value && !std::is_base_of<Object, T>::value>::type>
-		inline operator instance<T>() const { return asFeature<T>(); }
-
 		inline operator bool() const { return !isNull(); }
 
-		inline void* get() { return _actual; }
-		inline void const* get() const { return _actual; }
+		inline void* get() const { return _actual; }
 
 		template<typename T>
 		inline instance<T> asType() const
 		{
-			if (_meta != nullptr && type<T>::typeId() != _meta->typeId)
-				throw stdext::exception("instance<void>::asType() | T.id != instance.id");
+			assert(_meta != nullptr
+				&& cpptype<T>::typeDesc().asId() == _meta->typeId
+				&& "instance<void>::asType() | T.id != instance.id");
 
-			return instance<T>(_meta->restore());
+			return instance<T>(_meta);
 		}
 
 		template<typename T>
 		inline instance<T> asFeature() const
 		{
-			return instance<T>(_meta->restore());
+			return instance<T>(_meta);
 		}
 
 		inline bool isNull() const
@@ -164,7 +148,6 @@ namespace types
 
 		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, bool verbose = false);
 		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, TypeId tid, bool verbose = false);
-		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, FeatureId fid, bool verbose = false);
 
 		inline std::string toString(bool verbose = false) const
 		{
@@ -177,11 +160,6 @@ namespace types
 		template<typename TFeature> inline bool hasFeature() const;
 		template<typename TFeature> inline TFeature* getFeature() const;
 	};
-
-	inline instance<> _details::InstanceMetaHeader::restore()
-	{
-		return instance<void>(this);
-	}
 }
 
 using ::craft::types::instance;

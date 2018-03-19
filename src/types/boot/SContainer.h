@@ -12,7 +12,7 @@ namespace types
 	class SContainer abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_ASPECT_DECLARE(SContainer, "types.container", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SContainer, "types.container", FactoryAspectManager);
 
 	public:
 		struct Description
@@ -20,8 +20,6 @@ namespace types
 			bool isDict;
 			bool isList;
 			bool isSet;
-
-			FeatureId hint;
 		};
 
 		virtual Description container_desc() const = 0;
@@ -52,8 +50,6 @@ namespace types
 			void *p;
 		};
 	private:
-		FeatureId _hint;
-
 		std::map<std::string, instance<>> TType::* _member_map;
 		std::vector<instance<>> TType::* _member_vector;
 
@@ -62,9 +58,6 @@ namespace types
 		//
 	public:
 		ContainerViaStds()
-			: _hint(0)
-			, _member_map(nullptr)
-			, _member_vector(nullptr)
 		{
 
 		}
@@ -142,7 +135,7 @@ namespace types
 		template<typename TFeature>
 		inline ContainerViaStds* withOffsetMap(std::map<std::string, instance<TFeature>> TType::* member)
 		{
-			_hint = type<TFeature>::featureId();
+			//_hint = type<TFeature>::featureId();
 			_member_map = reinterpret_cast<std::map<std::string, instance<>> TType::*>(member);
 			return this;
 		}
@@ -150,7 +143,7 @@ namespace types
 		template<typename TFeature>
 		inline ContainerViaStds* withOffsetVector(std::vector<instance<TFeature>> TType::* member)
 		{
-			_hint = type<TFeature>::featureId();
+			//_hint = type<TFeature>::featureId();
 			_member_vector = reinterpret_cast<std::vector<instance<>> TType::*>(member);
 			return this;
 		}

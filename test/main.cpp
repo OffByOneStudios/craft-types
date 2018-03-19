@@ -6,7 +6,7 @@
 
 int main(int argc, char const *argv[])
 {
-	craft::types::system().init();
+	craft::types::boot_with_cpp();
 
 	auto ret = bandit::run(argc, (char**)argv);
 

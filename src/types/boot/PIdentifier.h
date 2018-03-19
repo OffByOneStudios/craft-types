@@ -1,6 +1,6 @@
 #pragma once
 #include "../common.h"
-
+#include "../core.h"
 
 namespace craft {
 namespace types
@@ -17,7 +17,7 @@ namespace types
 	class PIdentifier abstract
 		: public Provider
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_PROVIDER_DECLARE(PIdentifier, "types.id",  NamedSingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PIdentifier, "types.id", NamedSingletonProviderManager);
 
 	public:
 		virtual std::string identifier() const = 0;
@@ -27,8 +27,9 @@ namespace types
 	};
 
 	/******************************************************************************
-	** DefaultIdentifier
+	** SimpleIdentifier
 	******************************************************************************/
+
 	template <typename T>
 	class SimpleIdentifier
 		: public Implements<PIdentifier>::For<T>
@@ -40,6 +41,10 @@ namespace types
 
 		inline virtual std::string identifier() const override { return _name; }
 	};
+
+	/******************************************************************************
+	** DefaultIdentifier
+	******************************************************************************/
 
 	template <typename T>
 	class DefaultIdentifier

@@ -4,16 +4,16 @@
 class SEmptyTestFactory abstract
 	: public craft::types::Aspect
 {
-	CRAFT_ASPECT_DECLARE(SEmptyTestFactory, "types.test.empty.factory", craft::types::FactoryAspectManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(SEmptyTestFactory, "types.test.empty.factory", craft::types::FactoryAspectManager);
 };
 
 class SEmptyTestInstance abstract
 	: public craft::types::Aspect
 {
-	CRAFT_ASPECT_DECLARE(SEmptyTestInstance, "types.test.empty.instance", craft::types::InstanceAspectManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(SEmptyTestInstance, "types.test.empty.instance", craft::types::InstanceAspectManager);
 };
 
-template<template<typename> typename T>
+template<template<typename> class T>
 inline void describe_for_empty_aspects(std::string desc)
 {
 	bandit::describe(desc.c_str(), []() {

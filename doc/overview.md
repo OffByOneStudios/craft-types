@@ -30,7 +30,7 @@ TypeId's are system word sized integers that represent a type. They can either b
 
 Instances are allocated memory of a type, interpreting the memory obviously depends on the type. In general the memory does not provide a mechanism for recovering the type, or other helpers.
 
-There is a standard instance metadata struct. It is composed of the TypeId, the pointer to the actual instance, a reference count (for reference counted types).
+There is a standard instance metadata struct. It is composed of the TypeId, the pointer to the actual instance, a reference count (for reference counted types). It *does* provide recovering the type, and wrapping arbitrary instances.
 
 ### Features
 

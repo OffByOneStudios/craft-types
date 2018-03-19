@@ -1,6 +1,6 @@
 #pragma once
-#include "common.h"
-#include "core.h"
+#include "../common.h"
+#include "../core.h"
 
 namespace craft {
 namespace types
@@ -14,7 +14,7 @@ namespace types
 		: public IAspectManager
 	{
 	protected:
-		std::map<TypeId, IAspectFactory<TAspect>*> _factories;
+		std::map<cpp::TypePtr, IAspectFactory<TAspect>*> _factories;
 
 		struct _t_instanceCounted
 		{
@@ -31,16 +31,16 @@ namespace types
 		//
 		// IFeatureManager
 		//
-		inline virtual FeatureId featureId() const override
+		virtual cpp::TypePtr featureDesc() const override
 		{
-			return TAspect::craft_s_featureId();
+			return TAspect::craft_s_typeDesc();
 		}
 		inline virtual std::string featureName() const override
 		{
-			return std::string(TAspect::craft_c_featureName);
+			return std::string(TAspect::craft_s_featureName());
 		}
 
-		virtual void purgeType(TypeId tid) noexcept override
+		virtual void purgeType(cpp::TypePtr tid) noexcept override
 		{
 			auto it = _factories.find(tid);
 			if (it == _factories.end())
@@ -48,9 +48,9 @@ namespace types
 			delete it->second;
 		}
 
-		virtual std::vector<TypeId> supportedTypes() const override
+		virtual std::vector<cpp::TypePtr> supportedTypes() const override
 		{
-			return std::vector<TypeId>(
+			return std::vector<cpp::TypePtr>(
 				stdext::key_iterator(_factories.begin()),
 				stdext::key_iterator(_factories.end()));
 		}
@@ -58,17 +58,17 @@ namespace types
 		//
 		// IAspectManager
 		//
-		inline virtual bool hasAspect(TypeId tid, void* instance) override
+		inline virtual bool hasAspect(cpp::TypePtr tid, void* instance) override
 		{
 			return  _factories.find(tid) != _factories.end();
 		}
 
-		inline virtual Aspect* getAspect(TypeId tid, void* instance) override
+		inline virtual Aspect* getAspect(cpp::TypePtr tid, void* instance) override
 		{
 			auto it_f = _factories.find(tid);
 
 			if (it_f == _factories.end())
-				throw stdext::exception("FactoryAspectManager.getAspect() for `{0}` Type `{1}` not found", this->featureId().toString(), tid.toString());
+				throw stdext::exception("FactoryAspectManager.getAspect() for `{0}` Type `{1}` not found", this->featureDesc().toString(), tid.toString());
 
 			auto factory = it_f->second;
 
@@ -97,18 +97,19 @@ namespace types
 			assert(aspect->craft_featureManager() == this
 				&& "Ensure advertised manager matches.");
 
-			auto it = _instances.find(aspect->craft_featuredInstance().get());
+			auto inst = aspect->craft_featuredInstance();
+			auto it = _instances.find(inst.get());
 
 			if (it == _instances.end())
 			{
-				_factories[aspect->craft_featuredTypeId()]->destroy((TAspect*)aspect);
+				_factories[inst.typeId()]->destroy((TAspect*)aspect);
 				return;
 			}
 			else
 			{
 				if (--(it->second.count) <= 0)
 				{
-					_factories[aspect->craft_featuredTypeId()]->destroy((TAspect*)aspect);
+					_factories[inst.typeId()]->destroy((TAspect*)aspect);
 				}
 				return;
 			}
@@ -117,7 +118,7 @@ namespace types
 		//
 		// FactoryAspectManager
 		//
-		inline virtual void addFactory(TypeId tid, IAspectFactory<TAspect>* factory)
+		inline virtual void addFactory(cpp::TypePtr tid, IAspectFactory<TAspect>* factory)
 		{
 			/*
 			assert(factory->craft_featuredTypeId() == tid
@@ -129,16 +130,6 @@ namespace types
 				&& "Ensure type is not already registered.");
 
 			_factories[tid] = factory;
-		}
-
-		//
-		// Template IFeatureManager
-		//
-		inline void add(TypeId tid, FeatureId fid, IAspectFactory<TAspect>* object)
-		{
-			assert(TAspect::craft_s_featureId() == fid
-				&& "Ensure advertised features match.");
-			addFactory(tid, object);
 		}
 	};
 }}

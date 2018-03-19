@@ -12,15 +12,6 @@ go_bandit([]()
 	*/
 	describe("craft::types::TypeGraphSystem", []()
 	{
-		types::TypeGraphSystem* graph_system;
-
-		before_each([&]() {
-			graph_system = new types::TypeGraphSystem();
-		});
-		after_each([&]() {
-			delete graph_system;
-		});
-
 
 	});
 });

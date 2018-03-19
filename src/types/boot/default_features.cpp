@@ -4,22 +4,21 @@
 using namespace craft::types;
 
 // Core Providers
-CRAFT_PROVIDER_DEFINE(PIdentifier);
-CRAFT_PROVIDER_DEFINE(PConstructor);
-CRAFT_PROVIDER_DEFINE(PStringer);
-CRAFT_PROVIDER_DEFINE(PConversion);
-CRAFT_PROVIDER_DEFINE(PParse);
-CRAFT_PROVIDER_DEFINE(PRepr);
-CRAFT_PROVIDER_DEFINE(PClone);
+CRAFT_DEFINE(PIdentifier) { _.defaults(); }
+CRAFT_DEFINE(PConstructor) { _.defaults(); }
+CRAFT_DEFINE(PStringer) { _.defaults(); }
+CRAFT_DEFINE(PConversion) { _.defaults(); }
+CRAFT_DEFINE(PParse) { _.defaults(); }
+CRAFT_DEFINE(PClone) { _.defaults(); }
 
 // Object Providers
-CRAFT_PROVIDER_DEFINE(PObjectContextual);
+CRAFT_DEFINE(PObjectContextual) { _.defaults(); }
 
 // Core Aspects
-CRAFT_ASPECT_DEFINE(SLifecycle);
-CRAFT_ASPECT_DEFINE(SContainer);
+CRAFT_DEFINE(SLifecycle) { _.defaults(); }
+CRAFT_DEFINE(SContainer) { _.defaults(); }
 
 // Object Aspects
-CRAFT_ASPECT_DEFINE(SObjectComposite);
-CRAFT_ASPECT_DEFINE(SObjectManipulation);
-CRAFT_ASPECT_DEFINE(SObjectFungible);
+CRAFT_DEFINE(SObjectComposite) { _.defaults(); }
+CRAFT_DEFINE(SObjectManipulation) { _.defaults(); }
+CRAFT_DEFINE(SObjectFungible) { _.defaults(); }

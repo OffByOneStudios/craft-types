@@ -1,18 +1,42 @@
 #pragma once
 #include "../common.h"
+#include "../core.h"
 #include "graph.h"
 
 namespace craft {
 namespace types {
 
-	class TypeGraph sealed
+	class TypeGraph final
 	{
 	private:
+		struct _Node;
+		struct _Edge;
+
+		struct _Edge
+		{
+			void* edgePayload;
+			TypeId edgePayloadType;
+
+			std::vector<_Node*> nodes;
+		};
+
+		struct _Node
+		{
+			void* nodePayload;
+			TypeId nodePayloadType;
+			TypeId typeId; // May be none if the content of this node does not have a typeid
+
+			std::vector<_Edge*> edges;
+		};
+
 		struct _Data
 		{
 			std::atomic<int> refcount;
+			std::recursive_mutex operation;
 
-			std::vector<SType*> types;
+			std::vector<_Edge*> _allEdges;
+			std::vector<_Node*> _allNodes;
+			std::map<TypeId, _Node*> _nodesByType;
 		};
 
 		_Data* _contents;
@@ -33,22 +57,25 @@ namespace types {
 		CRAFT_TYPES_EXPORTED static TypeGraph& threadlocal_instance();
 
 	//
-	// Locking
+	// Runtime Interface
 	//
 	public:
-		std::recursive_mutex operation;
+		class Expression
+		{
+			friend class TypeGraph;
 
-	//
-	// Registry
-	//
-	public:
-		CRAFT_TYPES_EXPORTED TypeId anyType() const;
-		CRAFT_TYPES_EXPORTED size_t typeCount() const;
+			_Node* _node;
 
-		CRAFT_TYPES_EXPORTED TypeId add(SType* type);
-		CRAFT_TYPES_EXPORTED SType const* get(TypeId const& id) const;
+			Expression(_Node* const& c) { _node = c; }
+		public:
 
-		CRAFT_TYPES_EXPORTED void import(TypeGraph const&);
+		};
+
+		inline Expression get(TypeId const& id) const { return Expression { _contents->_nodesByType[id] }; }
 	};
 
+	inline TypeGraph& graph()
+	{
+		return TypeGraph::global_instance();
+	}
 }}

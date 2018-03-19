@@ -29,30 +29,41 @@ namespace types
 #include "prelude.h"
 #include "exceptions.hpp"
 
-#include "cpp_interface.h"
+//
+// Cpp System
+//
 
+#include "cpp/instance_prelude.hpp"
+
+#include "cpp/cpp_interface.h"
+
+#include "cpp/SingletonProviderManager.hpp"
+
+#include "cpp/FactoryAspectManager.hpp"
+#include "cpp/InstanceAspectManager.hpp"
+
+#include "cpp/Instance.hpp"
+
+/*
 #include "Feature.h"
 #include "Object.h"
 
 #include "Provider.h"
 #include "Aspect.h"
 
-#include "instance_prelude.hpp"
 
 #include "Types.h"
+*/
 
 //
 // Templated defines
 //
 
-#include "Instance.hpp"
+/*
 
-#include "SingletonProviderManager.hpp"
-
-#include "FactoryAspectManager.hpp"
-#include "InstanceAspectManager.hpp"
 
 #include "Type.h"
+*/
 
 //
 // Feature helpers
@@ -84,7 +95,7 @@ namespace types
 //
 
 #include "helpers.h"
-#include "ObjectDefineDetails.hpp"
+#include "cpp/TypeDefineHelper.hpp"
 
 //
 // Built in types

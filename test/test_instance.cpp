@@ -61,7 +61,7 @@ go_bandit([]()
 			});
 			it(".typeId() is type<std::string>::typeId()", [&]()
 			{
-				AssertThat(inst.typeId(), Equals(type<std::string>::typeId()));
+				AssertThat(inst.typeId(), Equals(types::cpptype<std::string>::typeDesc().asId()));
 			});
 			it("*(std::string*) .get() is \"test\"", [&]()
 			{
@@ -95,11 +95,11 @@ go_bandit([]()
 			});
 			it(".typeId() is type<std::string>::typeId()", [&]()
 			{
-				AssertThat(inst.typeId(), Equals(type<TestBasicObject>::typeId()));
+				AssertThat(inst.typeId(), Equals(types::cpptype<TestBasicObject>::typeDesc().asId()));
 			});
 			it(".typeId() is ::craft_s_typeId()", [&]()
 			{
-				AssertThat(inst.typeId(), Equals(TestBasicObject::craft_s_typeId()));
+				AssertThat(inst.typeId(), Equals(TestBasicObject::craft_s_typeDesc().asId()));
 			});
 
 			describe("empty providers,", std::bind(describe_no_empty_providers<void>, inst));

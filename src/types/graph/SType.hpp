@@ -5,6 +5,7 @@
 namespace craft {
 namespace types {
 
+	// Not current included, this is for exstensible types.
 	class SType
 	{
 	// 

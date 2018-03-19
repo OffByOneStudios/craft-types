@@ -11,7 +11,7 @@ namespace types
 	class SObjectComposite abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_ASPECT_DECLARE(SObjectComposite, "types.attrs", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SObjectComposite, "types.attrs", FactoryAspectManager);
 
 	public:
 

@@ -4,13 +4,13 @@
 class PEmptyTestSingleton abstract
 	: public craft::types::Provider
 {
-	CRAFT_PROVIDER_DECLARE(PEmptyTestSingleton, "types.test.empty.singleton", craft::types::SingletonProviderManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingleton, "types.test.empty.singleton", craft::types::SingletonProviderManager);
 };
 
 class PEmptyTestSingletonNamed abstract
 	: public craft::types::Provider
 {
-	CRAFT_PROVIDER_DECLARE(PEmptyTestSingletonNamed, "types.test.empty.singleton-named", craft::types::NamedSingletonProviderManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingletonNamed, "types.test.empty.singleton-named", craft::types::NamedSingletonProviderManager);
 
 	virtual std::string provider_index() = 0;
 };
@@ -18,12 +18,12 @@ class PEmptyTestSingletonNamed abstract
 class PEmptyTestSingletonTagged abstract
 	: public craft::types::Provider
 {
-	CRAFT_PROVIDER_DECLARE(PEmptyTestSingletonTagged, "types.test.empty.singleton-tagged", craft::types::TaggedSingletonProviderManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingletonTagged, "types.test.empty.singleton-tagged", craft::types::TaggedSingletonProviderManager);
 
 	virtual std::vector<std::string> provider_tags() = 0;
 };
 
-template<template<typename> typename T>
+template<template<typename> class T>
 inline void describe_for_empty_providers(std::string desc)
 {
 	bandit::describe(desc.c_str(), []() {

@@ -93,10 +93,10 @@ public: \
     inline virtual ::craft::types::TypeId craft_typeId() const override { return craft_s_typeId(); } \
 	inline virtual void* craft_instance() const override { return reinterpret_cast<void*>(static_cast<x*>(const_cast<x*>(this))); } \
 private: \
-    inline ::craft::types::instance<x> craft_instance_from_this() const { return ::craft::types::instance<x>(craft_instance(), craft_typeId()); } \
+    inline ::craft::types::instance<x> craft_instance() const { return ::craft::types::instance<x>(craft_instance(), craft_typeId()); } \
 private:
 
-#define CRAFT_OBJECT_DEFINE(x) \
+#define CRAFT_DEFINE(x) \
 	::craft::types::_details::type_impl::_static_init x::__si((::craft::types::_details::_fn_register_type_init)&x::__craft_s_types_init); \
 	void x::__craft_s_types_init(::craft::types::_details::TypeDefineHelper<x> _)
 

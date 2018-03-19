@@ -65,8 +65,8 @@ namespace entry
 		{
 			_impl::console->info("expand");
 			
-			_example_context_0 = types::Context::makeChildContext(c, this);
-			_example_context_1 = types::Context::makeChildContext(c, this);
+			_example_context_0 = types::Context::makeChildContext(c, craft_instance());
+			_example_context_1 = types::Context::makeChildContext(c, craft_instance());
 
 			c->add(instance<ThingOne>::make("Thing1"));
 			_example_context_0->add(instance<ThingOne>::make("Thing2"));
@@ -86,7 +86,7 @@ namespace entry
 }
 
 
-CRAFT_OBJECT_DEFINE(entry::ThingOne)
+CRAFT_DEFINE(entry::ThingOne)
 {
 	_.use<PObjectContextual>().byConfiguring<ObjectContextualWrapper>()
 		->withExpander(&entry::ThingOne::expand)
@@ -96,7 +96,7 @@ CRAFT_OBJECT_DEFINE(entry::ThingOne)
 	_.defaults();
 }
 
-CRAFT_OBJECT_DEFINE(entry::ContextHost)
+CRAFT_DEFINE(entry::ContextHost)
 {
 	_.use<PObjectContextual>().byConfiguring<ObjectContextualWrapper>()
 		->withExpander(&entry::ContextHost::expand)
@@ -107,7 +107,8 @@ CRAFT_OBJECT_DEFINE(entry::ContextHost)
 
 int main(int argc, char** argv)
 {
-	craft::types::system().init();
+	craft::types::boot_with_cpp();
+
 	_impl::console = spdlog::stdout_color_mt("console");
 	// Init ur config
 	//types::system().getManager<PObjectContextual>()->

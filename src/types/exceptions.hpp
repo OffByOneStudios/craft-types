@@ -11,11 +11,23 @@ namespace types
 		using stdext::exception::exception;
 	};
 
-	// Something is unintialized, meant to be internal
-	class type_error_uninitialized : public type_error
+	// Type identifier errors
+	class type_identifier_error : public type_error
 	{
 	public:
 		using type_error::type_error;
+	};
+
+	class type_not_found_by_identifer_error : public type_identifier_error
+	{
+	public:
+		using type_identifier_error::type_identifier_error;
+	};
+
+	class type_identifer_not_found_error : public type_identifier_error
+	{
+	public:
+		using type_identifier_error::type_identifier_error;
 	};
 
 	// Type graph errors

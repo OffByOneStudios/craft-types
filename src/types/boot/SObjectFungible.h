@@ -12,7 +12,7 @@ namespace types
 	class SObjectFungible abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_ASPECT_DECLARE(SObjectFungible, "types.fungible", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SObjectFungible, "types.fungible", FactoryAspectManager);
 
 	public:
 		/* T:
@@ -31,7 +31,7 @@ namespace types
 	public:
 		inline virtual void objectFungible_emitUpdated(instance<> newInst = nullptr)
 		{
-			objectFungible_onUpdate().emit(instance<>(this, this->craft_featuredTypeId()), newInst);
+			objectFungible_onUpdate().emit(craft_featuredInstance(), newInst);
 		}
 	};
 

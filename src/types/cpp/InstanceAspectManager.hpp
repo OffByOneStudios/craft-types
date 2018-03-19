@@ -1,6 +1,6 @@
 #pragma once
-#include "common.h"
-#include "core.h"
+#include "../common.h"
+#include "../core.h"
 
 namespace craft {
 namespace types
@@ -22,11 +22,11 @@ namespace types
 		//
 		// IAspectManager
 		//
-		inline virtual bool hasAspect(TypeId tid, void* instance)
+		inline virtual bool hasAspect(cpp::TypePtr tid, void* instance)
 		{
 			return _overrideInstances.find(instance) != _overrideInstances.end() || FactoryAspectManager<TAspect>::hasAspect(tid, instance);
 		}
-		inline virtual Aspect* getAspect(TypeId tid, void* instance)
+		inline virtual Aspect* getAspect(cpp::TypePtr tid, void* instance)
 		{
 			auto it = _overrideInstances.find(instance);
 			if (it == _overrideInstances.end())

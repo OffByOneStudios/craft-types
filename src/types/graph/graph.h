@@ -1,7 +1,6 @@
 #pragma once
 #include "../common.h"
 #include "../exceptions.hpp"
-#include "graph.h"
 
 namespace craft {
 namespace types {
@@ -12,7 +11,7 @@ namespace types {
 	class ValidationWithSubtypingAlgorithmState;
 }}
 
-#include "SType.hpp"
+#include "RootType.hpp"
 
 #include "TupleType.h"
 #include "UnionType.h"
@@ -23,12 +22,6 @@ namespace types {
 
 #include "FunctionType.h"
 
-#include "BaseType.h"
-
 #include "TagAbstractType.h"
 
-#include "CppNativeAbstractType.h"
-#include "CppNativeActualType.h"
-#include "CppObjectActualType.h"
-
-#include "TypeGraphSystem.h"
+#include "TypeGraph.h"

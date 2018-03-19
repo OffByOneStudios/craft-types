@@ -19,7 +19,7 @@ namespace types
 	class PObjectContextual abstract
 		: public Provider
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_PROVIDER_DECLARE(PObjectContextual, "types.context", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PObjectContextual, "types.context", SingletonProviderManager);
 
 	public:
 		virtual void expand(instance<>, std::shared_ptr<Context>) = 0;

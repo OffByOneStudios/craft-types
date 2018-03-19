@@ -15,7 +15,7 @@ namespace types
 	class PClone abstract
 		: public Provider
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_PROVIDER_DECLARE(PClone, "types.clone", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PClone, "types.clone", SingletonProviderManager);
 
 	public:
 		virtual instance<> clone(instance<>) const noexcept = 0;

@@ -33,11 +33,6 @@ go_bandit([]()
 				instance<std::string> _ = instance<std::string>::make();
 				AssertThat(_.isNull(), IsFalse());
 			});
-			it("via new", [&]()
-			{
-				instance<std::string> _ = instance<std::string>(new std::string());
-				AssertThat(_.isNull(), IsFalse());
-			});
 		});
 
 		instance<std::string> inst;
@@ -58,7 +53,7 @@ go_bandit([]()
 			});
 			it("typeId is type<std::string>::typeId()", [&]()
 			{
-				AssertThat(inst.typeId(), Equals(type<std::string>::typeId()));
+				AssertThat(inst.typeId(), Equals(types::cpptype<std::string>::typeDesc().asId()));
 			});
 
 			describe("empty providers,", std::bind(describe_no_empty_providers<std::string>, inst));
@@ -88,7 +83,7 @@ go_bandit([]()
 			});
 			it(".parse(\"test\") is type<std::string>::typeId()", [&]()
 			{
-				AssertThat(parser->parse("test").typeId(), Equals(type<std::string>::typeId()));
+				AssertThat(parser->parse("test").typeId(), Equals(types::cpptype<std::string>::typeDesc().asId()));
 			});
 			it(".parse(\"test\") is \"test\"", [&]()
 			{
@@ -116,7 +111,7 @@ go_bandit([]()
 			});
 			it(".typeId() is type<std::string>::typeId()", [&]()
 			{
-				AssertThat(inst.typeId(), Equals(type<std::string>::typeId()));
+				AssertThat(inst.typeId(), Equals(types::cpptype<std::string>::typeDesc().asId()));
 			});
 			it(".value() is \"test\"", [&]()
 			{

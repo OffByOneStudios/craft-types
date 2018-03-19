@@ -1,4 +1,5 @@
-#include "helpers.h"
+#include "../common.h"
+#include "../core.h"
 
 using namespace craft::types;
 
@@ -35,7 +36,7 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 	std::string from, name;
 	if (inst.hasFeature<PStringer>())
 	{
-		from = std::string(PStringer::craft_c_featureName);
+		from = std::string(PStringer::craft_s_typeName());
 		name = fmt::format("{0}", inst.getFeature<PStringer>()->toString(inst));
 	}
 	else
@@ -51,6 +52,7 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 		return name;
 }
 
+/*
 std::string instance<void>::toString(instance<void> const& inst, FeatureId fid, bool verbose)
 {
 	if (inst.isNull())
@@ -67,6 +69,7 @@ std::string instance<void>::toString(instance<void> const& inst, FeatureId fid, 
 
 	return "TODO NOT IMPLEMENTED";
 }
+*/
 
 std::string TypeId::toString(bool verbose) const
 {
@@ -82,7 +85,7 @@ std::string TypeId::toString(bool verbose) const
 
 	if (hasFeature<PIdentifier>())
 	{
-		from = std::string(PIdentifier::craft_c_featureName) + " (#)";
+		from = std::string(PIdentifier::craft_s_typeName()) + " (#)";
 		name = fmt::format("{0} ({1})", getFeature<PIdentifier>()->identifier(), std::to_string(id));
 	}
 	else
@@ -95,20 +98,4 @@ std::string TypeId::toString(bool verbose) const
 		return fmt::format("<Type|{0}|{1}>", from, name);
 	else
 		return name;
-}
-
-std::string FeatureId::toString(bool verbose) const
-{
-	if (id == NoFeature.id)
-	{
-		if (verbose)
-			return "<Feature|NoFeature>";
-		else
-			return "NoFeature";
-	}
-
-	if (verbose)
-		return fmt::format("<Feature|name (#)|{0} ({1})>", getManager()->featureName(), id);
-	else
-		return fmt::format("{0}", getManager()->featureName());
 }

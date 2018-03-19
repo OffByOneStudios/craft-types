@@ -1,15 +1,17 @@
 #include "../common.h"
-#include "./Context.h"
+#include "Context.h"
 
 using namespace craft;
 using namespace craft::types;
 using namespace craft::types::_details;
 
-CRAFT_OBJECT_DEFINE(craft::types::Context)
+CRAFT_DEFINE(craft::types::Context)
 {
 
 	_.defaults();
 }
+
+IContextQueryable::~IContextQueryable() { }
 
 /******************************************************************************
 ** _ContextQueryable
@@ -22,7 +24,7 @@ enum class SearchKind
 	Feature
 };
 
-class _details::_ContextQueryable
+class _details::_ContextQueryable final
 	: public std::enable_shared_from_this<_ContextQueryable>
 	, public IContextQueryable
 {
@@ -57,6 +59,10 @@ private:
 	}
 
 public:
+	virtual ~_ContextQueryable()
+	{
+	}
+
 	_ContextQueryable(std::shared_ptr<_ContextQueryable const> parent, std::string value)
 		: _ContextQueryable(parent)
 	{
@@ -76,13 +82,6 @@ public:
 			_searchType = value;
 			auto it = _parentRoot->_primesByType.find(value);
 			if (it != _parentRoot->_primesByType.end())
-				_prime = it->second;
-		}
-		if (_searchKind == SearchKind::Feature)
-		{
-			_searchFeature = value;
-			auto it = _parentRoot->_primesByFeature.find(value);
-			if (it != _parentRoot->_primesByFeature.end())
 				_prime = it->second;
 		}
 	}
@@ -116,21 +115,6 @@ public:
 				parent = parent->_parent;
 			}
 		}
-		if (_searchKind == SearchKind::Feature)
-		{
-			_searchFeature = value;
-
-			while (parent)
-			{
-				auto it = parent->_primesByFeature.find(value);
-				if (it != parent->_primesByFeature.end())
-				{
-					_prime = it->second;
-					break;
-				}
-				parent = parent->_parent;
-			}
-		}
 	}
 
 public:
@@ -141,7 +125,6 @@ public:
 	SearchKind _searchKind;
 	std::string _searchName;
 	TypeId _searchType;
-	FeatureId _searchFeature;
 
 	mutable instance<> _prime;
 	mutable std::set<instance<>> _cache;
@@ -155,7 +138,7 @@ public:
 			? c->_objectsByName[_searchName]
 			: ((kind == SearchKind::Type)
 				? c->_objectsByType[_searchType]
-				: c->_objectsByFeature[_searchFeature]);
+				: std::set<instance<>> { });
 	}
 
 	inline void resolve_children(Context* c, std::set<instance<>>& res, SearchKind kind) const
@@ -203,10 +186,6 @@ public:
 	{
 		return std::make_shared<_ContextQueryable>(shared_from_this(), name);
 	}
-	virtual std::shared_ptr<IContextQueryable> byFeature(FeatureId const& i_id) const override
-	{
-		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Feature, (size_t)i_id);
-	}
 	virtual std::shared_ptr<IContextQueryable> byType(TypeId const& t_id) const override
 	{
 		return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Type, (size_t)t_id);
@@ -234,6 +213,10 @@ Context::Context(instance<> prime)
 	_tree_depth = 0;
 	_prime = prime;
 	_finalized = false;
+}
+
+Context::~Context()
+{
 }
 
 std::shared_ptr<Context> Context::makeChildContext(std::shared_ptr<Context> parent, instance<> prime)
@@ -280,11 +263,9 @@ std::shared_ptr<Context> Context::copy() const
 	res->_all = this->_all;
 
 	res->_objectsByType = this->_objectsByType;
-	res->_objectsByFeature = this->_objectsByFeature;
 	res->_objectsByName = this->_objectsByName;
 
 	res->_primesByType = this->_primesByType;
-	res->_primesByFeature = this->_primesByFeature;
 	res->_primesByName = this->_primesByName;
 
 	return res;
@@ -317,17 +298,6 @@ void Context::addOnType(TypeId t_id, instance<> obj)
 	}
 }
 
-void Context::addOnFeature(FeatureId i_id, instance<> obj)
-{
-	if (finalized()) throw stdext::exception("Context is finalized, cannot add.");
-
-	_objectsByFeature[i_id].insert(obj);
-	if (std::find(_all.begin(), _all.end(), obj) == _all.end())
-	{
-		_all.push_back(obj);
-	}
-}
-
 void Context::promoteOnName(std::string const& name, instance<> obj)
 {
 	if (finalized()) throw stdext::exception("Context is finalized, cannot promote.");
@@ -344,13 +314,6 @@ void Context::promoteOnType(TypeId t_id, instance<> obj)
 	addOnType(t_id, obj);
 }
 
-void Context::promoteOnFeature(FeatureId i_id, instance<> obj)
-{
-	if (finalized()) throw stdext::exception("Context is finalized, cannot promote.");
-
-	_primesByFeature[i_id] = obj;
-	addOnFeature(i_id, obj);
-}
 
 void Context::finalize()
 {
@@ -367,10 +330,6 @@ bool Context::finalized() const
 std::shared_ptr<IContextQueryable> Context::byName(std::string const& name) const
 {
 	return std::make_shared<_ContextQueryable>(shared_from_this(), name);
-}
-std::shared_ptr<IContextQueryable> Context::byFeature(FeatureId const& i_id) const
-{
-	return std::make_shared<_ContextQueryable>(shared_from_this(), SearchKind::Feature, (size_t)i_id);
 }
 std::shared_ptr<IContextQueryable> Context::byType(TypeId const& t_id) const
 {

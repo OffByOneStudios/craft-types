@@ -12,7 +12,7 @@ namespace types
 	class SObjectManipulation abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_ASPECT_DECLARE(SObjectManipulation, "types.funcs", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SObjectManipulation, "types.funcs", FactoryAspectManager);
 
 	public:
 
@@ -208,24 +208,24 @@ namespace types
 
 		template<typename _TType = TType,
 			typename TRet>
-		inline ObjectManipulater* withMethod(std::string name, ::craft::instance<TRet> (_TType::*mem)(void))
+		inline ObjectManipulater* withMethod(std::string name, instance<TRet> (_TType::*mem)(void))
 		{
 			std::vector<TypeId> argTypes;
 			typename ListingActual::FuncPtr fp;
 			fp.assign((instance<>(_TType::*)())mem);
 
-			registerWith(name, fp, true, ::craft::type<TRet>::typeId(), argTypes);
+			registerWith(name, fp, true, cpptype<TRet>::typeDesc(), argTypes);
 
 			return this;
 		}
 
 		template<typename _TType = TType,
 			typename... TArgs>
-			inline ObjectManipulater* withMethod(std::string name, void(_TType::*mem)(::craft::instance<TArgs>...))
+			inline ObjectManipulater* withMethod(std::string name, void(_TType::*mem)(instance<TArgs>...))
 		{
 			static_assert(sizeof...(TArgs) <= _c_supportedArgs, "ObjectManipulater::withMethod does not support that many arguments");
 
-			std::vector<TypeId> argTypes = { (::craft::type<TArgs>::typeId())... };
+			std::vector<TypeId> argTypes = { (cpptype<TArgs>::typeDesc())... };
 			typename ListingActual::FuncPtr fp;
 			fp.assign((void (_TType::*)(typename stdext::typechange<TArgs, instance<>>::type...))mem);
 
@@ -241,11 +241,11 @@ namespace types
 		{
 			static_assert(sizeof...(TArgs) <= _c_supportedArgs, "ObjectManipulater::withMethod does not support that many arguments");
 
-			std::vector<TypeId> argTypes = { (::craft::type<TArgs>::typeId())... };
+			std::vector<TypeId> argTypes = { (cpptype<TArgs>::typeDesc())... };
 			typename ListingActual::FuncPtr fp;
 			fp.assign((instance<>(_TType::*)(typename stdext::typechange<TArgs, instance<>>::type...))mem);
 
-			registerWith(name, fp, true, ::craft::type<TRet>::typeId(), argTypes);
+			registerWith(name, fp, true, cpptype<TRet>::typeDesc(), argTypes);
 
 			return this;
 		}
