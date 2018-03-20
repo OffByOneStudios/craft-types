@@ -153,7 +153,7 @@ namespace types
 		virtual void* craft_instancePointer() const = 0;
 		virtual cpp::TypePtr craft_typeDesc() const = 0;
 
-		InstanceHeader* header;
+		InstanceHeader* craft_header;
 	};
 
 	/******************************************************************************
@@ -582,7 +582,7 @@ namespace types
 		: public virtual Object
 		, public TFeature
 	{
-		inline virtual instance<> craft_featuredInstance() override { return instance<void>(header); }
+		inline virtual instance<> craft_featuredInstance() override { return instance<void>(craft_header); }
 
 
 		/******************************************************************************
@@ -639,7 +639,7 @@ protected: \
     inline virtual ::craft::types::cpp::TypePtr craft_typeDesc() const override { return craft_s_typeDesc(); } \
 	inline virtual void* craft_instancePointer() const override { return reinterpret_cast<void*>(static_cast<x*>(const_cast<x*>(this))); } \
 public: \
-    inline ::craft::types::instance<x> craft_instance() const { return ::craft::types::instance<x>(static_cast<::craft::types::Object*>(const_cast<x*>(this))->header); } \
+    inline ::craft::types::instance<x> craft_instance() const { return ::craft::types::instance<x>(static_cast<::craft::types::Object*>(const_cast<x*>(this))->craft_header); } \
 private:
 
 

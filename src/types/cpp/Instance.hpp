@@ -131,7 +131,7 @@ namespace types
 			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
 		inline instance(_T* const& ptr)
 			: _actual(ptr)
-			, _meta(InstanceHeader::safe_inc(static_cast<Object*>(ptr)->header))
+			, _meta(InstanceHeader::safe_inc(static_cast<Object*>(ptr)->craft_header))
 		{
 		}
 

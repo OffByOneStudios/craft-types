@@ -12,12 +12,12 @@ using namespace craft::types;
 
 Object::Object()
 {
-	header = nullptr;
+	craft_header = nullptr;
 }
 
 void Object::craft_setupInstance()
 {
-	header = new InstanceHeader(craft_typeDesc(), craft_instancePointer());
+	craft_header = new InstanceHeader(craft_typeDesc(), craft_instancePointer());
 }
 
 Object::~Object()
