@@ -179,6 +179,7 @@ namespace types
 			{
 				if (_parent != nullptr) return;
 
+				// Add defaults
 				auto const id = cpptype<TType>::typeDesc();
 				if (!system().typeHasFeature<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
 				if (!system().typeHasFeature<PConstructor>(id)) use<PConstructor>().template singleton<DefaultConstructor>();
@@ -190,10 +191,12 @@ namespace types
 			{
 				if (_parent != nullptr) return;
 
-				//auto const id = cpptype<TType>::typeDesc();
-
 				// Instantiate the manager
 				CppSystem::ensureManager<TType>();
+
+				// Add defaults
+				auto const id = cpptype<TType>::typeDesc();
+				if (!system().typeHasFeature<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
 			}
 		};
 	}

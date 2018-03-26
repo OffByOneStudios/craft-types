@@ -69,6 +69,12 @@ namespace types
 		}
 
 	public:
+		template<typename _T = T,
+			typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
+			inline DefaultIdentifier() { _typename = T::craft_s_featureName(); }
+
+		template<typename _T = T,
+			typename std::enable_if< !cpptype<_T>::isLegacyFeature >::type* = nullptr>
 		inline DefaultIdentifier() { _typename = _process(T::craft_s_typeName()); }
 
 		inline virtual std::string identifier() const override { return _typename; }

@@ -96,7 +96,7 @@ namespace types
 			//
 			// Defined in to_string.cpp
 			//
-			inline std::string toString(bool verbose = true) const { return asId().toString(); }
+			inline std::string toString(bool verbose = true) const { return asId().toString(verbose); }
 		};
 
 		const static TypePtr None = nullptr;
@@ -459,6 +459,7 @@ namespace types
 			typename std::enable_if< !cpptype<TFeature>::isLegacyFeature >::type* = nullptr>
 			static inline TFeature* typeGetFeature(cpp::TypePtr const& type)
 		{
+			// Runtime answer for feature-types that we have not compile time knowledge of
 			return typeGetFeature(type, cpptype<TFeature>::typeDesc());
 		}
 
@@ -482,6 +483,20 @@ namespace types
 
 		template<typename TFeature,
 			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			static inline bool typeHasFeature(instance<> const& inst)
+		{
+			return static_cast<IAspectManager*>(getManager<TFeature>())->hasAspect(inst.typeId(), inst.get());
+		}
+
+		template<typename TFeature,
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			static inline bool typeHasFeature(instance<> const& inst)
+		{
+			return static_cast<IProviderManager*>(getManager<TFeature>())->hasProvider(inst.typeId());
+		}
+
+		template<typename TFeature,
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
 			static inline bool typeHasFeature(cpp::TypePtr const& type)
 		{
 			return static_cast<IAspectManager*>(getManager<TFeature>())->hasAspect(type, nullptr);
@@ -498,16 +513,17 @@ namespace types
 			typename std::enable_if< !cpptype<TFeature>::isLegacyFeature >::type* = nullptr>
 			static inline bool typeHasFeature(cpp::TypePtr const& type)
 		{
+			// Runtime answer for feature-types that we have not compile time knowledge of
 			return typeHasFeature(type, cpptype<TFeature>::typeDesc());
 		}
 
 		template<typename TType, typename TFeature>
 		static inline bool typeHasFeature()
 		{
-			if (std::is_base_of<TFeature, TType>::value)
-				return true;
+			if (std::is_base_of<TFeature, TType>::value) // Compile time check has an answer
+				return true; // Compile time answer
 			else
-				return typeHasFeature<TFeature>(cpptype<TType>::typeDesc());
+				return typeHasFeature<TFeature>(cpptype<TType>::typeDesc()); // Runtime answer
 		}
 	};
 
