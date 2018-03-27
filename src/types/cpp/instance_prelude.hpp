@@ -146,6 +146,17 @@ namespace types
 			return _actual == _meta->actual;
 		}
 
+		inline bool isType(TypeId id) const
+		{
+			return typeId().isType(id);
+		}
+
+		template<typename T>
+		inline bool isType() const
+		{
+			return typeId().isType<T>();
+		}
+
 		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, bool verbose = false);
 		static CRAFT_TYPES_EXPORTED std::string toString(instance<void> const&, TypeId tid, bool verbose = false);
 

@@ -20,6 +20,11 @@ namespace types
 			return that_type.id != 0 && *this == that_type;
 		}
 
+		inline bool isType(TypeId that_type)
+		{
+			return that_type.id != 0 && *this == that_type.id;
+		}
+
 		//
 		// Defined in cpp_interface.h
 		//
