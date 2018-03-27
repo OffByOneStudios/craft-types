@@ -45,6 +45,7 @@
 #include "boot/PConstructor.h"
 #include "boot/PStringer.h"
 #include "boot/PParse.h"
+#include "boot/PRepr.h"
 #include "boot/PConversion.h"
 #include "boot/PClone.h"
 #include "boot/SLifecycle.h"
