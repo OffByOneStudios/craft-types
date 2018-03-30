@@ -16,17 +16,18 @@ namespace types
 }}
 
 //
-// Components Subsystems
-//
-
-#include "identifiers.h"
-
-//
 // Forward declares
 //
 
 #include "prelude.h"
 #include "exceptions.hpp"
+
+//
+// Components Subsystems
+//
+
+#include "identifiers.h"
+#include "graph/graph.h"
 
 //
 // Cpp System
