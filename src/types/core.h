@@ -8,8 +8,8 @@ namespace types
 	class Identifiers;
 	inline Identifiers& identifiers();
 
-	class TypeGraph;
-	inline TypeGraph& graph();
+	class Graph;
+	inline Graph& graph();
 
 	class CppSystem;
 	inline CppSystem& system();
@@ -20,7 +20,6 @@ namespace types
 //
 
 #include "identifiers.h"
-#include "graph/graph.h"
 
 //
 // Forward declares
