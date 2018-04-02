@@ -704,3 +704,6 @@ namespace craft { namespace types { \
 #define CRAFT_TYPE_DEFINE(x) \
 	::craft::types::cpp::type_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, (::craft::types::cpp::_fn_register_type_init)&::craft::types::cpptype<x>::__craft_s_types_init); \
 	void ::craft::types::cpptype<x>::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
+
+#define CRAFT_DEFINE_MORE(x) \
+	

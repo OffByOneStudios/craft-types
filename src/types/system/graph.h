@@ -44,7 +44,7 @@ namespace types
 	** Graph
 	******************************************************************************/
 
-	class Graph sealed
+	class Graph final
 	{
 		// 
 		// Lifecycle
