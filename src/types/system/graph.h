@@ -9,6 +9,29 @@ namespace types
 	** Node
 	******************************************************************************/
 
+	struct GraphNode
+	{
+		void* node_value;
+		GraphNode* node_type;
+
+		GraphNode(GraphNode* type, void* value)
+			: node_value(value), node_type(type)
+		{ }
+
+	protected:
+		GraphNode() = default;
+		GraphNode(GraphNode const&) = default;
+	};
+
+	struct GraphRootNode final
+		: GraphNode
+	{
+	public:
+		GraphRootNode(std::string const& s)
+			: GraphNode()
+		{ }
+	};
+
 	/******************************************************************************
 	** Edge
 	******************************************************************************/
