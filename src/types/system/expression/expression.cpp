@@ -5,6 +5,11 @@
 using namespace craft;
 using namespace craft::types;
 
+Expression::~Expression()
+{
+
+}
+
 /******************************************************************************
 ** ExpressionConcrete
 ******************************************************************************/
@@ -33,6 +38,7 @@ Graph::Node ExpressionConcrete::kind() const
 std::string const& ExpressionConcrete::displayString() const
 {
 	identifiers();
+	return ""; // TODO
 }
 std::vector<Expression*> const* ExpressionConcrete::children() const
 {

@@ -50,7 +50,7 @@ namespace types
 		struct _Edge final : public Element
 		{
 			void* value;
-			std::vector<_Edge*> between;
+			std::vector<_Node*> between;
 		};
 
 		//
@@ -99,5 +99,9 @@ namespace types
 
 		template<typename T>
 		inline Node get() { return get(cpptype<T>::typeDesc()); }
+
+		CRAFT_TYPES_EXPORTED Node addNode(Node const& label, void* value) const;
+		CRAFT_TYPES_EXPORTED void addProperty(Node const& label, void* value, Node const& on_node) const;
+		CRAFT_TYPES_EXPORTED void addEdge(Node const& label, void* value, std::vector<Node> const& edge) const;
 	};
 }}

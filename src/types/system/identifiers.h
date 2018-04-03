@@ -85,6 +85,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED TypeId add(void* const& ptr, void* const& node_ptr);
 
 		CRAFT_TYPES_EXPORTED Record const& get(TypeId const& id) const;
+		CRAFT_TYPES_EXPORTED Record const& get(void* const& ptr) const;
 		CRAFT_TYPES_EXPORTED TypeId id(void* const& id) const;
 	};
 }}

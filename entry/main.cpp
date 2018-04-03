@@ -107,7 +107,7 @@ CRAFT_DEFINE(entry::ContextHost)
 
 int main(int argc, char** argv)
 {
-	craft::types::boot_with_cpp();
+	craft::types::boot();
 
 	_impl::console = spdlog::stdout_color_mt("console");
 	// Init ur config

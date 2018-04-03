@@ -51,6 +51,30 @@ void CppSystem::_init()
 
 	_current_dll_entries = new _Entries();
 
+	// Set up graph and identifiers
+	for (auto i = 0; i < _static_entries->_entries.size(); ++i)
+	{
+		auto& entry = _static_entries->_entries[i];
+		switch (entry.kind)
+		{
+			case _Entry::Kind::Type:
+			{
+				auto td = static_cast<cpp::type_desc*>(entry.ptr);
+
+				cpp::TypeDefineHelper<void> helper(td);
+				td->initer(helper);
+			} break;
+
+			case _Entry::Kind::Info:
+			{
+				auto id = static_cast<cpp::info_desc*>(entry.ptr);
+
+				cpp::InfoDefineHelper<void> helper(id);
+				id->initer(helper);
+			} break;
+		}
+	}
+
 	// Build up the Runtime and Graph:
 	cpp::TypeDefineHelper<void>::_build_default_providers();
 
@@ -61,7 +85,6 @@ void CppSystem::_init()
 		{
 			case _Entry::Kind::Type:
 			{
-				// TODO add to identifiers
 				auto td = static_cast<cpp::type_desc*>(entry.ptr);
 
 				cpp::TypeDefineHelper<void> helper(td);

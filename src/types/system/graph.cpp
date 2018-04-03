@@ -17,9 +17,17 @@ Graph::~Graph()
 {
 
 }
-Graph::Node Graph::get(TypeId const&) const
+
+
+Graph::Node Graph::get(TypeId const& tid) const
 {
-	_Node* n = nullptr;
+	_Node* n = (_Node*)identifiers().get(tid).node;
+
+	return Graph::Node{ const_cast<Graph*>(this), n };
+}
+Graph::Node Graph::get(cpp::TypePtr const& tp) const
+{
+	_Node* n = (_Node*)identifiers().get(tp).node;
 
 	return Graph::Node { const_cast<Graph*>(this), n };
 }

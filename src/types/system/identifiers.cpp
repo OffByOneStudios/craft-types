@@ -47,12 +47,20 @@ Identifiers::Record const& Identifiers::get(TypeId const& id) const
 {
 	auto v = id.id - 1;
 	if (v > _contents->types.size())
-		throw type_not_found_by_identifer_error("Identifier {0} out of rance.", id.id);
-	return *_contents->types.get_iterator_from_index(v);
+		throw type_not_found_by_identifer_error("Identifier {0} out of range.", id.id);
+	return ;
 }
-TypeId Identifiers::id(void* const& id) const
+Identifiers::Record const& Identifiers::get(void* const& ptr) const
 {
-	auto it = _contents->types_byPtr.find(id);
+	auto it = _contents->types_byPtr.find(ptr);
+	if (it == _contents->types_byPtr.end())
+		throw type_identifer_not_found_error("Could not find an identifer for the given pointer.");
+	return *_contents->types.get_iterator_from_index(it->second);
+}
+
+TypeId Identifiers::id(void* const& ptr) const
+{
+	auto it = _contents->types_byPtr.find(ptr);
 	if (it == _contents->types_byPtr.end())
 		throw type_identifer_not_found_error("Could not find an identifer for the given pointer.");
 	return it->second;
