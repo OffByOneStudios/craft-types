@@ -27,63 +27,72 @@ Object::~Object()
 ** CppSystem
 ******************************************************************************/
 
-CppSystem CppSystem::__global_instance;
-
 CppSystem::CppSystem()
-	: _identifiers(_identifiers)
-	, _type_cpp(_type_cpp)
-	, operation()
 {
-	__s_init();
+	_static_entries = new _Entries();
+	_addEntry({ new std::string("cpp-static-init-start"), _Entry::Kind::Marker });
 }
 CppSystem::~CppSystem()
 {
-
-}
-
-void CppSystem::__s_init()
-{
-	static std::once_flag flag;
-	std::call_once(flag, []() {
-		global_instance()._identifiers = new Identifiers();
-		global_instance()._type_cpp = global_instance()._identifiers->add(new RootType("cpp"), 0);
-		global_instance()._identifiers->startMarker({ &global_instance(), 0, "cpp:static-init" });
-	});
 }
 
 CppSystem& CppSystem::global_instance()
 {
+	static CppSystem __global_instance;
 	return __global_instance;
 }
 
-Identifiers const& CppSystem::identifiers() const
+void CppSystem::_init()
 {
-	return *_identifiers;
-}
+	_addEntry({ new std::string("cpp-static-init-finish"), _Entry::Kind::Marker });
 
-void CppSystem::init()
-{
+	_identifiers = new Identifiers();
+	_graph = new Graph();
+
+	_current_dll_entries = new _Entries();
+
+	// Build up the Runtime and Graph:
 	cpp::TypeDefineHelper<void>::_build_default_providers();
 
-	types::identifiers().import(*_identifiers);
-
-	for (auto i = 1; i < _identifiers->count(); ++i)
+	for (auto i = 0; i < _static_entries->_entries.size(); ++i)
 	{
-		auto record = _identifiers->get(i);
-		if (record.ptr_type == _type_cpp)
+		auto& entry = _static_entries->_entries[i];
+		switch (entry.kind)
 		{
-			auto td = static_cast<cpp::type_desc*>(record.ptr);
+			case _Entry::Kind::Type:
+			{
+				// TODO add to identifiers
+				auto td = static_cast<cpp::type_desc*>(entry.ptr);
 
-			cpp::TypeDefineHelper<void> helper(td);
+				cpp::TypeDefineHelper<void> helper(td);
+				td->initer(helper);
+			} break;
 
-			td->initer(helper);
+			case _Entry::Kind::Info:
+			{
+				auto id = static_cast<cpp::info_desc*>(entry.ptr);
+
+				cpp::InfoDefineHelper<void> helper(id);
+				id->initer(helper);
+			} break;
 		}
 	}
 }
 
+void CppSystem::_addEntry(_Entry && e)
+{
+	if (_current_dll_entries == nullptr)
+		_static_entries->_entries.push_back(e);
+	else
+		_current_dll_entries->_entries.push_back(e);
+}
+
 void CppSystem::_registerType(cpp::TypePtr tp)
 {
-	__s_init();
+	_addEntry({ const_cast<cpp::type_desc*>(tp.desc), _Entry::Kind::Type });
+}
 
-	_identifiers->add(const_cast<cpp::type_desc*>(tp.desc), _type_cpp);
+void CppSystem::_registerInfo(cpp::info_desc const* info)
+{
+	_addEntry({ const_cast<cpp::info_desc*>(info), _Entry::Kind::Info });
 }

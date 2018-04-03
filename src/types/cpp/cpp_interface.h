@@ -18,7 +18,9 @@ namespace types
 	namespace cpp
 	{
 		struct type_desc;
+		struct info_desc;
 		template<typename T> class TypeDefineHelper;
+		template<typename T> class InfoDefineHelper;
 
 		enum class CppTypeKindEnum
 		{
@@ -46,6 +48,26 @@ namespace types
 			void* repr;
 
 			inline type_desc(CppTypeKindEnum kind_, _fn_register_type_init init_);
+		};
+
+		enum class CppInfoKindEnum
+		{
+			None = 0,
+			NoneMore = 1,
+			MultimethodRoot = 4,
+			MultimethodMore = 5
+		};
+
+		typedef void(*_fn_register_info_init)(InfoDefineHelper<void> _);
+
+		struct info_desc final
+		{
+		public:
+			_fn_register_info_init initer;
+			CppInfoKindEnum kind;
+			void* repr;
+
+			inline info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_);
 		};
 	}
 
@@ -367,9 +389,31 @@ namespace types
 	{
 	private:
 
-		Identifiers* _identifiers;
+		struct _Entry
+		{
+			enum class Kind
+			{
+				Type,
+				Info,
+				Marker
+			};
 
-		TypeId _type_cpp;
+			void* ptr;
+			Kind kind;
+		};
+
+		struct _Entries
+		{
+			std::vector<_Entry> _entries;
+		};
+
+		_Entries* _static_entries;
+
+		_Entries* _current_dll_entries;
+		std::map<std::string, _Entries*> _dll_entries;
+
+		Graph* _graph;
+		Identifiers* _identifiers;
 
 		std::recursive_mutex operation;
 
@@ -377,12 +421,11 @@ namespace types
 		// Lifecycle
 		//
 	private:
-		static CppSystem __global_instance;
+		CppSystem();
+		~CppSystem();
 
-		CRAFT_TYPES_EXPORTED CppSystem();
-		CRAFT_TYPES_EXPORTED ~CppSystem();
-
-		static void __s_init();
+		friend inline void boot();
+		CRAFT_TYPES_EXPORTED void _init();
 
 	public:
 		CRAFT_TYPES_EXPORTED static CppSystem& global_instance();
@@ -390,11 +433,15 @@ namespace types
 		//
 		// Registry
 		//
+	private:
+		void _addEntry(_Entry &&);
+
 	public:
-		CRAFT_TYPES_EXPORTED Identifiers const& identifiers() const;
-		CRAFT_TYPES_EXPORTED void init();
+		inline Identifiers& identifiers() { return *_identifiers; }
+		inline Graph& graph() { return *_graph; }
 
 		CRAFT_TYPES_EXPORTED void _registerType(cpp::TypePtr);
+		CRAFT_TYPES_EXPORTED void _registerInfo(cpp::info_desc const*);
 
 	public:
 
@@ -531,12 +578,26 @@ namespace types
 	{
 		return CppSystem::global_instance();
 	}
+	inline Identifiers& identifiers()
+	{
+		return CppSystem::global_instance().identifiers();
+	}
+	inline Graph& graph()
+	{
+		return CppSystem::global_instance().graph();
+	}
 
 	inline cpp::type_desc::type_desc(CppTypeKindEnum kind_, _fn_register_type_init init_)
 	{
 		initer = init_;
 		kind = kind_;
 		system()._registerType(this);
+	}
+	inline cpp::info_desc::info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_)
+	{
+		initer = init_;
+		kind = kind_;
+		system()._registerInfo(this);
 	}
 
 	template<typename TFeature>
@@ -548,6 +609,31 @@ namespace types
 	inline TFeature* TypeId::getFeature() const
 	{
 		return system().typeGetFeature<TFeature>(*this);
+	}
+
+	/******************************************************************************
+	** cpp::Multimethod
+	******************************************************************************/
+
+	namespace cpp
+	{
+		class Function
+		{
+			std::function<void()>* _func;
+		};
+
+		template<typename TDispatcher>
+		class Multimethod final
+			: public types::Multimethod<Function, TDispatcher>
+		{
+		private:
+			info_desc __id;
+
+			CRAFT_TYPES_EXPORTED void add(Function func);
+
+		public:
+			CRAFT_TYPES_EXPORTED Multimethod(_fn_register_type_init);
+		};
 	}
 
 	/******************************************************************************
@@ -626,9 +712,27 @@ namespace types
 	using cpp::CppTypeKindEnum;
 }}
 
+#define _CRAFT_PP_CONCAT_0(a, b) _CRAFT_PP_CONCAT_1(a, b)
+#define _CRAFT_PP_CONCAT_1(a, b) _CRAFT_PP_CONCAT_2(~, a ## b)
+#define _CRAFT_PP_CONCAT_2(p, res) res
+
 #define CRAFT_DEFINE(x) \
 	::craft::types::cpp::type_desc x::__td(x::craft_c_typeKind, (::craft::types::cpp::_fn_register_type_init)&x::__craft_s_types_init); \
 	void x::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
+
+#define CRAFT_TYPE_DEFINE(x) \
+	::craft::types::cpp::type_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, (::craft::types::cpp::_fn_register_type_init)&::craft::types::cpptype<x>::__craft_s_types_init); \
+	void ::craft::types::cpptype<x>::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
+
+#define CRAFT_MULTIMETHOD_DECALRE(x, dispatcher) \
+	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _); \
+	::craft::types::cpp::Multimethod< dispatcher > x ((::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__))); \
+	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _)
+
+#define CRAFT_INFO_MORE(x) \
+	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _); \
+	::craft::types::cpp::info_desc _CRAFT_PP_CONCAT_0(__id_ ## x, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, (::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__))); \
+	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _)
 
 #define CRAFT_FORWARD_DECLARE(x, kind) \
 namespace craft { namespace types { \
@@ -701,9 +805,5 @@ namespace craft { namespace types { \
 	}; \
 }}
 
-#define CRAFT_TYPE_DEFINE(x) \
-	::craft::types::cpp::type_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, (::craft::types::cpp::_fn_register_type_init)&::craft::types::cpptype<x>::__craft_s_types_init); \
-	void ::craft::types::cpptype<x>::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
-
-#define CRAFT_DEFINE_MORE(x) \
-	
+#define CRAFT_MULTIMETHOD_DECLARE(x, dispatcher) \
+::craft::types::cpp::Multimethod< dispatcher > x;

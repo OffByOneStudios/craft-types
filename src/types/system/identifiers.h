@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "../common.h"
 
 namespace craft {
 namespace types
@@ -51,38 +51,19 @@ namespace types
 		struct Record
 		{
 			void* ptr;
-			TypeId ptr_type;
 			TypeId id;
+			void* node;
 		};
-
-		struct Marker
-		{
-			void* ptr;
-			TypeId ptr_type;
-
-			std::string name;
-		};
-
-		typedef size_t MarkerId;
 
 	private:
-		struct _Marker
-		{
-			Marker public_;
-			size_t start;
-			size_t end;
-		};
 
 		struct _Data
 		{
 			std::atomic<int> refcount;
 			std::recursive_mutex operation;
 
-			std::vector<Record> types; // TODO, use colony for stable pointers
+			plf::colony <Record> types;
 			std::map<void*, TypeId> types_byPtr;
-
-			std::vector<_Marker> markers;
-			std::map<std::string, size_t> markers_byName;
 		};
 
 		_Data* _contents;
@@ -90,18 +71,10 @@ namespace types
 	// 
 	// Lifecycle
 	//
-	private:
-		static Identifiers __global_instance;
-		static thread_local Identifiers __threadlocal_instance;
-
+	public:
+		CRAFT_TYPES_EXPORTED Identifiers();
 		CRAFT_TYPES_EXPORTED Identifiers(Identifiers const&);
 		CRAFT_TYPES_EXPORTED ~Identifiers();
-
-	public:
-		CRAFT_TYPES_EXPORTED Identifiers(bool singleton = false);
-
-		CRAFT_TYPES_EXPORTED static Identifiers& global_instance();
-		CRAFT_TYPES_EXPORTED static Identifiers& threadlocal_instance();
 
 	//
 	// Registry
@@ -109,21 +82,9 @@ namespace types
 	public:
 		CRAFT_TYPES_EXPORTED size_t count() const;
 
-		CRAFT_TYPES_EXPORTED TypeId add(void* const& ptr, TypeId const& ptr_type);
+		CRAFT_TYPES_EXPORTED TypeId add(void* const& ptr, void* const& node_ptr);
 
 		CRAFT_TYPES_EXPORTED Record const& get(TypeId const& id) const;
 		CRAFT_TYPES_EXPORTED TypeId id(void* const& id) const;
-
-		CRAFT_TYPES_EXPORTED void import(Identifiers const&);
-
-		CRAFT_TYPES_EXPORTED MarkerId getMarker(std::string const&) const;
-		CRAFT_TYPES_EXPORTED MarkerId startMarker(Marker const& marker);
-		CRAFT_TYPES_EXPORTED void endMarker(MarkerId markerId);
-		CRAFT_TYPES_EXPORTED size_t countOfMarker(MarkerId markerId) const;
 	};
-
-	inline Identifiers& identifiers()
-	{
-		return Identifiers::global_instance();
-	}
 }}

@@ -30,6 +30,7 @@ namespace types
 #include "system/graph.h"
 #include "system/expression/expression.h"
 #include "system/expression_cache.h"
+#include "system/multimethods.h"
 
 //
 // Cpp System
@@ -46,26 +47,8 @@ namespace types
 
 #include "cpp/Instance.hpp"
 
-/*
-#include "Feature.h"
-#include "Object.h"
 
-#include "Provider.h"
-#include "Aspect.h"
-
-
-#include "Types.h"
-*/
-
-//
-// Templated defines
-//
-
-/*
-
-
-#include "Type.h"
-*/
+#include "boot/system_into_cpp.h"
 
 //
 // Feature helpers
@@ -98,6 +81,7 @@ namespace types
 
 #include "helpers.h"
 #include "cpp/TypeDefineHelper.hpp"
+#include "cpp/InfoDefineHelper.hpp"
 
 //
 // Built in types

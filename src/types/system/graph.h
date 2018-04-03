@@ -5,40 +5,12 @@
 namespace craft {
 namespace types
 {
-	/******************************************************************************
-	** Node
-	******************************************************************************/
-
-	struct GraphNode
-	{
-		void* node_value;
-		GraphNode* node_type;
-
-		GraphNode(GraphNode* type, void* value)
-			: node_value(value), node_type(type)
-		{ }
-
-	protected:
-		GraphNode() = default;
-		GraphNode(GraphNode const&) = default;
-	};
-
-	struct GraphRootNode final
-		: GraphNode
-	{
-	public:
-		GraphRootNode(std::string const& s)
-			: GraphNode()
-		{ }
-	};
-
-	/******************************************************************************
-	** Edge
-	******************************************************************************/
 
 	/******************************************************************************
 	** Index
 	******************************************************************************/
+
+
 
 	/******************************************************************************
 	** Graph
@@ -46,22 +18,86 @@ namespace types
 
 	class Graph final
 	{
+		//
+		// Pieces
+		//
+
+		struct _Node;
+		struct _Prop;
+		struct _Edge;
+
+		friend class Node;
+
+		// Anything in the graph fullfills this "interface"
+		struct Element
+		{
+			_Node* label;
+		};
+
+		struct _Node final : public Element
+		{
+			void* node_value;
+			std::vector<_Prop*> properties;
+			std::vector<_Edge*> edges;
+		};
+
+		struct _Prop final : public Element
+		{
+			_Node* of_node;
+			void* value;
+		};
+
+		struct _Edge final : public Element
+		{
+			void* value;
+			std::vector<_Edge*> between;
+		};
+
+		//
+		// Data
+		//
+
+		plf::colony<_Node> _nodes;
+		plf::colony<_Edge> _edges;
+		plf::colony<_Prop> _props;
+
 		// 
 		// Lifecycle
 		//
 	private:
-		static thread_local Graph* __threadlocal_instance;
+		Graph(Graph const&) = delete;
 
-		CRAFT_TYPES_EXPORTED Graph(Graph const&);
+	public:
+		CRAFT_TYPES_EXPORTED Graph();
 		CRAFT_TYPES_EXPORTED ~Graph();
 
+		// 
+		// Interface Types
+		//
 	public:
-		CRAFT_TYPES_EXPORTED Graph(bool singleton = false);
 
-		CRAFT_TYPES_EXPORTED static Graph& thread_instance();
+		class Node
+		{
+		protected:
+			friend class Graph;
+
+			Graph* _graph;
+			_Node* _node;
+
+			inline Node(Graph* graph, _Node* node)
+				: _graph(graph), _node(node)
+			{ }
+
+		public:
+			inline Node(Node const&) = default;
+		};
 
 	public:
+
+		CRAFT_TYPES_EXPORTED Node get(TypeId const&) const;
+		CRAFT_TYPES_EXPORTED Node get(cpp::TypePtr const&) const;
+
+		template<typename T>
+		inline Node get() { return get(cpptype<T>::typeDesc()); }
 	};
-
-	inline Graph& graph() { return Graph::thread_instance(); }
 }}

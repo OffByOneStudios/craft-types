@@ -5,18 +5,10 @@
 namespace craft {
 namespace types {
 
-	inline void boot_core()
+	inline void boot()
 	{
-		identifiers();
-		graph();
-	}
-
-	inline void boot_with_cpp()
-	{
-		boot_core();
-
 		system();
-		system().init();
+		system()._init();
 	}
 
 }}
