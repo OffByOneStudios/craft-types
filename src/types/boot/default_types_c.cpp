@@ -13,7 +13,7 @@ CRAFT_TYPE_DEFINE(int8_t)
 CRAFT_TYPE_DEFINE(int16_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("int16");
-	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<int16_t>::make(std::stol(s)); });
+	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<int16_t>::make(int16_t(std::stol(s))); });
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<int16_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<int16_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
@@ -47,7 +47,7 @@ CRAFT_TYPE_DEFINE(uint8_t)
 CRAFT_TYPE_DEFINE(uint16_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint16");
-	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<uint16_t>::make(std::stol(s)); });
+	_.use<PParse>().singleton<FunctionalParse>([](std::string s) { return instance<uint16_t>::make(uint16_t(std::stoi(s))); });
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<uint16_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<uint16_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
