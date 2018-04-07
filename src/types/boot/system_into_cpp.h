@@ -1,3 +1,4 @@
+#pragma once
 #include "../common.h"
 #include "../core.h"
 
@@ -15,3 +16,15 @@
 #include "types/system/expression/expression.h"
 
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionConcrete);
+
+/******************************************************************************
+** /types/system/expression/queries.h
+******************************************************************************/
+
+#include "types/system/expression/queries.h"
+
+namespace craft {
+namespace types
+{
+	CRAFT_MULTIMETHOD_DECLARE(isSubtypeMethod, SimpleDispatcher);
+}}

@@ -51,6 +51,8 @@ void CppSystem::_init()
 
 	_current_dll_entries = new _Entries();
 
+	auto type_desc_root = _graph->ensureRoot("cpp-type");
+
 	// Set up graph and identifiers
 	for (auto i = 0; i < _static_entries->_entries.size(); ++i)
 	{
@@ -59,18 +61,12 @@ void CppSystem::_init()
 		{
 			case _Entry::Kind::Type:
 			{
-				auto td = static_cast<cpp::type_desc*>(entry.ptr);
-
-				cpp::TypeDefineHelper<void> helper(td);
-				td->initer(helper);
+				auto node = _graph->addNode(type_desc_root, entry.ptr);
+				_identifiers->add(entry.ptr, node.ptr());
 			} break;
 
 			case _Entry::Kind::Info:
 			{
-				auto id = static_cast<cpp::info_desc*>(entry.ptr);
-
-				cpp::InfoDefineHelper<void> helper(id);
-				id->initer(helper);
 			} break;
 		}
 	}
@@ -119,3 +115,4 @@ void CppSystem::_registerInfo(cpp::info_desc const* info)
 {
 	_addEntry({ const_cast<cpp::info_desc*>(info), _Entry::Kind::Info });
 }
+

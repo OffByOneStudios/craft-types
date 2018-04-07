@@ -94,6 +94,11 @@ namespace types
 				return identifiers().id((void*)desc);
 			}
 
+			inline void* asNode() const
+			{
+				return identifiers().get((void*)desc).node;
+			}
+
 			template<typename TType>
 			inline bool isType()
 			{
@@ -130,7 +135,6 @@ namespace types
 	** type definitions
 	******************************************************************************/
 
-	template <typename T, typename = void> struct cpptype;
 	template<>
 	struct cpptype<void>
 	{
@@ -617,11 +621,6 @@ namespace types
 
 	namespace cpp
 	{
-		class Function
-		{
-			std::function<void()>* _func;
-		};
-
 		template<typename TDispatcher>
 		class Multimethod final
 			: public types::Multimethod<Function, TDispatcher>
@@ -629,10 +628,34 @@ namespace types
 		private:
 			info_desc __id;
 
-			CRAFT_TYPES_EXPORTED void add(Function func);
+		public:
+			inline Multimethod(_fn_register_info_init init)
+				: __id(CppInfoKindEnum::MultimethodRoot, init)
+			{
+
+			}
 
 		public:
-			CRAFT_TYPES_EXPORTED Multimethod(_fn_register_type_init);
+			template <typename ...TArgs>
+			inline typename TDispatcher::InvokeResult operator() (TArgs &&... args) const
+			{
+				// This may return an arbitrary invoke structure that forwards types and arguments
+				return invoke( std::move(typename TDispatcher::cppArgumentsToInvoke(std::forward<TArgs>(args)...)) );
+			}
+
+			template <typename TInvoke>
+			inline typename TDispatcher::InvokeResult invoke (TInvoke && invoke) const
+			{
+				typename TDispatcher::Dispatch d;
+
+				typename TDispatcher::invokeIntoDispatch(invoke, d);
+
+				auto res = this->dispatchWithRecord(d);
+				auto callable = std::get<0>(res);
+				auto dispatchRecord = std::get<1>(res);
+
+				return typename TDispatcher::invoke(callable, dispatchRecord, std::move(invoke));
+			}
 		};
 	}
 
@@ -724,15 +747,15 @@ namespace types
 	::craft::types::cpp::type_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, (::craft::types::cpp::_fn_register_type_init)&::craft::types::cpptype<x>::__craft_s_types_init); \
 	void ::craft::types::cpptype<x>::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
 
-#define CRAFT_MULTIMETHOD_DECALRE(x, dispatcher) \
-	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _); \
-	::craft::types::cpp::Multimethod< dispatcher > x ((::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__))); \
-	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _)
+#define CRAFT_MULTIMETHOD_DEFINE(x) \
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<decltype(x)> _); \
+	decltype(x) x ((::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<decltype(x)> _)
 
 #define CRAFT_INFO_MORE(x) \
-	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _); \
-	::craft::types::cpp::info_desc _CRAFT_PP_CONCAT_0(__id_ ## x, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, (::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__))); \
-	void _CRAFT_PP_CONCAT_0(__fninit_ ## x, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _)
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _); \
+	::craft::types::cpp::info_desc _CRAFT_PP_CONCAT_0(__id_, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, (::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _)
 
 #define CRAFT_FORWARD_DECLARE(x, kind) \
 namespace craft { namespace types { \
@@ -806,4 +829,4 @@ namespace craft { namespace types { \
 }}
 
 #define CRAFT_MULTIMETHOD_DECLARE(x, dispatcher) \
-::craft::types::cpp::Multimethod< dispatcher > x;
+extern ::craft::types::cpp::Multimethod< dispatcher > x;

@@ -10,6 +10,15 @@ namespace types
 	******************************************************************************/
 
 	// TODO, speed this up later
+	class Function
+	{
+	public:
+		typedef void (*_fnptr)();
+
+		_fnptr _fn;
+
+
+	};
 
 
 	/******************************************************************************
@@ -23,32 +32,22 @@ namespace types
 		struct Record
 		{
 			TCallable callable;
-			typename TDispatcher::DispatchRecord dispatch;
 		};
 
+		plf::colony<Record> _records;
+		TDispatcher _dispatcher;
+
 	public:
 
-		CRAFT_TYPES_EXPORTED TCallable const& dispatch(typename TDispatcher::DispatchInvoke);
-	};
+		Multimethod()
+		{
+		}
+		
+		std::tuple<TCallable const*, typename TDispatcher::DispatchRecord const*> dispatchWithRecord(typename TDispatcher::Dispatch const& d) const
+		{
+			auto res = _dispatcher.dispatchWithRecord(d);
 
-	/******************************************************************************
-	** SimpleTypesDispatcher
-	******************************************************************************/
-
-	class SimpleTypesDispatcher final
-	{
-	public:
-		typedef int DispatchRecord;
-		typedef int DispatchInvoke;
-	};
-
-	/******************************************************************************
-	** WithInstancesDispatcher
-	******************************************************************************/
-
-	template<typename TTypeDispatcher>
-	class WithInstancesDispatcher final
-	{
-
+			return std::make_tuple(&((Record*)std::get<0>(res))->callable, std::get<1>(res));
+		}
 	};
 }}

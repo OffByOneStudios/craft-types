@@ -9,4 +9,6 @@ namespace types
 	{
 		struct TypePtr;
 	}
+
+	template <typename T, typename = void> struct cpptype;
 }}

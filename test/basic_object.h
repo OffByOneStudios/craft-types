@@ -5,7 +5,11 @@ class TestBasicObject
 	: public virtual craft::types::Object
 {
 	CRAFT_OBJECT_DECLARE(TestBasicObject);
-private:
+public: // normally private
+
+	std::string a_string;
+	uint64_t a_int;
+	double a_double;
 
 public:
 	TestBasicObject();

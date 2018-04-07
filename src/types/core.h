@@ -29,6 +29,7 @@ namespace types
 #include "system/identifiers.h"
 #include "system/graph.h"
 #include "system/expression/expression.h"
+#include "system/expression/queries.h"
 #include "system/expression_cache.h"
 #include "system/multimethods.h"
 
@@ -46,7 +47,10 @@ namespace types
 #include "cpp/InstanceAspectManager.hpp"
 
 #include "cpp/Instance.hpp"
+#include "system/GenericInvoke.hpp"
 
+#include "system/SimpleDispatcher.hpp"
+#include "system/ExpressionDispatcher.hpp"
 
 #include "boot/system_into_cpp.h"
 

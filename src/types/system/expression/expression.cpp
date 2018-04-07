@@ -1,11 +1,12 @@
 #include "../../common.h"
 #include "../../core.h"
 #include "expression.h"
+#include "../../boot/system_into_cpp.h"
 
 using namespace craft;
 using namespace craft::types;
 
-Expression::~Expression()
+IExpression::~IExpression()
 {
 
 }
@@ -20,7 +21,7 @@ CRAFT_TYPE_DEFINE(ExpressionConcrete)
 }
 
 ExpressionConcrete::ExpressionConcrete(Graph::Node const& node)
-	: Expression()
+	: IExpression()
 	, node(node)
 {
 
@@ -35,17 +36,22 @@ Graph::Node ExpressionConcrete::kind() const
 {
 	return graph().get<ExpressionConcrete>();
 }
+void* ExpressionConcrete::ptr() const
+{
+	return (void*)this;
+}
+
 std::string const& ExpressionConcrete::displayString() const
 {
 	identifiers();
 	return ""; // TODO
 }
-std::vector<Expression*> const* ExpressionConcrete::children() const
+std::vector<IExpression*> const* ExpressionConcrete::children() const
 {
 	return nullptr;
 }
 
-Expression* ExpressionConcrete::clone() const
+IExpression* ExpressionConcrete::clone() const
 {
 	return new ExpressionConcrete(node);
 }
@@ -74,7 +80,7 @@ void ExpressionStore::finish()
 	this->_building = false;
 }
 
-Expression const* ExpressionStore::root()
+IExpression const* ExpressionStore::root()
 {
 	return _root;
 }

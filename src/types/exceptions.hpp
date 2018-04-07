@@ -43,4 +43,11 @@ namespace types
 	public:
 		using type_graph_error::type_graph_error;
 	};
+
+	// Only errors in runtime execution will throw this (e.g. C++ glue code, the system runtime not otherwise covered, and the booted system)
+	class type_runtime_error : public type_error
+	{
+	public:
+		using type_error::type_error;
+	};
 }}

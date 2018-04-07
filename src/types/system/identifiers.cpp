@@ -35,7 +35,7 @@ TypeId Identifiers::add(void* const& ptr, void* const& node_ptr)
 	std::lock_guard<std::recursive_mutex> lock(_contents->operation);
 
 	auto it = _contents->types.insert({ ptr, 0, node_ptr });
-	auto id = _contents->types.get_index_from_iterator(it);
+	auto id = _contents->types.get_index_from_iterator(it) + 1;
 	_contents->types_byPtr[ptr] = id;
 	_contents->types_byPtr[node_ptr] = id;
 	it->id = id;
@@ -46,16 +46,16 @@ TypeId Identifiers::add(void* const& ptr, void* const& node_ptr)
 Identifiers::Record const& Identifiers::get(TypeId const& id) const
 {
 	auto v = id.id - 1;
-	if (v > _contents->types.size())
+	if (v >= _contents->types.size())
 		throw type_not_found_by_identifer_error("Identifier {0} out of range.", id.id);
-	return ;
+	return *_contents->types.get_iterator_from_index(v);
 }
 Identifiers::Record const& Identifiers::get(void* const& ptr) const
 {
 	auto it = _contents->types_byPtr.find(ptr);
 	if (it == _contents->types_byPtr.end())
 		throw type_identifer_not_found_error("Could not find an identifer for the given pointer.");
-	return *_contents->types.get_iterator_from_index(it->second);
+	return *_contents->types.get_iterator_from_index(it->second.id);
 }
 
 TypeId Identifiers::id(void* const& ptr) const

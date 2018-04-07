@@ -5,6 +5,26 @@
 namespace craft {
 namespace types
 {
+	/******************************************************************************
+	** RootGraphType
+	******************************************************************************/
+
+	// At it's root we are stringly typed.
+	class RootGraphType final
+	{
+	private:
+		std::string _typeName;
+
+	public:
+		RootGraphType(std::string const& name)
+			: _typeName(name)
+		{ }
+
+		inline std::string const& typeName() const
+		{
+			return _typeName;
+		}
+	};
 
 	/******************************************************************************
 	** Index
@@ -32,13 +52,20 @@ namespace types
 		struct Element
 		{
 			_Node* label;
+
+			Element(_Node* label)
+				: label(label)
+			{ }
 		};
 
 		struct _Node final : public Element
 		{
 			void* node_value;
-			std::vector<_Prop*> properties;
-			std::vector<_Edge*> edges;
+
+			_Node(_Node* label, void* value)
+				: Element(label)
+				, node_value(value)
+			{ }
 		};
 
 		struct _Prop final : public Element
@@ -60,6 +87,8 @@ namespace types
 		plf::colony<_Node> _nodes;
 		plf::colony<_Edge> _edges;
 		plf::colony<_Prop> _props;
+
+		std::map<std::string, _Node*> _roots;
 
 		// 
 		// Lifecycle
@@ -90,6 +119,10 @@ namespace types
 
 		public:
 			inline Node(Node const&) = default;
+
+			inline void* ptr() const { return _node; }
+
+			inline bool isValid() const { return _node != nullptr; }
 		};
 
 	public:
@@ -100,8 +133,12 @@ namespace types
 		template<typename T>
 		inline Node get() { return get(cpptype<T>::typeDesc()); }
 
-		CRAFT_TYPES_EXPORTED Node addNode(Node const& label, void* value) const;
-		CRAFT_TYPES_EXPORTED void addProperty(Node const& label, void* value, Node const& on_node) const;
-		CRAFT_TYPES_EXPORTED void addEdge(Node const& label, void* value, std::vector<Node> const& edge) const;
+		CRAFT_TYPES_EXPORTED Node ensureRoot(std::string const& name);
+
+		CRAFT_TYPES_EXPORTED Node addNode(Node const& label, void* value);
+		CRAFT_TYPES_EXPORTED void addProperty(Node const& label, void* value, Node const& on_node);
+		CRAFT_TYPES_EXPORTED void addEdge(Node const& label, void* value, std::vector<Node> const& edge);
+
+		CRAFT_TYPES_EXPORTED Node recoverNode(void*);
 	};
 }}
