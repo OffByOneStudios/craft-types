@@ -25,6 +25,16 @@ namespace types
 
 		public:
 
+			// Basic function
+			template<
+				typename T,
+				typename TInfoType_ = TInfoType,
+				typename std::enable_if< stdext::is_specialization<TInfoType_, cpp::Multimethod>::value >::type* = nullptr>
+				inline void add_method(T a)
+			{
+				((TInfoType_*)(_id->repr))->add(a);
+			}
+
 		public:
 
 		};

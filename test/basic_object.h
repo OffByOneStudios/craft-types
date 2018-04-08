@@ -14,4 +14,6 @@ public: // normally private
 public:
 	TestBasicObject();
 	TestBasicObject(TestBasicObject const&);
+
+	bool sameAs_string(TestBasicObject const*) const;
 };

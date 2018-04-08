@@ -10,16 +10,12 @@ namespace types
 	******************************************************************************/
 
 	// TODO, speed this up later
-	class Function
+	struct Function final
 	{
-	public:
 		typedef void (*_fnptr)();
 
 		_fnptr _fn;
-
-
 	};
-
 
 	/******************************************************************************
 	** Multimethod

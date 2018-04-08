@@ -67,7 +67,7 @@ namespace types
 			CppInfoKindEnum kind;
 			void* repr;
 
-			inline info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_);
+			inline info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_, void* repr_);
 		};
 	}
 
@@ -597,10 +597,11 @@ namespace types
 		kind = kind_;
 		system()._registerType(this);
 	}
-	inline cpp::info_desc::info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_)
+	inline cpp::info_desc::info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_, void* repr_)
 	{
 		initer = init_;
 		kind = kind_;
+		repr = repr_;
 		system()._registerInfo(this);
 	}
 
@@ -630,7 +631,7 @@ namespace types
 
 		public:
 			inline Multimethod(_fn_register_info_init init)
-				: __id(CppInfoKindEnum::MultimethodRoot, init)
+				: __id(CppInfoKindEnum::MultimethodRoot, init, this)
 			{
 
 			}
@@ -656,6 +657,8 @@ namespace types
 
 				return typename TDispatcher::invoke(callable, dispatchRecord, std::move(invoke));
 			}
+
+		public:
 		};
 	}
 
