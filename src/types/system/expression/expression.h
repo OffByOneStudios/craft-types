@@ -16,7 +16,7 @@ namespace types
 		virtual Graph::Node kind() const = 0;
 		virtual void* ptr() const = 0;
 
-		virtual std::string const& displayString() const = 0;
+		virtual std::string displayString() const = 0;
 		virtual std::vector<IExpression*> const* children() const = 0;
 
 		virtual IExpression* clone() const = 0;
@@ -43,7 +43,56 @@ namespace types
 		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string const& displayString() const override;
+		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
+		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+
+		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+	};
+
+	/******************************************************************************
+	** ExpressionArrow
+	******************************************************************************/
+
+	struct ExpressionArrow sealed
+		: public IExpression
+	{
+	public:
+		IExpression* input;
+		IExpression* output;
+
+		CRAFT_TYPES_EXPORTED ExpressionArrow(IExpression* input, IExpression* output);
+
+	public:
+		CRAFT_TYPES_EXPORTED virtual ~ExpressionArrow();
+
+		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+
+		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
+		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+
+		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+	};
+
+	/******************************************************************************
+	** ExpressionTuple
+	******************************************************************************/
+
+	struct ExpressionTuple sealed
+		: public IExpression
+	{
+	public:
+		std::vector<IExpression*> entries;
+
+		CRAFT_TYPES_EXPORTED ExpressionTuple(std::vector<IExpression*> const&);
+
+	public:
+		CRAFT_TYPES_EXPORTED virtual ~ExpressionTuple();
+
+		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+
+		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
 		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
 		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
@@ -61,6 +110,7 @@ namespace types
 
 	public:
 		CRAFT_TYPES_EXPORTED ExpressionStore();
+		CRAFT_TYPES_EXPORTED ExpressionStore(IExpression* ptr);
 		CRAFT_TYPES_EXPORTED ExpressionStore(ExpressionStore const&);
 		CRAFT_TYPES_EXPORTED ~ExpressionStore();
 

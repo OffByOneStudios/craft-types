@@ -659,6 +659,13 @@ namespace types
 			}
 
 		public:
+			template<typename T>
+			inline void add(T fn)
+			{
+				auto res = TDispatcher::cppFunctionToRecordAndFunction(fn);
+
+				addRecord(std::get<0>(res), std::get<1>(res));
+			}
 		};
 	}
 

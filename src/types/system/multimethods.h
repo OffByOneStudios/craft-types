@@ -15,6 +15,13 @@ namespace types
 		typedef void (*_fnptr)();
 
 		_fnptr _fn;
+
+		template <typename T
+			/*typename std::enable_if< std::is_invocable<T> >::type* = nullptr*/>
+		Function(T fn)
+		{
+			_fn = (_fnptr)fn;
+		}
 	};
 
 	/******************************************************************************
@@ -37,6 +44,12 @@ namespace types
 
 		Multimethod()
 		{
+		}
+
+		void addRecord(typename TDispatcher::DispatchRecord dr, TCallable c)
+		{
+			auto it = _records.insert({ c });
+			_dispatcher.add(dr, (void*)&*it);
 		}
 		
 		std::tuple<TCallable const*, typename TDispatcher::DispatchRecord const*> dispatchWithRecord(typename TDispatcher::Dispatch const& d) const

@@ -41,10 +41,9 @@ void* ExpressionConcrete::ptr() const
 	return (void*)this;
 }
 
-std::string const& ExpressionConcrete::displayString() const
+std::string ExpressionConcrete::displayString() const
 {
-	identifiers();
-	return ""; // TODO
+	return identifiers().get(node.ptr()).id.toString();
 }
 std::vector<IExpression*> const* ExpressionConcrete::children() const
 {
@@ -63,6 +62,11 @@ IExpression* ExpressionConcrete::clone() const
 ExpressionStore::ExpressionStore()
 {
 	this->_building = true;
+}
+ExpressionStore::ExpressionStore(IExpression* ptr)
+{
+	this->_root = ptr;
+	this->_building = false;
 }
 ExpressionStore::ExpressionStore(ExpressionStore const& other)
 {

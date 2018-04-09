@@ -14,11 +14,7 @@ namespace types
 	public:
 		typedef TypeId DispatchArgument;
 		typedef std::vector<TypeId> Dispatch;
-		struct DispatchRecord
-		{
-			Dispatch args;
-			DispatchArgument ret;
-		};
+		typedef ExpressionStore DispatchRecord;
 
 		typedef instance<> InvokeResult;
 
@@ -34,6 +30,37 @@ namespace types
 		static inline GenericInvoke cppArgumentsToInvoke(TArgs &&... args)
 		{
 			return GenericInvoke{ cppArgumentToInvokeArgument<TArgs>(std::forward<TArgs>(args))... };
+		}
+
+		template<typename T
+			/*typename std::enable_if< std::is_invocable<T>::value >::type* = nullptr*/>
+			static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
+		{
+			return to_expression_and_function(fn);
+		}
+
+		//
+		// Actual Class Data
+		//
+	private:
+		struct _Record
+		{
+			void* value;
+			DispatchRecord dispatch;
+		};
+
+		std::vector<_Record> _records;
+
+	public:
+		void add(DispatchRecord const& d, void* v)
+		{
+			// TODO
+		}
+
+		std::tuple<void*, DispatchRecord const*> dispatchWithRecord(Dispatch const& d) const
+		{
+			// TODO
+			throw type_graph_not_implemented_error("requires typegraph");
 		}
 	};
 

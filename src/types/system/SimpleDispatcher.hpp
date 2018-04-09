@@ -41,10 +41,11 @@ namespace types
 			std::transform(i.begin(), i.end(), std::back_inserter(d), (void* const& (*)(InvokeArgument const&))std::get<0>);
 		}
 
-		template<typename T>
+		template<typename T,
+			typename std::enable_if< std::is_pointer<T>::value >::type* = nullptr>
 		static inline DispatchArgument cppTypeToDispatchArgument()
 		{
-			return (DispatchArgument)cpptype<T>::typeDesc().asNode();
+			return (DispatchArgument)(cpptype<typename std::remove_pointer<T>::type>::typeDesc().asNode());
 		}
 
 		template<typename ...TArgs>
@@ -63,6 +64,21 @@ namespace types
 		static inline Invoke cppArgumentsToInvoke(TArgs &&... args)
 		{
 			return Invoke{ cppArgumentToInvokeArgument<TArgs>(args)... };
+		}
+
+		template<typename T
+			/*typename std::enable_if< std::is_invocable<T>::value >::type* = nullptr*/>
+		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
+		{
+			// Decay the lambda
+			return cppFunctionToRecordAndFunction(+fn);
+		}
+
+		template<typename ...TArgs>
+		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(uintptr_t (*fn)(TArgs...))
+		{
+			DispatchRecord record = { cppTypesToDispatch<TArgs...>(), nullptr };
+			return std::make_tuple(record, Function(fn));
 		}
 
 		//
