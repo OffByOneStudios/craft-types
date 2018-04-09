@@ -14,10 +14,11 @@ CRAFT_MULTIMETHOD_DEFINE(test_multimethod_simple)
 {
 	//_.add_method(&TestBasicObject::sameAs_string); //Not supported 
 	_.add_method(test_method_simple);
-	/*_.add_method([](void* a, TestAdvancedObject const* b) -> uintptr_t
-	{
-		return a == b->a_generic_instance.get();
-	});*/
+	_.add_method_lambdaHack<uintptr_t(*)(void*, TestAdvancedObject const*)>(
+		[](auto a, auto b) -> uintptr_t
+		{
+			return a == b->a_generic_instance.get();
+		});
 }
 
 instance<bool> test_method_expression(instance<TestBasicObject> this_, instance<TestAdvancedObject> that)

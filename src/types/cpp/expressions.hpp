@@ -9,7 +9,7 @@ namespace types
 		typename std::enable_if< stdext::is_specialization<T, instance>::value >::type* = nullptr>
 	IExpression* to_expression()
 	{
-		return new ExpressionConcrete(cpptype<typename T::instance_type>::typeDesc().asNode());
+		return new ExpressionConcrete(graph().recoverNode(cpptype<typename T::instance_type>::typeDesc().asNode()));
 	}
 
 	template<typename ...TArgs>

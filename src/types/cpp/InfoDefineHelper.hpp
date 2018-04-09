@@ -30,9 +30,20 @@ namespace types
 				typename T,
 				typename TInfoType_ = TInfoType,
 				typename std::enable_if< stdext::is_specialization<TInfoType_, cpp::Multimethod>::value >::type* = nullptr>
-				inline void add_method(T a)
+				inline void add_method(T actual)
 			{
-				((TInfoType_*)(_id->repr))->add(a);
+				((TInfoType_*)(_id->repr))->add(actual);
+			}
+
+			template<
+				typename T,
+				typename TTemp,
+				typename TInfoType_ = TInfoType,
+				typename std::enable_if< stdext::is_specialization<TInfoType_, cpp::Multimethod>::value >::type* = nullptr>
+				inline void add_method_lambdaHack(TTemp actual)
+			{
+				T temp = actual;
+				((TInfoType_*)(_id->repr))->add(temp);
 			}
 
 		public:
