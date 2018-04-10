@@ -177,14 +177,14 @@ namespace types
 		template<typename T>
 		inline ObjectCompositer* withOffset(std::string name, size_t offset)
 		{
-			registerWith(name, offset, type<T>::typeId());
+			registerWith(name, offset, cpptype<T>::typeDesc());
 			return this;
 		}
 
 		template<typename T>
 		inline ObjectCompositer* withOffsetRaw(std::string name, size_t offset)
 		{
-			registerWith(name, offset, type<T>::typeId(), true);
+			registerWith(name, offset, cpptype<T>::typeDesc(), true);
 			return this;
 		}
 

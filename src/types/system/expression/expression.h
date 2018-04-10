@@ -29,7 +29,7 @@ namespace types
 	** ExpressionConcrete
 	******************************************************************************/
 
-	struct ExpressionConcrete sealed
+	struct ExpressionConcrete final
 		: public IExpression
 	{
 	public:
@@ -53,7 +53,7 @@ namespace types
 	** ExpressionArrow
 	******************************************************************************/
 
-	struct ExpressionArrow sealed
+	struct ExpressionArrow final
 		: public IExpression
 	{
 	public:
@@ -78,7 +78,7 @@ namespace types
 	** ExpressionTuple
 	******************************************************************************/
 
-	struct ExpressionTuple sealed
+	struct ExpressionTuple final
 		: public IExpression
 	{
 	public:

@@ -16,6 +16,9 @@
 #include "types/system/expression/expression.h"
 
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionConcrete);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionArrow);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionTuple);
+
 
 /******************************************************************************
 ** /types/system/expression/queries.h

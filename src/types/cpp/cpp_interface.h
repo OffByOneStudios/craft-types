@@ -102,7 +102,7 @@ namespace types
 			template<typename TType>
 			inline bool isType()
 			{
-				const TypePtr that_type = types::type<TType>::typeDesc();
+				const TypePtr that_type = types::cpptype<TType>::typeDesc();
 				return that_type.desc != nullptr && *this == that_type;
 			}
 
@@ -471,7 +471,7 @@ namespace types
 			auto m = getManager(feature_desc);
 
 			if (m == nullptr)
-				const_cast<cpp::type_desc*>(feature_desc.desc)->repr = static_cast<IFeatureManager*>(new TFeature::TManager());
+				const_cast<cpp::type_desc*>(feature_desc.desc)->repr = static_cast<IFeatureManager*>(new typename TFeature::TManager());
 
 			return static_cast<typename TFeature::TManager*>(getManager(feature_desc));
 		}

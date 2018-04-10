@@ -42,10 +42,18 @@ namespace types
 		}
 
 		template<typename T,
-			typename std::enable_if< std::is_pointer<T>::value >::type* = nullptr>
+			typename TActual = typename std::remove_pointer<T>::type,
+			typename std::enable_if< cpptype<TActual>::kind != cpp::CppTypeKindEnum::None >::type* = nullptr>
 		static inline DispatchArgument cppTypeToDispatchArgument()
 		{
-			return (DispatchArgument)(cpptype<typename std::remove_pointer<T>::type>::typeDesc().asNode());
+			return (DispatchArgument)(cpptype<TActual>::typeDesc().asNode());
+		}
+
+		template<typename T,
+			typename std::enable_if< std::is_same<T, void*>::value || std::is_same<T, uintptr_t>::value >::type* = nullptr>
+			static inline DispatchArgument cppTypeToDispatchArgument()
+		{
+			return (DispatchArgument)(nullptr);
 		}
 
 		template<typename ...TArgs>

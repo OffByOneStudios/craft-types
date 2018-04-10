@@ -2,6 +2,11 @@
 
 #include "default_types_c.h"
 
+CRAFT_TYPE_DEFINE(void*)
+{
+	_.use<PIdentifier>().singleton<SimpleIdentifier>("void*");
+}
+
 CRAFT_TYPE_DEFINE(int8_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("int8");

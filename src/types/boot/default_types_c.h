@@ -2,6 +2,8 @@
 #include "../common.h"
 #include "../core.h"
 
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, void*);
+
 
 
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, uint8_t);
