@@ -12,6 +12,54 @@ IExpression::~IExpression()
 }
 
 /******************************************************************************
+** ExpressionSpecial
+******************************************************************************/
+
+ExpressionSpecial* ExpressionSpecial::Void;
+ExpressionSpecial* ExpressionSpecial::Any;
+ExpressionSpecial* ExpressionSpecial::Bottom;
+
+CRAFT_TYPE_DEFINE(ExpressionSpecial)
+{
+	ExpressionSpecial::Void = nullptr;
+}
+
+ExpressionSpecial::ExpressionSpecial(Graph::Node const& node)
+	: IExpression()
+	, node(node)
+{
+
+}
+
+ExpressionSpecial::~ExpressionSpecial()
+{
+
+}
+
+Graph::Node ExpressionSpecial::kind() const
+{
+	return graph().get<ExpressionConcrete>();
+}
+void* ExpressionSpecial::ptr() const
+{
+	return (void*)this;
+}
+
+std::string ExpressionSpecial::displayString() const
+{
+	return "";
+}
+std::vector<IExpression*> const* ExpressionSpecial::children() const
+{
+	return nullptr;
+}
+
+IExpression* ExpressionSpecial::clone() const
+{
+	return new ExpressionSpecial(node);
+}
+
+/******************************************************************************
 ** ExpressionConcrete
 ******************************************************************************/
 
@@ -148,6 +196,11 @@ IExpression* ExpressionTuple::clone() const
 /******************************************************************************
 ** ExpressionStore
 ******************************************************************************/
+
+CRAFT_TYPE_DEFINE(ExpressionStore)
+{
+
+}
 
 ExpressionStore::ExpressionStore()
 {

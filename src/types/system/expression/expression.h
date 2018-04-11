@@ -26,6 +26,35 @@ namespace types
 	};
 
 	/******************************************************************************
+	** ExpressionSpecial
+	******************************************************************************/
+
+	struct ExpressionSpecial final
+		: public IExpression
+	{
+	private:
+		Graph::Node node;
+
+		CRAFT_TYPES_EXPORTED ExpressionSpecial(Graph::Node const& node);
+
+	public:
+		CRAFT_TYPES_EXPORTED virtual ~ExpressionSpecial();
+
+		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+
+		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
+		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+
+		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+
+	public:
+		CRAFT_TYPES_EXPORTED static ExpressionSpecial* Void; // None/Nothing
+		CRAFT_TYPES_EXPORTED static ExpressionSpecial* Any;
+		CRAFT_TYPES_EXPORTED static ExpressionSpecial* Bottom;
+	};
+
+	/******************************************************************************
 	** ExpressionConcrete
 	******************************************************************************/
 

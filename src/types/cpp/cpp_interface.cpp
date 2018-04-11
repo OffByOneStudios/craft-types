@@ -52,6 +52,7 @@ void CppSystem::_init()
 	_current_dll_entries = new _Entries();
 
 	auto type_desc_root = _graph->ensureRoot("cpp-type");
+	auto info_desc_root = _graph->ensureRoot("cpp-info");
 
 	// Set up graph and identifiers
 	for (auto i = 0; i < _static_entries->_entries.size(); ++i)
@@ -67,6 +68,7 @@ void CppSystem::_init()
 
 			case _Entry::Kind::Info:
 			{
+				auto node = _graph->addNode(info_desc_root, entry.ptr);
 			} break;
 		}
 	}

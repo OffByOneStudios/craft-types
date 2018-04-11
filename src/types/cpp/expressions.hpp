@@ -5,11 +5,27 @@
 namespace craft {
 namespace types
 {
+	struct Any final {};
+
 	template<typename T,
 		typename std::enable_if< stdext::is_specialization<T, instance>::value >::type* = nullptr>
 	IExpression* to_expression()
 	{
 		return new ExpressionConcrete(graph().recoverNode(cpptype<typename T::instance_type>::typeDesc().asNode()));
+	}
+
+	template<typename T,
+		typename std::enable_if< std::is_same<T, void>::value >::type* = nullptr>
+	IExpression* to_expression()
+	{
+		return ExpressionSpecial::Void;
+	}
+
+	template<typename T,
+		typename std::enable_if< std::is_same<T, Any>::value >::type* = nullptr>
+	IExpression* to_expression()
+	{
+		return ExpressionSpecial::Any;
 	}
 
 	template<typename ...TArgs>
