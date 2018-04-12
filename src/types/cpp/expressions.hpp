@@ -57,6 +57,13 @@ namespace types
 		return new ExpressionTuple({ to_expression<TArgs>()... });
 	}
 
+	template<typename ...TArgs,
+		typename std::enable_if< sizeof...(TArgs) == 0 >::type* = nullptr>
+		IExpression* to_expression_tuple()
+	{
+		return new ExpressionTuple({ to_expression<TArgs>()... });
+	}
+
 	template<typename TRet, typename ...TArgs>
 	std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (*fn)(TArgs...))
 	{
