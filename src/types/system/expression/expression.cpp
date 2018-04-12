@@ -122,7 +122,8 @@ ExpressionArrow::ExpressionArrow(IExpression* input, IExpression* output)
 
 ExpressionArrow::~ExpressionArrow()
 {
-
+	delete input;
+	delete output;
 }
 
 Graph::Node ExpressionArrow::kind() const
@@ -158,16 +159,21 @@ CRAFT_TYPE_DEFINE(ExpressionTuple)
 
 }
 
-ExpressionTuple::ExpressionTuple(std::vector<IExpression*> const& entries)
+ExpressionTuple::ExpressionTuple(std::vector<IExpression*> const& entries, IExpression* varType)
 	: IExpression()
 	, entries(entries)
+	, varType(varType)
 {
 
 }
 
 ExpressionTuple::~ExpressionTuple()
 {
+	for (auto e : entries)
+		delete e;
 
+	if (varType != nullptr)
+		delete varType;
 }
 
 Graph::Node ExpressionTuple::kind() const

@@ -5,13 +5,32 @@
 namespace craft {
 namespace types
 {
-	struct Any final {};
+	template<typename T>
+	struct VarArgs final
+	{
+		typedef typename T value_type;
+		std::vector<T> args;
+	};
 
 	template<typename T,
-		typename std::enable_if< stdext::is_specialization<T, instance>::value >::type* = nullptr>
+		typename std::enable_if< stdext::is_specialization<T, instance>::value && !std::is_same<typename T::instance_type, void>::value >::type* = nullptr>
 	IExpression* to_expression()
 	{
 		return new ExpressionConcrete(graph().recoverNode(cpptype<typename T::instance_type>::typeDesc().asNode()));
+	}
+
+	template<typename T,
+		typename std::enable_if< stdext::is_specialization<T, instance>::value && std::is_same<typename T::instance_type, void>::value >::type* = nullptr>
+		IExpression* to_expression()
+	{
+		return ExpressionSpecial::Any;
+	}
+
+	template<typename T,
+		typename std::enable_if< stdext::is_specialization<T, VarArgs>::value >::type* = nullptr>
+		IExpression* to_expression()
+	{
+		return to_expression<typename T::value_type>();
 	}
 
 	template<typename T,
@@ -21,15 +40,19 @@ namespace types
 		return ExpressionSpecial::Void;
 	}
 
-	template<typename T,
-		typename std::enable_if< std::is_same<T, Any>::value >::type* = nullptr>
-	IExpression* to_expression()
+	template<typename ...TArgs,
+		typename std::enable_if< stdext::is_specialization<typename stdext::parampack_last<TArgs...>::type, VarArgs>::value >::type* = nullptr>
+	IExpression* to_expression_tuple()
 	{
-		return ExpressionSpecial::Any;
+		std::vector<IExpression*> vec = { to_expression<TArgs>()... };
+		IExpression* collect = vec.back(); vec.pop_back();
+
+		return new ExpressionTuple(vec, collect);
 	}
 
-	template<typename ...TArgs>
-	IExpression* to_expression_tuple()
+	template<typename ...TArgs,
+		typename std::enable_if< !stdext::is_specialization<typename stdext::parampack_last<TArgs...>::type, VarArgs>::value >::type* = nullptr>
+		IExpression* to_expression_tuple()
 	{
 		return new ExpressionTuple({ to_expression<TArgs>()... });
 	}

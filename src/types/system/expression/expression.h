@@ -112,8 +112,9 @@ namespace types
 	{
 	public:
 		std::vector<IExpression*> entries;
+		IExpression* varType;
 
-		CRAFT_TYPES_EXPORTED ExpressionTuple(std::vector<IExpression*> const&);
+		CRAFT_TYPES_EXPORTED ExpressionTuple(std::vector<IExpression*> const&, IExpression* varType = nullptr);
 
 	public:
 		CRAFT_TYPES_EXPORTED virtual ~ExpressionTuple();
