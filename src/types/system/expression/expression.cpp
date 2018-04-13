@@ -6,11 +6,6 @@
 using namespace craft;
 using namespace craft::types;
 
-IExpression::~IExpression()
-{
-
-}
-
 /******************************************************************************
 ** ExpressionSpecial
 ******************************************************************************/
@@ -19,9 +14,17 @@ ExpressionSpecial* ExpressionSpecial::Void;
 ExpressionSpecial* ExpressionSpecial::Any;
 ExpressionSpecial* ExpressionSpecial::Bottom;
 
+void craft::types::__special_init_ExpressionSpecial()
+{
+	ExpressionSpecial::Void = new ExpressionSpecial(graph().recoverNode(cpptype<ExpressionSpecial>::typeDesc().asNode()));
+	ExpressionSpecial::Any = new ExpressionSpecial(graph().recoverNode(cpptype<ExpressionSpecial>::typeDesc().asNode()));
+	ExpressionSpecial::Bottom = new ExpressionSpecial(graph().recoverNode(cpptype<ExpressionSpecial>::typeDesc().asNode()));
+}
+
 CRAFT_TYPE_DEFINE(ExpressionSpecial)
 {
-	ExpressionSpecial::Void = nullptr;
+
+	__special_init_ExpressionSpecial();
 }
 
 ExpressionSpecial::ExpressionSpecial(Graph::Node const& node)
@@ -52,6 +55,11 @@ std::string ExpressionSpecial::displayString() const
 std::vector<IExpression*> const* ExpressionSpecial::children() const
 {
 	return nullptr;
+}
+
+void ExpressionSpecial::destroy()
+{
+
 }
 
 IExpression* ExpressionSpecial::clone() const
@@ -98,6 +106,11 @@ std::vector<IExpression*> const* ExpressionConcrete::children() const
 	return nullptr;
 }
 
+void ExpressionConcrete::destroy()
+{
+	delete this;
+}
+
 IExpression* ExpressionConcrete::clone() const
 {
 	return new ExpressionConcrete(node);
@@ -122,8 +135,8 @@ ExpressionArrow::ExpressionArrow(IExpression* input, IExpression* output)
 
 ExpressionArrow::~ExpressionArrow()
 {
-	delete input;
-	delete output;
+	input->destroy();
+	output->destroy();
 }
 
 Graph::Node ExpressionArrow::kind() const
@@ -142,6 +155,11 @@ std::string ExpressionArrow::displayString() const
 std::vector<IExpression*> const* ExpressionArrow::children() const
 {
 	return nullptr;
+}
+
+void ExpressionArrow::destroy() 
+{
+	delete this;
 }
 
 IExpression* ExpressionArrow::clone() const
@@ -170,10 +188,10 @@ ExpressionTuple::ExpressionTuple(std::vector<IExpression*> const& entries, IExpr
 ExpressionTuple::~ExpressionTuple()
 {
 	for (auto e : entries)
-		delete e;
+		e->destroy();
 
 	if (varType != nullptr)
-		delete varType;
+		varType->destroy();
 }
 
 Graph::Node ExpressionTuple::kind() const
@@ -192,6 +210,11 @@ std::string ExpressionTuple::displayString() const
 std::vector<IExpression*> const* ExpressionTuple::children() const
 {
 	return nullptr;
+}
+
+void ExpressionTuple::destroy()
+{
+	delete this;
 }
 
 IExpression* ExpressionTuple::clone() const
@@ -214,18 +237,16 @@ ExpressionStore::ExpressionStore()
 }
 ExpressionStore::ExpressionStore(IExpression* ptr)
 {
-	this->_root = ptr;
+	this->_root = std::shared_ptr<IExpression>(ptr, [=](IExpression* ex) { ex->destroy(); });
 	this->_building = false;
 }
 ExpressionStore::ExpressionStore(ExpressionStore const& other)
 {
-	this->_root = other._root->clone();
+	this->_root = other._root;
 	this->_building = true;
 }
 ExpressionStore::~ExpressionStore()
 {
-	if (this->_root != nullptr)
-		delete this->_root;
 }
 
 void ExpressionStore::finish()
@@ -233,7 +254,7 @@ void ExpressionStore::finish()
 	this->_building = false;
 }
 
-IExpression const* ExpressionStore::root()
+IExpression const* ExpressionStore::root() const
 {
-	return _root;
+	return _root.get();
 }
