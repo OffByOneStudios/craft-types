@@ -103,7 +103,7 @@ namespace types
 		{
 			auto it = _index.find(s);
 			if (it == _index.end())
-				return 0;
+				return nullptr;
 			return it->second;
 		}
 	};
@@ -165,7 +165,7 @@ namespace types
 			}
 		}
 
-		inline virtual void addSingleton(TypeId tid, TProvider* singleton) override
+		inline virtual void addSingleton(cpp::TypePtr tid, TProvider* singleton) override
 		{
 			SingletonProviderManager<TProvider>::addSingleton(tid, singleton);
 
