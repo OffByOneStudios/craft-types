@@ -8,10 +8,10 @@ using namespace craft::types;
 
 CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 {
-	_.add_method([](IExpression* left, ExpressionAny* right) { return true; });
-	_.add_method([](ExpressionAny* left, IExpression* right) { return false; });
-	_.add_method([](ExpressionBottom* left, IExpression* right) { return true; });
-	_.add_method([](IExpression* left, ExpressionBottom* right) { return false; });
+	_.add_method([](void* left, ExpressionAny* right) { return true; });
+	_.add_method([](ExpressionAny* left, void* right) { return false; });
+	_.add_method([](ExpressionBottom* left, void* right) { return true; });
+	_.add_method([](void* left, ExpressionBottom* right) { return false; });
 
 	_.add_method([](ExpressionConcrete* left, ExpressionConcrete* right)
 	{

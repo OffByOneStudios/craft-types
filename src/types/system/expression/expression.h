@@ -35,7 +35,7 @@ namespace types
 		ExpressionAny() = default;
 		~ExpressionAny() = default;
 	public:
-		static ExpressionAny Value;
+		CRAFT_TYPES_EXPORTED static ExpressionAny Value;
 
 		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
@@ -54,7 +54,7 @@ namespace types
 		ExpressionVoid() = default;
 		~ExpressionVoid() = default;
 	public:
-		static ExpressionVoid Value;
+		CRAFT_TYPES_EXPORTED static ExpressionVoid Value;
 
 		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
@@ -73,7 +73,7 @@ namespace types
 		ExpressionBottom() = default;
 		~ExpressionBottom() = default;
 	public:
-		static ExpressionBottom Value;
+		CRAFT_TYPES_EXPORTED static ExpressionBottom Value;
 
 		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;

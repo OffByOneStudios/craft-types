@@ -45,7 +45,7 @@ namespace types
 		typename std::enable_if< stdext::is_specialization<T, instance>::value && std::is_same<typename T::instance_type, void>::value >::type* = nullptr>
 	inline IExpression* to_expression()
 	{
-		return ExpressionSpecial::Any;
+		return &ExpressionAny::Value;
 	}
 
 	template<typename T,
@@ -59,7 +59,7 @@ namespace types
 		typename std::enable_if< std::is_same<T, void>::value >::type* = nullptr>
 	inline IExpression* to_expression()
 	{
-		return ExpressionSpecial::Void;
+		return &ExpressionVoid::Value;
 	}
 
 	template<typename ...TArgs,
