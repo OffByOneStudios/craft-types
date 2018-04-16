@@ -10,5 +10,5 @@ namespace types
 	******************************************************************************/
 
 	// Checks to see if left is a subtype of right
-	bool isSubtype(IExpression* left, IExpression* right);
+	CRAFT_TYPES_EXPORTED bool isSubtype(IExpression const* left, IExpression const* right);
 }}

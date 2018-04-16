@@ -8,6 +8,8 @@ using namespace craft::types;
 
 CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 {
+	_.add_method([](ExpressionVoid* left, ExpressionVoid* right) { return true; });
+
 	_.add_method([](void* left, ExpressionAny* right) { return true; });
 	_.add_method([](ExpressionAny* left, void* right) { return false; });
 	_.add_method([](ExpressionBottom* left, void* right) { return true; });
@@ -80,7 +82,7 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 	_.add_method([](void* left, void* right) { return false; });
 }
 
-bool craft::types::isSubtype(IExpression* left, IExpression* right)
+bool craft::types::isSubtype(IExpression const* left, IExpression const* right)
 {
 	auto res = isSubtypeMethod.invoke(SimpleDispatcher::Invoke{ left->invokeArg(), right->invokeArg() });
 

@@ -653,6 +653,7 @@ namespace types
 
 				auto res = this->dispatchWithRecord(d);
 				auto callable = std::get<0>(res);
+				if (callable == nullptr) throw stdext::exception("bad dispatch");
 				auto dispatchRecord = std::get<1>(res);
 
 				return typename TDispatcher::invoke(callable, dispatchRecord, std::move(invoke));

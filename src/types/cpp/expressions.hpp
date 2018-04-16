@@ -100,6 +100,13 @@ namespace types
 		
 	}
 
+	template<typename T,
+		typename std::enable_if< !std::is_pointer<T>::value >::type* = nullptr>
+		inline std::tuple<ExpressionStore, Function> to_expression_and_function(T fn)
+	{
+		return to_expression_and_function(+fn);
+	}
+
 	//
 	// invoke
 	//
@@ -109,7 +116,7 @@ namespace types
 		assert(exs.root()->kind().ptr() == cpptype<ExpressionArrow>::typeDesc().asNode());
 		auto arrow = (ExpressionArrow const*)exs.root();
 
-		assert(arrow->input->kind().ptr() == cpptype<ExpressionArrow>::typeDesc().asNode());
+		assert(arrow->input->kind().ptr() == cpptype<ExpressionTuple>::typeDesc().asNode());
 		auto tuple = (ExpressionTuple const*)arrow->input;
 
 		auto t_size = tuple->entries.size();

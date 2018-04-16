@@ -21,7 +21,7 @@ namespace types
 		virtual IExpression* clone() const = 0;
 
 	public:
-		inline std::tuple<void*, void*> invokeArg() { return std::make_tuple(kind().ptr(), ptr()); }
+		inline std::tuple<void*, void*> invokeArg() const { return std::make_tuple(kind().ptr(), ptr()); }
 	};
 
 	/******************************************************************************

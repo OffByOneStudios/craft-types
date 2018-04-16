@@ -17,13 +17,21 @@ namespace types
 		typedef ExpressionStore DispatchRecord;
 
 		typedef instance<> InvokeResult;
+		typedef instance<> InvokeArgument;
+		typedef GenericInvoke Invoke;
 
 	public:
 
-		template<typename T>
-		static inline instance<> cppArgumentToInvokeArgument(instance<T> && a)
+		static inline void invokeIntoDispatch(Invoke const& i, Dispatch& d)
 		{
-			return a;
+			std::transform(i.args.begin(), i.args.end(), std::back_inserter(d), [](auto i) { return i.typeId(); });
+		}
+
+		template<typename T,
+			typename std::enable_if< stdext::is_specialization<typename std::decay<T>::type, instance>::value >::type* = nullptr>
+		static inline instance<> cppArgumentToInvokeArgument(T && a)
+		{
+			return (instance<>)a;
 		}
 
 		template<typename ...TArgs>
@@ -34,7 +42,7 @@ namespace types
 
 		template<typename T
 			/*typename std::enable_if< std::is_invocable<T>::value >::type* = nullptr*/>
-			static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
+		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
 		{
 			return to_expression_and_function(fn);
 		}
@@ -51,6 +59,9 @@ namespace types
 
 		std::vector<_Record> _records;
 
+		//
+		// Dispatch manipulators
+		//
 	public:
 		void add(DispatchRecord const& d, void* v)
 		{
@@ -59,9 +70,25 @@ namespace types
 
 		std::tuple<void*, DispatchRecord const*> dispatchWithRecord(Dispatch const& d) const
 		{
-			auto expres = ExpressionStore(to_expression_tuple(d));
+			auto expres = ExpressionStore(new ExpressionArrow(to_expression_tuple(d), &ExpressionBottom::Value));
 
-			throw type_graph_not_implemented_error("requires typegraph");
+			for (auto& rec : _records)
+			{
+				if (isSubtype(expres.root(), rec.dispatch.root()))
+					return std::make_tuple(rec.value, &rec.dispatch);
+			}
+
+			return std::make_tuple(nullptr, nullptr);
+		}
+
+		//
+		// Invoke Helpers
+		//
+	public:
+
+		static inline InvokeResult invoke(Function const* f, DispatchRecord const* d, Invoke && i)
+		{
+			return types::invoke(*d, f, i);
 		}
 	};
 
