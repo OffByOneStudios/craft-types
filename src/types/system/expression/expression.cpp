@@ -7,65 +7,46 @@ using namespace craft;
 using namespace craft::types;
 
 /******************************************************************************
-** ExpressionSpecial
+** Expression Specials
 ******************************************************************************/
 
-ExpressionSpecial* ExpressionSpecial::Void;
-ExpressionSpecial* ExpressionSpecial::Any;
-ExpressionSpecial* ExpressionSpecial::Bottom;
+ExpressionAny ExpressionAny::Value;
+CRAFT_TYPE_DEFINE(ExpressionAny) { }
 
-void craft::types::__special_init_ExpressionSpecial()
-{
-	ExpressionSpecial::Void = new ExpressionSpecial(graph().recoverNode(cpptype<ExpressionSpecial>::typeDesc().asNode()));
-	ExpressionSpecial::Any = new ExpressionSpecial(graph().recoverNode(cpptype<ExpressionSpecial>::typeDesc().asNode()));
-	ExpressionSpecial::Bottom = new ExpressionSpecial(graph().recoverNode(cpptype<ExpressionSpecial>::typeDesc().asNode()));
-}
+Graph::Node ExpressionAny::kind() const { return graph().get<ExpressionAny>(); }
+void* ExpressionAny::ptr() const { return (void*)this; }
 
-CRAFT_TYPE_DEFINE(ExpressionSpecial)
-{
+std::string ExpressionAny::displayString() const { return "Any"; }
+std::vector<IExpression*> const* ExpressionAny::children() const { return nullptr; }
 
-	__special_init_ExpressionSpecial();
-}
+void ExpressionAny::destroy() { }
+IExpression* ExpressionAny::clone() const { return &Value; }
 
-ExpressionSpecial::ExpressionSpecial(Graph::Node const& node)
-	: IExpression()
-	, node(node)
-{
 
-}
+ExpressionVoid ExpressionVoid::Value;
+CRAFT_TYPE_DEFINE(ExpressionVoid) { }
 
-ExpressionSpecial::~ExpressionSpecial()
-{
+Graph::Node ExpressionVoid::kind() const { return graph().get<ExpressionVoid>(); }
+void* ExpressionVoid::ptr() const { return (void*)this; }
 
-}
+std::string ExpressionVoid::displayString() const { return "Void"; }
+std::vector<IExpression*> const* ExpressionVoid::children() const { return nullptr; }
 
-Graph::Node ExpressionSpecial::kind() const
-{
-	return graph().get<ExpressionConcrete>();
-}
-void* ExpressionSpecial::ptr() const
-{
-	return (void*)this;
-}
+void ExpressionVoid::destroy() { }
+IExpression* ExpressionVoid::clone() const { return &Value; }
 
-std::string ExpressionSpecial::displayString() const
-{
-	return "";
-}
-std::vector<IExpression*> const* ExpressionSpecial::children() const
-{
-	return nullptr;
-}
 
-void ExpressionSpecial::destroy()
-{
+ExpressionBottom ExpressionBottom::Value;
+CRAFT_TYPE_DEFINE(ExpressionBottom) { }
 
-}
+Graph::Node ExpressionBottom::kind() const { return graph().get<ExpressionBottom>(); }
+void* ExpressionBottom::ptr() const { return (void*)this; }
 
-IExpression* ExpressionSpecial::clone() const
-{
-	return new ExpressionSpecial(node);
-}
+std::string ExpressionBottom::displayString() const { return "Bottom"; }
+std::vector<IExpression*> const* ExpressionBottom::children() const { return nullptr; }
+
+void ExpressionBottom::destroy() { }
+IExpression* ExpressionBottom::clone() const { return &Value; }
 
 /******************************************************************************
 ** ExpressionConcrete
@@ -196,7 +177,7 @@ ExpressionTuple::~ExpressionTuple()
 
 Graph::Node ExpressionTuple::kind() const
 {
-	return graph().get<ExpressionConcrete>();
+	return graph().get<ExpressionTuple>();
 }
 void* ExpressionTuple::ptr() const
 {
@@ -209,7 +190,7 @@ std::string ExpressionTuple::displayString() const
 }
 std::vector<IExpression*> const* ExpressionTuple::children() const
 {
-	return nullptr;
+	return &entries;
 }
 
 void ExpressionTuple::destroy()

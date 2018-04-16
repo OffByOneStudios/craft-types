@@ -36,6 +36,8 @@ namespace types
 		// Static Helpers
 		//
 	public:
+		CRAFT_TYPES_EXPORTED static void* Any;
+
 		static inline void invokeIntoDispatch(Invoke const& i, Dispatch& d)
 		{
 			std::transform(i.begin(), i.end(), std::back_inserter(d), (void* const& (*)(InvokeArgument const&))std::get<0>);
@@ -43,7 +45,8 @@ namespace types
 
 		template<typename T,
 			typename TActual = typename std::remove_pointer<T>::type,
-			typename std::enable_if< cpptype<TActual>::kind != cpp::CppTypeKindEnum::None >::type* = nullptr>
+			typename std::enable_if< cpptype<TActual>::kind != cpp::CppTypeKindEnum::None
+				&& !(std::is_same<T, void>::value || std::is_same<T, void*>::value || std::is_same<T, uintptr_t>::value) >::type* = nullptr>
 		static inline DispatchArgument cppTypeToDispatchArgument()
 		{
 			return (DispatchArgument)(cpptype<TActual>::typeDesc().asNode());
@@ -51,6 +54,13 @@ namespace types
 
 		template<typename T,
 			typename std::enable_if< std::is_same<T, void*>::value || std::is_same<T, uintptr_t>::value >::type* = nullptr>
+			static inline DispatchArgument cppTypeToDispatchArgument()
+		{
+			return (DispatchArgument)(Any); // any
+		}
+
+		template<typename T,
+			typename std::enable_if< std::is_same<T, void>::value >::type* = nullptr>
 			static inline DispatchArgument cppTypeToDispatchArgument()
 		{
 			return (DispatchArgument)(nullptr);
@@ -65,28 +75,28 @@ namespace types
 		template<typename T>
 		static inline InvokeArgument cppArgumentToInvokeArgument(T && a)
 		{
-			return InvokeArgument(cpptype<T>::typeDesc().asNode(), (void*)a);
+			return InvokeArgument(cppTypeToDispatchArgument<std::decay<T>::type>(), (void*)a);
 		}
 
 		template<typename ...TArgs>
 		static inline Invoke cppArgumentsToInvoke(TArgs &&... args)
 		{
-			return Invoke{ cppArgumentToInvokeArgument<TArgs>(args)... };
+			return Invoke{ cppArgumentToInvokeArgument<TArgs>(std::forward<TArgs>(args))... };
 		}
 
-		template<typename T
-			/*typename std::enable_if< std::is_invocable<T>::value >::type* = nullptr*/>
-		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
+		template<typename TRet, typename ...TArgs>
+		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(TRet (*fn)(TArgs...))
+		{
+			DispatchRecord record = { cppTypesToDispatch<TArgs...>(), cppTypeToDispatchArgument<TRet>() };
+			return std::make_tuple(record, Function(fn));
+		}
+
+		template<typename T,
+			typename std::enable_if< !std::is_pointer<T>::value >::type* = nullptr>
+			static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
 		{
 			// Decay the lambda
 			return cppFunctionToRecordAndFunction(+fn);
-		}
-
-		template<typename ...TArgs>
-		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(uintptr_t (*fn)(TArgs...))
-		{
-			DispatchRecord record = { cppTypesToDispatch<TArgs...>(), nullptr };
-			return std::make_tuple(record, Function(fn));
 		}
 
 		//
@@ -162,7 +172,7 @@ namespace types
 		std::tuple<void*, DispatchRecord const*> dispatchWithRecord(Dispatch const& d) const
 		{
 			auto target_size = d.size();
-			for (auto rec : _records)
+			for (auto& rec : _records)
 			{
 				if (rec.dispatch.args.size() != target_size)
 					continue;
@@ -170,7 +180,10 @@ namespace types
 				bool all_match = true;
 				for (auto i = 0; i < target_size; ++i)
 				{
-					if (rec.dispatch.args[i] != d[i])
+					auto dispatching_type = rec.dispatch.args[i];
+					if (dispatching_type == Any)
+						continue;
+					if (dispatching_type != d[i])
 					{
 						all_match = false;
 						break;

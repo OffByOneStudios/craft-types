@@ -54,12 +54,13 @@ namespace types
 	public:
 		void add(DispatchRecord const& d, void* v)
 		{
-			// TODO
+			_records.push_back({ v, d });
 		}
 
 		std::tuple<void*, DispatchRecord const*> dispatchWithRecord(Dispatch const& d) const
 		{
-			// TODO
+			auto expres = ExpressionStore(to_expression_tuple(d));
+
 			throw type_graph_not_implemented_error("requires typegraph");
 		}
 	};

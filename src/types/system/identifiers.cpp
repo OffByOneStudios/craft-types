@@ -55,7 +55,7 @@ Identifiers::Record const& Identifiers::get(void* const& ptr) const
 	auto it = _contents->types_byPtr.find(ptr);
 	if (it == _contents->types_byPtr.end())
 		throw type_identifer_not_found_error("Could not find an identifer for the given pointer.");
-	return *_contents->types.get_iterator_from_index(it->second.id);
+	return *_contents->types.get_iterator_from_index(it->second.id - 1);
 }
 
 TypeId Identifiers::id(void* const& ptr) const

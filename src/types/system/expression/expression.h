@@ -25,19 +25,17 @@ namespace types
 	};
 
 	/******************************************************************************
-	** ExpressionSpecial
+	** Expression Specials
 	******************************************************************************/
 
-	struct ExpressionSpecial final
+	struct ExpressionAny final
 		: public IExpression
 	{
 	private:
-		Graph::Node node;
-		friend void __special_init_ExpressionSpecial();
-		CRAFT_TYPES_EXPORTED ExpressionSpecial(Graph::Node const& node);
-		CRAFT_TYPES_EXPORTED ~ExpressionSpecial();
-
+		ExpressionAny() = default;
+		~ExpressionAny() = default;
 	public:
+		static ExpressionAny Value;
 
 		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
@@ -47,11 +45,44 @@ namespace types
 
 		CRAFT_TYPES_EXPORTED virtual void destroy() override;
 		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+	};
 
+	struct ExpressionVoid final
+		: public IExpression
+	{
+	private:
+		ExpressionVoid() = default;
+		~ExpressionVoid() = default;
 	public:
-		CRAFT_TYPES_EXPORTED static ExpressionSpecial* Void; // None/Nothing
-		CRAFT_TYPES_EXPORTED static ExpressionSpecial* Any;
-		CRAFT_TYPES_EXPORTED static ExpressionSpecial* Bottom;
+		static ExpressionVoid Value;
+
+		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+
+		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
+		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+
+		CRAFT_TYPES_EXPORTED virtual void destroy() override;
+		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+	};
+
+	struct ExpressionBottom final
+		: public IExpression
+	{
+	private:
+		ExpressionBottom() = default;
+		~ExpressionBottom() = default;
+	public:
+		static ExpressionBottom Value;
+
+		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+
+		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
+		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+
+		CRAFT_TYPES_EXPORTED virtual void destroy() override;
+		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	/******************************************************************************

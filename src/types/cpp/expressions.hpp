@@ -5,10 +5,6 @@
 namespace craft {
 namespace types
 {
-	//
-	// expression
-	//
-
 	template<typename T>
 	struct VarArgs final
 	{
@@ -16,37 +12,59 @@ namespace types
 		std::vector<T> args;
 	};
 
+	//
+	// to_expression - simple
+	//
+
+	inline IExpression* to_expression(TypeId tid)
+	{
+		return new ExpressionConcrete(graph().get(tid));
+	}
+
+	inline IExpression* to_expression_tuple(std::vector<TypeId> const& tids)
+	{
+		std::vector<IExpression*> exprs;
+		exprs.reserve(tids.size());
+		std::transform(tids.begin(), tids.end(), std::back_inserter(exprs), [](TypeId const& tid) { return to_expression(tid); });
+
+		return new ExpressionTuple(exprs);
+	}
+
+	//
+	// to_expression - templated
+	//
+
 	template<typename T,
 		typename std::enable_if< stdext::is_specialization<T, instance>::value && !std::is_same<typename T::instance_type, void>::value >::type* = nullptr>
-	IExpression* to_expression()
+		inline IExpression* to_expression()
 	{
 		return new ExpressionConcrete(graph().recoverNode(cpptype<typename T::instance_type>::typeDesc().asNode()));
 	}
 
 	template<typename T,
 		typename std::enable_if< stdext::is_specialization<T, instance>::value && std::is_same<typename T::instance_type, void>::value >::type* = nullptr>
-		IExpression* to_expression()
+	inline IExpression* to_expression()
 	{
 		return ExpressionSpecial::Any;
 	}
 
 	template<typename T,
 		typename std::enable_if< stdext::is_specialization<T, VarArgs>::value >::type* = nullptr>
-		IExpression* to_expression()
+	inline IExpression* to_expression()
 	{
 		return to_expression<typename T::value_type>();
 	}
 
 	template<typename T,
 		typename std::enable_if< std::is_same<T, void>::value >::type* = nullptr>
-	IExpression* to_expression()
+	inline IExpression* to_expression()
 	{
 		return ExpressionSpecial::Void;
 	}
 
 	template<typename ...TArgs,
 		typename std::enable_if< stdext::is_specialization<typename stdext::parampack_last<TArgs...>::type, VarArgs>::value >::type* = nullptr>
-	IExpression* to_expression_tuple()
+	inline IExpression* to_expression_tuple()
 	{
 		std::vector<IExpression*> vec = { to_expression<TArgs>()... };
 		IExpression* collect = vec.back(); vec.pop_back();
@@ -56,20 +74,20 @@ namespace types
 
 	template<typename ...TArgs,
 		typename std::enable_if< !stdext::is_specialization<typename stdext::parampack_last<TArgs...>::type, VarArgs>::value >::type* = nullptr>
-		IExpression* to_expression_tuple()
+	inline IExpression* to_expression_tuple()
 	{
 		return new ExpressionTuple({ to_expression<TArgs>()... });
 	}
 
 	template<typename ...TArgs,
 		typename std::enable_if< sizeof...(TArgs) == 0 >::type* = nullptr>
-		IExpression* to_expression_tuple()
+	inline IExpression* to_expression_tuple()
 	{
 		return new ExpressionTuple({ to_expression<TArgs>()... });
 	}
 
 	template<typename TRet, typename ...TArgs>
-	std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (*fn)(TArgs...))
+	inline std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (*fn)(TArgs...))
 	{
 		auto arrow = new ExpressionArrow(to_expression_tuple<TArgs...>(), to_expression<TRet>());
 
@@ -77,7 +95,7 @@ namespace types
 	}
 
 	template<typename TClass, typename TRet, typename ...TArgs>
-	std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (TClass::*fn)(TArgs...))
+	inline std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (TClass::*fn)(TArgs...))
 	{
 		
 	}
@@ -108,7 +126,7 @@ namespace types
 			std::copy(i.args.begin() + t_size, i.args.end(), std::back_inserter(va.args));
 
 			// WITH ret
-			if (arrow->output != ExpressionSpecial::Void)
+			if (arrow->output != &ExpressionVoid::Value)
 			{
 				switch (t_size)
 				{
@@ -154,7 +172,7 @@ namespace types
 			assert(t_size == i.args.size());
 
 			// WITH ret
-			if (arrow->output != ExpressionSpecial::Void)
+			if (arrow->output != &ExpressionVoid::Value)
 			{
 				switch (t_size)
 				{
