@@ -72,7 +72,7 @@ go_bandit([]()
 			auto res = test_multimethod_expression(hello);
 
 			AssertThat(res.typeId(), Equals(cpptype<TestBasicObject>::typeDesc().asId()));
-			AssertThat(*res.asType<std::string>(), Equals("hello"));
+			AssertThat(res.asType<TestBasicObject>()->a_string, Equals("hello"));
 		});
 	});
 });

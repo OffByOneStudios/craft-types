@@ -88,7 +88,7 @@ namespace types
 
 		static inline InvokeResult invoke(Function const* f, DispatchRecord const* d, Invoke && i)
 		{
-			return types::invoke(*d, f, i);
+			return types::invoke(*d, *f, i);
 		}
 	};
 
