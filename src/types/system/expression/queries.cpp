@@ -8,14 +8,14 @@ using namespace craft::types;
 
 CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 {
-	_.add_method([](ExpressionVoid* left, ExpressionVoid* right) { return true; });
+	_.add_method([](ExpressionVoid* left, ExpressionVoid* right) -> uintptr_t { return true; });
 
-	_.add_method([](void* left, ExpressionAny* right) { return true; });
-	_.add_method([](ExpressionAny* left, void* right) { return false; });
-	_.add_method([](ExpressionBottom* left, void* right) { return true; });
-	_.add_method([](void* left, ExpressionBottom* right) { return false; });
+	_.add_method([](void* left, ExpressionAny* right) -> uintptr_t { return true; });
+	_.add_method([](ExpressionAny* left, void* right) -> uintptr_t { return false; });
+	_.add_method([](ExpressionBottom* left, void* right) -> uintptr_t { return true; });
+	_.add_method([](void* left, ExpressionBottom* right) -> uintptr_t { return false; });
 
-	_.add_method([](ExpressionConcrete* left, ExpressionConcrete* right)
+	_.add_method([](ExpressionConcrete* left, ExpressionConcrete* right) -> uintptr_t
 	{
 		if (left->node.ptr() == right->node.ptr())
 			return true;
@@ -25,7 +25,7 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 		return false;
 	});
 
-	_.add_method([](ExpressionTuple* left, ExpressionTuple* right)
+	_.add_method([](ExpressionTuple* left, ExpressionTuple* right) -> uintptr_t
 	{
 		auto var = right->varType != nullptr;
 		auto left_count = left->entries.size();
@@ -74,12 +74,12 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 		return true;
 	});
 
-	_.add_method([](ExpressionArrow* left, ExpressionArrow* right)
+	_.add_method([](ExpressionArrow* left, ExpressionArrow* right) -> uintptr_t
 	{
 		return isSubtype(left->input, right->input) && isSubtype(left->output, right->output);
 	});
 
-	_.add_method([](void* left, void* right) { return false; });
+	_.add_method([](void* left, void* right) -> uintptr_t { return false; });
 }
 
 bool craft::types::isSubtype(IExpression const* left, IExpression const* right)

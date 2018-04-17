@@ -25,7 +25,8 @@ namespace types
 	{
 		std::vector<IExpression*> exprs;
 		exprs.reserve(tids.size());
-		std::transform(tids.begin(), tids.end(), std::back_inserter(exprs), [](TypeId const& tid) { return to_expression(tid); });
+		std::transform(tids.begin(), tids.end(), std::back_inserter(exprs),
+			[](TypeId const& tid) { return to_expression(tid); });
 
 		return new ExpressionTuple(exprs);
 	}
