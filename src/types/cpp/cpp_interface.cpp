@@ -100,6 +100,66 @@ void CppSystem::_init()
 	}
 }
 
+void CppSystem::_update()
+{
+	auto type_desc_root = _graph->ensureRoot("cpp-type");
+	auto info_desc_root = _graph->ensureRoot("cpp-info");
+
+	auto start = 0;
+	for (start = 0; start < _current_dll_entries->_entries.size(); ++start)
+	{
+		auto& entry = _current_dll_entries->_entries[start];
+		if (entry.kind == _Entry::Kind::Marker)
+		{
+			break;
+		}
+	}
+	if (start == _current_dll_entries->_entries.size()) start = 0;
+	else if (start == _current_dll_entries->_entries.size() - 1) return; //Multiple invocations to rebuild without new types
+
+	for (auto i = start; i < _current_dll_entries->_entries.size(); ++i)
+	{
+		auto& entry = _current_dll_entries->_entries[i];
+		switch (entry.kind)
+		{
+		case _Entry::Kind::Type:
+		{
+			auto node = _graph->addNode(type_desc_root, entry.ptr);
+			_identifiers->add(entry.ptr, node.ptr());
+		} break;
+
+		case _Entry::Kind::Info:
+		{
+			auto node = _graph->addNode(info_desc_root, entry.ptr);
+		} break;
+		}
+	}
+	for (auto i = start; i < _current_dll_entries->_entries.size(); ++i)
+	{
+		auto& entry = _current_dll_entries->_entries[i];
+		switch (entry.kind)
+		{
+		case _Entry::Kind::Type:
+		{
+			auto td = static_cast<cpp::type_desc*>(entry.ptr);
+
+			cpp::TypeDefineHelper<void> helper(td);
+			td->initer(helper);
+		} break;
+
+		case _Entry::Kind::Info:
+		{
+			auto id = static_cast<cpp::info_desc*>(entry.ptr);
+
+			cpp::InfoDefineHelper<void> helper(id);
+			id->initer(helper);
+		} break;
+		}
+	}
+
+	_addEntry({ new std::string("cpp-dll-update-finish"), _Entry::Kind::Marker });
+}
+
 void CppSystem::_addEntry(_Entry && e)
 {
 	if (_current_dll_entries == nullptr)

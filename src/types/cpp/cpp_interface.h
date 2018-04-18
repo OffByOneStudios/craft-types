@@ -448,6 +448,8 @@ namespace types
 		CRAFT_TYPES_EXPORTED void _registerInfo(cpp::info_desc const*);
 
 	public:
+		// DLL Entrypoint Hacks
+		CRAFT_TYPES_EXPORTED void _update();
 
 		//
 		// Managers
