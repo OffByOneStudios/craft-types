@@ -31,6 +31,16 @@ namespace types
 		return new ExpressionTuple(exprs);
 	}
 
+	inline IExpression* to_expression_tuple(GenericInvoke const& invoke)
+	{
+		std::vector<IExpression*> exprs;
+		exprs.reserve(invoke.args.size());
+		std::transform(invoke.args.begin(), invoke.args.end(), std::back_inserter(exprs),
+			[](instance<> inst) { return to_expression(inst.typeId()); });
+
+		return new ExpressionTuple(exprs);
+	}
+
 	//
 	// to_expression - templated
 	//
@@ -130,7 +140,7 @@ namespace types
 			// TODO: improve
 			typedef VarArgs<instance<>> VarArgs;
 			VarArgs va;
-			va.args.resize(i.args.size() - t_size);
+			va.args.reserve(i.args.size() - t_size);
 			std::copy(i.args.begin() + t_size, i.args.end(), std::back_inserter(va.args));
 
 			// WITH ret
