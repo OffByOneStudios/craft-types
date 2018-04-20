@@ -11,4 +11,14 @@ namespace types {
 		system()._init();
 	}
 
+	inline void dll_begin(char const* name)
+	{
+		system();
+		system()._begin(name);
+	}
+
+	inline void dll_end()
+	{
+		system()._update();
+	}
 }}

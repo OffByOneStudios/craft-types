@@ -49,7 +49,7 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 	if (verbose)
 		return fmt::format("<instance|{0}|{1}>", from, name);
 	else
-		return fmt::format("({0})", name);
+		return fmt::format("{0}", name);
 }
 
 /*

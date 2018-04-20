@@ -199,7 +199,7 @@ namespace types
 
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isObject  >::type* = nullptr>
-			static inline instance<_T> makeFromPointer(T* actual)
+		static inline instance<_T> makeFromPointer(T* actual)
 		{
 			actual->craft_setupInstance();
 
@@ -209,7 +209,7 @@ namespace types
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr,
 			typename... TArgs>
-			static inline instance<_T> make(TArgs&&... args)
+		static inline instance<_T> make(TArgs&&... args)
 		{
 			_T* actual = new _T(std::forward<TArgs>(args)...);
 			InstanceHeader* header = new InstanceHeader(cpptype<_T>::typeDesc(), actual, 0);

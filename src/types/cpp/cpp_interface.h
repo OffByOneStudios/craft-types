@@ -429,7 +429,15 @@ namespace types
 		~CppSystem();
 
 		friend inline void boot();
+		friend inline void dll_begin(char const*);
+		friend inline void dll_end();
+
+		void _init_insertEntries(_Entries* entries, size_t start);
+		void _init_runEntries(_Entries* entries, size_t start);
+
 		CRAFT_TYPES_EXPORTED void _init();
+		CRAFT_TYPES_EXPORTED void _begin(char const* name);
+		CRAFT_TYPES_EXPORTED void _update();
 
 	public:
 		CRAFT_TYPES_EXPORTED static CppSystem& global_instance();
@@ -448,8 +456,6 @@ namespace types
 		CRAFT_TYPES_EXPORTED void _registerInfo(cpp::info_desc const*);
 
 	public:
-		// DLL Entrypoint Hacks
-		CRAFT_TYPES_EXPORTED void _update();
 
 		//
 		// Managers
