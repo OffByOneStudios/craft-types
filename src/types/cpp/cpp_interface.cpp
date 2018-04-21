@@ -2,6 +2,10 @@
 #include "../core.h"
 #include "cpp_interface.h"
 
+#include "Windows.h"
+
+// here be dragons
+
 using namespace craft;
 using namespace craft::types;
 
@@ -30,11 +34,13 @@ Object::~Object()
 CppSystem::CppSystem()
 {
 	_static_entries = new _Entries();
-	_addEntry({ new std::string("cpp-static-init-start"), _Entry::Kind::Marker });
+	_addEntry({ new std::string("cpp-static-init-begin"), _Entry::Kind::Marker });
 }
 CppSystem::~CppSystem()
 {
 }
+
+char const* CppSystem::__dll_region = nullptr;
 
 CppSystem& CppSystem::global_instance()
 {
@@ -110,9 +116,34 @@ void CppSystem::_init()
 	_init_runEntries(_static_entries, 0);
 }
 
-void CppSystem::_begin(char const* name)
+char const* CppSystem::_begin(char const* name)
 {
+	OutputDebugStringA("system::_begin()      ");
+	OutputDebugStringA(name);
+	OutputDebugStringA("\n");
+	// WARNING !! WARNING !! WARNING
+	// This function is called pre-C++-runtime initalize
+	// * Static initalizers have not ran
+	// * Exceptions are not configured
+	// * Stack safety has not been established
+	// Be very careful
+	// WARNING !! WARNING !! WARNING
 
+	auto ret = __dll_region;
+	__dll_region = name;
+	return ret;
+}
+void CppSystem::_finish(char const* name)
+{
+	OutputDebugStringA("system._finish()      ");
+	OutputDebugStringA(name);
+	OutputDebugStringA("\n");
+
+	auto ret = __dll_region;
+	__dll_region = name;
+
+	_addEntry({ new std::string(fmt::format("cpp-library-finish:{0}", ret)), _Entry::Kind::Marker });
+	// TODO insert the begin marker
 }
 
 void CppSystem::_update()
@@ -131,8 +162,6 @@ void CppSystem::_update()
 
 	_init_insertEntries(_current_dll_entries, start);
 	_init_runEntries(_current_dll_entries, start);
-
-	_addEntry({ new std::string("cpp-dll-update-finish"), _Entry::Kind::Marker });
 }
 
 void CppSystem::_addEntry(_Entry && e)

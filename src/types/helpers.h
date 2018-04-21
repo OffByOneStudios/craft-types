@@ -11,14 +11,13 @@ namespace types {
 		system()._init();
 	}
 
-	inline void dll_begin(char const* name)
+	inline char const* dll_begin(char const* name)
 	{
-		system();
-		system()._begin(name);
+		return CppSystem::_begin(name);
 	}
 
-	inline void dll_end()
+	inline void dll_finish(char const* name)
 	{
-		system()._update();
+		system()._finish(name);
 	}
 }}

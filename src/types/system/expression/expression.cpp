@@ -48,6 +48,8 @@ std::vector<IExpression*> const* ExpressionBottom::children() const { return nul
 void ExpressionBottom::destroy() { }
 IExpression* ExpressionBottom::clone() const { return &Value; }
 
+
+
 /******************************************************************************
 ** ExpressionConcrete
 ******************************************************************************/
@@ -96,6 +98,7 @@ IExpression* ExpressionConcrete::clone() const
 {
 	return new ExpressionConcrete(node);
 }
+
 
 /******************************************************************************
 ** ExpressionArrow
@@ -203,6 +206,7 @@ IExpression* ExpressionTuple::clone() const
 	return new ExpressionTuple(entries);
 }
 
+
 /******************************************************************************
 ** ExpressionStore
 ******************************************************************************/
@@ -239,3 +243,4 @@ IExpression const* ExpressionStore::root() const
 {
 	return _root.get();
 }
+

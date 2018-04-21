@@ -1,6 +1,7 @@
 #include "common.h"
 #include "core.h"
 
+
 using namespace craft::types;
 
 
@@ -12,3 +13,9 @@ Signal<void(instance<> origInst, instance<> newInst)>& BasicObjectFungible::obje
 {
 	return _fungible_signal;
 }
+
+/******************************************************************************
+** DLL ENTRY
+******************************************************************************/
+
+#include "types/dll_entry.inc"

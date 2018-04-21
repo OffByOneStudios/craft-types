@@ -429,14 +429,17 @@ namespace types
 		~CppSystem();
 
 		friend inline void boot();
-		friend inline void dll_begin(char const*);
-		friend inline void dll_end();
+		friend inline char const* dll_begin(char const*);
+		friend inline void dll_finish(char const*);
 
 		void _init_insertEntries(_Entries* entries, size_t start);
 		void _init_runEntries(_Entries* entries, size_t start);
 
+		static char const* __dll_region;
+
 		CRAFT_TYPES_EXPORTED void _init();
-		CRAFT_TYPES_EXPORTED void _begin(char const* name);
+		CRAFT_TYPES_EXPORTED static char const* _begin(char const* name);
+		CRAFT_TYPES_EXPORTED void _finish(char const* name);
 		CRAFT_TYPES_EXPORTED void _update();
 
 	public:
