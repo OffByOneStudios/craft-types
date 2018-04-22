@@ -136,7 +136,7 @@ namespace types
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< cpptype<_T>::kind == CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::kind == CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			inline instance(_T* const& ptr)
 			: _actual(ptr)
 			, _meta(nullptr)
@@ -171,14 +171,14 @@ namespace types
 
 		template<typename TType,
 			typename _T = T,
-			typename std::enable_if< cpptype<_T>::kind == CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::kind == CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 		static inline instance<_T> forType()
 		{
 			return forType(cpptype<TType>::typeDesc());
 		}
 
 		template<typename _T = T,
-			typename std::enable_if< cpptype<_T>::kind == CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::kind == CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			static inline instance<_T> forType(TypeId type)
 		{
 			auto actual = type.getFeature<_T>();
@@ -293,14 +293,14 @@ namespace types
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
 			return system().template typeGetFeature<TFeature>(typeId());
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyAspect >::type* = nullptr>
 		inline TFeature* getFeature() const
 		{
 			if (this->_meta == nullptr) return nullptr;
@@ -308,14 +308,14 @@ namespace types
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			inline bool hasFeature() const
 		{
 			return system().template typeHasFeature<TFeature>(typeId());
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			typename std::enable_if< TFeature::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyAspect >::type* = nullptr>
 			inline bool hasFeature() const
 		{
 			if (this->_meta == nullptr) return false;

@@ -5,7 +5,7 @@
 CRAFT_TYPE_DEFINE(void*)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("void*");
-}
+};
 
 CRAFT_TYPE_DEFINE(int8_t)
 {
@@ -14,7 +14,7 @@ CRAFT_TYPE_DEFINE(int8_t)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<int8_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<int8_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 CRAFT_TYPE_DEFINE(int16_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("int16");
@@ -23,7 +23,7 @@ CRAFT_TYPE_DEFINE(int16_t)
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<int16_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
 
-}
+};
 CRAFT_TYPE_DEFINE(int32_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("int32");
@@ -31,7 +31,7 @@ CRAFT_TYPE_DEFINE(int32_t)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<int32_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<int32_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 CRAFT_TYPE_DEFINE(int64_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("int64");
@@ -39,7 +39,7 @@ CRAFT_TYPE_DEFINE(int64_t)
 	_.use<PStringer>().singleton<FunctionalStringer>( [](::craft::instance<int64_t> _this) { return std::to_string(*_this); } );
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<int64_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 
 CRAFT_TYPE_DEFINE(uint8_t)
 {
@@ -48,7 +48,7 @@ CRAFT_TYPE_DEFINE(uint8_t)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<uint8_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<uint8_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 CRAFT_TYPE_DEFINE(uint16_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint16");
@@ -57,7 +57,7 @@ CRAFT_TYPE_DEFINE(uint16_t)
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<uint16_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
 
-}
+};
 CRAFT_TYPE_DEFINE(uint32_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint32");
@@ -65,7 +65,7 @@ CRAFT_TYPE_DEFINE(uint32_t)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<uint32_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<uint32_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 CRAFT_TYPE_DEFINE(uint64_t)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("uint64");
@@ -73,7 +73,7 @@ CRAFT_TYPE_DEFINE(uint64_t)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<uint64_t> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<uint64_t> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 
 CRAFT_TYPE_DEFINE(float)
 {
@@ -82,7 +82,7 @@ CRAFT_TYPE_DEFINE(float)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<float> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<float> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};
 CRAFT_TYPE_DEFINE(double)
 {
 	_.use<PIdentifier>().singleton<SimpleIdentifier>("float64");
@@ -90,4 +90,4 @@ CRAFT_TYPE_DEFINE(double)
 	_.use<PStringer>().singleton<FunctionalStringer>([](::craft::instance<double> _this) { return std::to_string(*_this); });
 	_.use<PRepr>().singleton<FunctionalRepr>([](::craft::instance<double> _this) { return std::to_string(*_this); });
 	_.use<PConstructor>().singleton<DefaultConstructor>();
-}
+};

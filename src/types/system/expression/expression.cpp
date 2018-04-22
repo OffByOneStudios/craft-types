@@ -13,7 +13,7 @@ using namespace craft::types;
 ExpressionAny ExpressionAny::Value;
 CRAFT_TYPE_DEFINE(ExpressionAny) { }
 
-Graph::Node ExpressionAny::kind() const { return graph().get<ExpressionAny>(); }
+TypeId ExpressionAny::kind() const { return cpptype<ExpressionAny>::typeDesc(); }
 void* ExpressionAny::ptr() const { return (void*)this; }
 
 std::string ExpressionAny::displayString() const { return "Any"; }
@@ -26,7 +26,7 @@ IExpression* ExpressionAny::clone() const { return &Value; }
 ExpressionVoid ExpressionVoid::Value;
 CRAFT_TYPE_DEFINE(ExpressionVoid) { }
 
-Graph::Node ExpressionVoid::kind() const { return graph().get<ExpressionVoid>(); }
+TypeId ExpressionVoid::kind() const { return cpptype<ExpressionVoid>::typeDesc(); }
 void* ExpressionVoid::ptr() const { return (void*)this; }
 
 std::string ExpressionVoid::displayString() const { return "Void"; }
@@ -39,7 +39,7 @@ IExpression* ExpressionVoid::clone() const { return &Value; }
 ExpressionBottom ExpressionBottom::Value;
 CRAFT_TYPE_DEFINE(ExpressionBottom) { }
 
-Graph::Node ExpressionBottom::kind() const { return graph().get<ExpressionBottom>(); }
+TypeId ExpressionBottom::kind() const { return cpptype<ExpressionBottom>::typeDesc(); }
 void* ExpressionBottom::ptr() const { return (void*)this; }
 
 std::string ExpressionBottom::displayString() const { return "Bottom"; }
@@ -59,9 +59,9 @@ CRAFT_TYPE_DEFINE(ExpressionConcrete)
 
 }
 
-ExpressionConcrete::ExpressionConcrete(Graph::Node const& node)
+ExpressionConcrete::ExpressionConcrete(TypeId tid)
 	: IExpression()
-	, node(node)
+	, node(tid.node)
 {
 
 }
@@ -71,9 +71,9 @@ ExpressionConcrete::~ExpressionConcrete()
 
 }
 
-Graph::Node ExpressionConcrete::kind() const
+TypeId ExpressionConcrete::kind() const
 {
-	return graph().get<ExpressionConcrete>();
+	return cpptype<ExpressionConcrete>::typeDesc();
 }
 void* ExpressionConcrete::ptr() const
 {
@@ -82,7 +82,7 @@ void* ExpressionConcrete::ptr() const
 
 std::string ExpressionConcrete::displayString() const
 {
-	return identifiers().get(node.ptr()).id.toString();
+	return TypeId(node).toString();
 }
 std::vector<IExpression*> const* ExpressionConcrete::children() const
 {
@@ -123,9 +123,9 @@ ExpressionArrow::~ExpressionArrow()
 	output->destroy();
 }
 
-Graph::Node ExpressionArrow::kind() const
+TypeId ExpressionArrow::kind() const
 {
-	return graph().get<ExpressionArrow>();
+	return cpptype<ExpressionArrow>::typeDesc();
 }
 void* ExpressionArrow::ptr() const
 {
@@ -178,9 +178,9 @@ ExpressionTuple::~ExpressionTuple()
 		varType->destroy();
 }
 
-Graph::Node ExpressionTuple::kind() const
+TypeId ExpressionTuple::kind() const
 {
-	return graph().get<ExpressionTuple>();
+	return cpptype<ExpressionTuple>::typeDesc();
 }
 void* ExpressionTuple::ptr() const
 {

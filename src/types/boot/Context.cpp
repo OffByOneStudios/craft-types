@@ -7,9 +7,8 @@ using namespace craft::types::_details;
 
 CRAFT_DEFINE(craft::types::Context)
 {
-
 	_.defaults();
-}
+};
 
 IContextQueryable::~IContextQueryable() { }
 

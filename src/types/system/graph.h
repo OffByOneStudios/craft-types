@@ -5,32 +5,108 @@
 namespace craft {
 namespace types
 {
+	// This graph will not support import / partial usage. You will have to reimport all of it.
+	// Because this graph is not meant to support deletion (replacement only) types have an incrementing index
+
 	/******************************************************************************
-	** RootGraphType
+	** GraphVector
 	******************************************************************************/
 
-	// At it's root we are stringly typed.
-	class RootGraphType final
+	// C friendly vector
+	template<typename T>
+	class GraphVector
 	{
-	private:
-		std::string _typeName;
+		static_assert(sizeof(T) == sizeof(void*), "Graph vectors only allowed for void* types.");
 
 	public:
-		RootGraphType(std::string const& name)
-			: _typeName(name)
-		{ }
+		size_t length;
+		T* data;
+	};
 
-		inline std::string const& typeName() const
+	/******************************************************************************
+	** GraphMeta
+	******************************************************************************/
+
+	struct GraphMeta
+	{
+		enum class Kind : size_t
 		{
-			return _typeName;
+			Node = 0,
+			Prop = 1,
+			Edge = 2
+		};
+
+		Kind kind;
+
+		// unique/display name of this graph meta type
+		//  a stringly typed identifier.
+		char const* name;
+	};
+
+	/******************************************************************************
+	** IGraphNodeMeta
+	******************************************************************************/
+
+	// This represents the meta interface for nodes
+	struct GraphNodeMeta : GraphMeta
+	{
+	public:
+
+	public:
+		static inline GraphNodeMeta* Named(char const* name)
+		{
+			GraphNodeMeta* ret = new GraphNodeMeta();
+			ret->kind = Kind::Node;
+			ret->name = name;
+			return ret;
 		}
 	};
 
 	/******************************************************************************
-	** Index
+	** IGraphPropertyMeta
 	******************************************************************************/
 
+	// This represents the meta interface for properties
+	struct GraphPropertyMeta : GraphMeta
+	{
+	public:
+		enum class Mode : size_t
+		{
+			Singular = 0,
+			Ordered = 1,
+			Set = 3,
+			Index = 4,
+		};
 
+	public:
+		Mode mode;
+
+	public:
+		inline bool isSingular() const { return ((size_t)mode & 3) == 0; }
+		inline bool isIndex() const { return ((size_t)mode & 4) == 1; }
+
+	public:
+		static inline GraphPropertyMeta* Singular(char const* name)
+		{
+			GraphPropertyMeta* ret = new GraphPropertyMeta();
+			ret->kind = Kind::Prop;
+			ret->name = name;
+			ret->mode = Mode::Singular;
+			return ret;
+		}
+	};
+
+	/******************************************************************************
+	** IGraphEdgeMeta
+	******************************************************************************/
+
+	// This represents the meta interface for edges
+	struct GraphEdgeMeta : GraphMeta
+	{
+	public:
+
+	public:
+	};
 
 	/******************************************************************************
 	** Graph
@@ -38,57 +114,66 @@ namespace types
 
 	class Graph final
 	{
-		//
-		// Pieces
-		//
-
-		struct _Node;
-		struct _Prop;
-		struct _Edge;
-
-		friend class Node;
+	public:
+		struct Node;
+		struct Prop;
+		struct Edge;
 
 		// Anything in the graph fullfills this "interface"
 		struct Element
 		{
-			_Node* label;
+			Node* label;
 
-			Element(_Node* label)
+			Element(Node* label)
 				: label(label)
 			{ }
 		};
 
-		struct _Node final : public Element
+		struct Node final : public Element
 		{
-			void* node_value;
+			void* value;
 
-			_Node(_Node* label, void* value)
+			GraphVector<Prop*> props;
+			GraphVector<Edge*> edges;
+
+		public:
+			Node(Node* label, void* value)
 				: Element(label)
-				, node_value(value)
+				, value(value)
 			{ }
+
+		public:
+			CRAFT_TYPES_EXPORTED bool isMeta() const;
+
+			CRAFT_TYPES_EXPORTED GraphNodeMeta* getInterface();
 		};
 
-		struct _Prop final : public Element
+		struct Prop final : public Element
 		{
-			_Node* of_node;
 			void* value;
+
+		public:
+			inline GraphPropertyMeta* getInterface() { return (GraphPropertyMeta*)label->value; }
 		};
 
-		struct _Edge final : public Element
+		struct Edge final : public Element
 		{
 			void* value;
-			std::vector<_Node*> between;
+			GraphVector<Node*> between;
+
+		public:
+			inline GraphEdgeMeta* getInterface() { return (GraphEdgeMeta*)label->value; }
 		};
 
 		//
 		// Data
 		//
+	private:
+		plf::colony<Node> _nodes;
 
-		plf::colony<_Node> _nodes;
-		plf::colony<_Edge> _edges;
-		plf::colony<_Prop> _props;
-
-		std::map<std::string, _Node*> _roots;
+		std::map<std::string, Node*> _nodeMetas;
+		std::map<std::string, Node*> _propMetas;
+		std::map<std::string, Node*> _edgeMetas;
 
 		// 
 		// Lifecycle
@@ -101,44 +186,51 @@ namespace types
 		CRAFT_TYPES_EXPORTED ~Graph();
 
 		// 
-		// Interface Types
+		// Interface
 		//
 	public:
+		CRAFT_TYPES_EXPORTED Node* ensureMeta(GraphMeta::Kind kind, char const* name, GraphMeta* (*builder)() = nullptr);
 
-		class Node
-		{
-		protected:
-			friend class Graph;
+		CRAFT_TYPES_EXPORTED Node* addNode(Node* label, void* value);
+		CRAFT_TYPES_EXPORTED void addProp(Node* label, void* value, Node* on_node);
+		CRAFT_TYPES_EXPORTED void addEdge(Node* label, void* value, std::vector<Node*> const& edge);
 
-			Graph* _graph;
-			_Node* _node;
+		CRAFT_TYPES_EXPORTED std::string dumpNode(Node*) const;
 
-			inline Node(Graph* graph, _Node* node)
-				: _graph(graph), _node(node)
-			{ }
-
-		public:
-			inline Node(Node const&) = default;
-
-			inline void* ptr() const { return _node; }
-
-			inline bool isValid() const { return _node != nullptr; }
-		};
-
+		// 
+		// Templated Interface
+		//
 	public:
-
-		CRAFT_TYPES_EXPORTED Node get(TypeId const&) const;
-		CRAFT_TYPES_EXPORTED Node get(cpp::TypePtr const&) const;
+		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Node >::type* = nullptr>
+		inline Node* meta() { return ensureMeta(GraphMeta::Kind::Node, T::craftTypes_metaNode_name, (GraphMeta* (*)())&T::craftTypes_metaNode_builder); }
+		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
+		inline Node* meta() { return ensureMeta(GraphMeta::Kind::Prop, T::craftTypes_metaProp_name, (GraphMeta* (*)())&T::craftTypes_metaProp_builder); }
+		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Edge >::type* = nullptr>
+		inline Node* meta() { return ensureMeta(GraphMeta::Kind::Edge, T::craftTypes_metaEdge_name, (GraphMeta* (*)())&T::craftTypes_metaEdge_builder); }
 
 		template<typename T>
-		inline Node get() { return get(cpptype<T>::typeDesc()); }
+		inline Node* add(T* value) { return addNode(meta<T>(), value); }
+		template<typename T>
+		inline void add(Node* on_node, T* value) { return addProp(meta<T>(), value, on_node); }
+		template<typename T>
+		inline void add(T* value, std::vector<Node*> const& edge) { return addEdge(meta<T>(), value, edge); }
 
-		CRAFT_TYPES_EXPORTED Node ensureRoot(std::string const& name);
 
-		CRAFT_TYPES_EXPORTED Node addNode(Node const& label, void* value);
-		CRAFT_TYPES_EXPORTED void addProperty(Node const& label, void* value, Node const& on_node);
-		CRAFT_TYPES_EXPORTED void addEdge(Node const& label, void* value, std::vector<Node> const& edge);
+	};
 
-		CRAFT_TYPES_EXPORTED Node recoverNode(void*);
+	/******************************************************************************
+	** GraphPropertyName
+	******************************************************************************/
+
+	struct GraphPropertyName final
+	{
+		// is a   `char const*`
+		typedef char const* value_type;
+	private:
+		GraphPropertyName() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
+		static constexpr char const* craftTypes_metaProp_name = "name";
+		static GraphPropertyMeta* craftTypes_metaProp_builder() { return GraphPropertyMeta::Singular(craftTypes_metaProp_name); }
 	};
 }}

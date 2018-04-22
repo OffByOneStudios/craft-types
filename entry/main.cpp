@@ -4,8 +4,45 @@
 using namespace craft;
 using namespace craft::types;
 
+int main(int argc, char** argv)
+{
+	craft::types::boot();
 
+	for (;;)
+	{
+		std::string input;
+		std::getline(std::cin, input);
 
+		bool has_args = true;
+
+		auto cmd_break = input.find(' ');
+		if (cmd_break == std::string::npos) has_args = false;
+		
+		std::string args;
+		if (has_args)
+		{
+			args = input.substr(cmd_break);
+			input = input.substr(0, cmd_break - 1);
+		}
+		else
+			cmd_break = input.size();
+
+		try
+		{
+			//if (input == "dump")
+			//	craft::types::dump();
+			//else
+				throw stdext::exception("unknown command `{0}`", input);
+		}
+		catch (std::exception const& ex)
+		{
+			std::cout << ex.what() << std::endl;
+		}
+	}
+}
+
+// TODO move to tests:
+/*
 namespace _impl
 {
 	std::shared_ptr<spdlog::logger> console;
@@ -122,3 +159,4 @@ int main(int argc, char** argv)
 	_root_context->fishtacos();
 	
 }
+*/

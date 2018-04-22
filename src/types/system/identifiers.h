@@ -9,20 +9,33 @@ namespace types
 	******************************************************************************/
 
 	struct TypeId final
-		: stdext::IdValue<TypeId, uintptr_t>
 	{
-		using IdValue::IdValue;
+		// TODO rename this type?
+		Graph::Node* node;
 
+		inline TypeId() : node(nullptr) {}
+		inline TypeId(Graph::Node* n) : node(n) {}
+		inline TypeId(uintptr_t v) : node((Graph::Node*)v) {}
+
+		// From IdValue, depreciate this:
+		inline explicit operator uintptr_t() const { return (uintptr_t)node; }
+		
+		inline bool operator <(TypeId const& that) const { return this->node < that.node; }
+		inline bool operator >(TypeId const& that) const { return this->node > that.node; }
+		inline bool operator ==(TypeId const& that) const { return this->node == that.node; }
+		inline bool operator !=(TypeId const& that) const { return this->node != that.node; }
+
+		// Helpers defined here
 		template<typename TType>
 		inline bool isType()
 		{
 			const TypeId that_type = types::cpptype<TType>::typeDesc();
-			return that_type.id != 0 && *this == that_type;
+			return that_type.node != nullptr && this->node == that_type.node;
 		}
 
 		inline bool isType(TypeId that_type)
 		{
-			return that_type.id != 0 && *this == that_type.id;
+			return that_type.node != nullptr && this->node == that_type.node;
 		}
 
 		//
@@ -37,7 +50,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED std::string toString(bool verbose = true) const;
 	};
 
-	const static TypeId None = 0;
+	const static TypeId None = nullptr;
 
 	inline std::ostream & operator<<(std::ostream & s, TypeId const & v) { s << v.toString(); return s; }
 
@@ -45,14 +58,14 @@ namespace types
 	** Identifiers
 	******************************************************************************/
 
+	// TODO convert to index
 	class Identifiers final
 	{
 	public:
 		struct Record
 		{
-			void* ptr;
-			TypeId id;
-			void* node;
+			TypeId node;
+			void* desc;
 		};
 
 	private:
@@ -63,7 +76,7 @@ namespace types
 			std::recursive_mutex operation;
 
 			plf::colony <Record> types;
-			std::map<void*, TypeId> types_byPtr;
+			std::map<void*, size_t> types_byPtr;
 		};
 
 		_Data* _contents;
@@ -82,10 +95,9 @@ namespace types
 	public:
 		CRAFT_TYPES_EXPORTED size_t count() const;
 
-		CRAFT_TYPES_EXPORTED TypeId add(void* const& ptr, void* const& node_ptr);
+		CRAFT_TYPES_EXPORTED TypeId add(Graph::Node* node_ptr);
 
-		CRAFT_TYPES_EXPORTED Record const& get(TypeId const& id) const;
-		CRAFT_TYPES_EXPORTED Record const& get(void* const& ptr) const;
-		CRAFT_TYPES_EXPORTED TypeId id(void* const& id) const;
+		CRAFT_TYPES_EXPORTED Record const& get(TypeId id) const;
+		CRAFT_TYPES_EXPORTED Record const& get(void* ptr) const;
 	};
 }}

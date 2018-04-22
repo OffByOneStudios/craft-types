@@ -11,7 +11,7 @@ namespace types
 
 	struct IExpression
 	{
-		virtual Graph::Node kind() const = 0;
+		virtual TypeId kind() const = 0;
 		virtual void* ptr() const = 0;
 
 		virtual std::string displayString() const = 0;
@@ -21,7 +21,7 @@ namespace types
 		virtual IExpression* clone() const = 0;
 
 	public:
-		inline std::tuple<void*, void*> invokeArg() const { return std::make_tuple(kind().ptr(), ptr()); }
+		inline std::tuple<void*, void*> invokeArg() const { return std::make_tuple(kind().node, ptr()); }
 	};
 
 	/******************************************************************************
@@ -37,7 +37,7 @@ namespace types
 	public:
 		CRAFT_TYPES_EXPORTED static ExpressionAny Value;
 
-		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
 		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
@@ -56,7 +56,7 @@ namespace types
 	public:
 		CRAFT_TYPES_EXPORTED static ExpressionVoid Value;
 
-		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
 		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
@@ -75,7 +75,7 @@ namespace types
 	public:
 		CRAFT_TYPES_EXPORTED static ExpressionBottom Value;
 
-		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
 		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
@@ -93,13 +93,13 @@ namespace types
 		: public IExpression
 	{
 	public:
-		Graph::Node node;
+		Graph::Node* node;
 
-		CRAFT_TYPES_EXPORTED ExpressionConcrete(Graph::Node const& node);
+		CRAFT_TYPES_EXPORTED ExpressionConcrete(TypeId node);
 		CRAFT_TYPES_EXPORTED ~ExpressionConcrete();
 
 	public:
-		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
 		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
@@ -124,7 +124,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED ~ExpressionArrow();
 
 	public:
-		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
 		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
@@ -149,7 +149,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED ~ExpressionTuple();
 
 	public:
-		CRAFT_TYPES_EXPORTED virtual Graph::Node kind() const override;
+		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
 		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
 
 		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;

@@ -17,7 +17,7 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 
 	_.add_method([](ExpressionConcrete* left, ExpressionConcrete* right) -> uintptr_t
 	{
-		if (left->node.ptr() == right->node.ptr())
+		if (left->node == right->node)
 			return true;
 
 		// Type System

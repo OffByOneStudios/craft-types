@@ -17,57 +17,49 @@ namespace types
 
 	namespace cpp
 	{
-		struct type_desc;
-		struct info_desc;
-		template<typename T> class TypeDefineHelper;
-		template<typename T> class InfoDefineHelper;
+		struct static_desc;
+		template<typename T> class DefineHelper;
 
-		enum class CppTypeKindEnum
+		enum class CppStaticDescKindEnum
 		{
 			None,
 			Object,
 			RawType,
 			LegacyAspect,
-			LegacyProvider
+			LegacyProvider,
+			MultiMethod,
 		};
 
-		bool constexpr kindIsMacroControlled(CppTypeKindEnum kind)
+		bool constexpr kindIsMacroControlled(CppStaticDescKindEnum kind)
 		{
-			return kind == CppTypeKindEnum::Object
-				|| kind == CppTypeKindEnum::LegacyAspect
-				|| kind == CppTypeKindEnum::LegacyProvider;
+			return kind == CppStaticDescKindEnum::Object
+				|| kind == CppStaticDescKindEnum::LegacyAspect
+				|| kind == CppStaticDescKindEnum::LegacyProvider;
+		}
+		bool constexpr kindIsType(CppStaticDescKindEnum kind)
+		{
+			return kind == CppStaticDescKindEnum::Object
+				|| kind == CppStaticDescKindEnum::RawType
+				|| kind == CppStaticDescKindEnum::LegacyAspect
+				|| kind == CppStaticDescKindEnum::LegacyProvider;
+		}
+		bool constexpr kindIsInfo(CppStaticDescKindEnum kind)
+		{
+			return kind == CppStaticDescKindEnum::MultiMethod;
 		}
 
-		typedef void(*_fn_register_type_init)(TypeDefineHelper<void> _);
+		typedef void(*_fn_register_static_init)(DefineHelper<void> _);
 
-		struct type_desc final
+		struct static_desc final
 		{
 		public:
-			_fn_register_type_init initer;
-			CppTypeKindEnum kind;
+			_fn_register_static_init initer;
+			CppStaticDescKindEnum kind;
 			void* repr;
 
-			inline type_desc(CppTypeKindEnum kind_, _fn_register_type_init init_);
-		};
+			inline static_desc(CppStaticDescKindEnum kind_, void* repr_ = nullptr, _fn_register_static_init initer_ = nullptr);
 
-		enum class CppInfoKindEnum
-		{
-			None = 0,
-			NoneMore = 1,
-			MultimethodRoot = 4,
-			MultimethodMore = 5
-		};
-
-		typedef void(*_fn_register_info_init)(InfoDefineHelper<void> _);
-
-		struct info_desc final
-		{
-		public:
-			_fn_register_info_init initer;
-			CppInfoKindEnum kind;
-			void* repr;
-
-			inline info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_, void* repr_);
+			inline static_desc& operator<< (_fn_register_static_init initer_);
 		};
 	}
 
@@ -79,22 +71,17 @@ namespace types
 	{
 		struct TypePtr final
 		{
-			type_desc const* desc;
+			static_desc const* desc;
 
 			inline TypePtr() : desc(nullptr) { }
-			inline TypePtr(type_desc const* const& v) : desc(v) { }
-			inline TypePtr(TypeId const& tid) : desc(static_cast<type_desc const*>(identifiers().get(tid).ptr))
+			inline TypePtr(static_desc const* const& v) : desc(v) { assert(desc == nullptr || kindIsType(desc->kind)); }
+			inline TypePtr(TypeId const& tid) : desc(static_cast<static_desc const*>(tid.node->value))
 			{
 				// TODO assert cpp type
 				//assert(identifiers().get(tid).ptr_type);
 			}
 
 			inline TypeId asId() const
-			{
-				return identifiers().id((void*)desc);
-			}
-
-			inline void* asNode() const
 			{
 				return identifiers().get((void*)desc).node;
 			}
@@ -106,7 +93,7 @@ namespace types
 				return that_type.desc != nullptr && *this == that_type;
 			}
 
-			inline explicit operator type_desc const*() const { return desc; }
+			inline explicit operator static_desc const*() const { return desc; }
 			inline operator TypeId() const { return asId(); }
 
 			inline bool operator <(TypePtr const& that) const { return this->desc < that.desc; }
@@ -144,7 +131,7 @@ namespace types
 		static constexpr bool isRawType = false;
 		static constexpr bool isLegacyFeature = false;
 
-		static constexpr cpp::CppTypeKindEnum kind = cpp::CppTypeKindEnum::None;
+		static constexpr cpp::CppStaticDescKindEnum kind = cpp::CppStaticDescKindEnum::None;
 		inline static cpp::TypePtr typeDesc() { return nullptr; }
 	};
 
@@ -154,11 +141,11 @@ namespace types
 	>
 		: public cpptype<void>
 	{
-		static constexpr bool isObject = TType::craft_c_typeKind == cpp::CppTypeKindEnum::Object;
-		static constexpr bool isRawType = TType::craft_c_typeKind == cpp::CppTypeKindEnum::RawType;
-		static constexpr bool isLegacyFeature = TType::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyAspect || TType::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyProvider;
+		static constexpr bool isObject = TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::Object;
+		static constexpr bool isRawType = TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::RawType;
+		static constexpr bool isLegacyFeature = TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyAspect || TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyProvider;
 
-		static constexpr cpp::CppTypeKindEnum kind = TType::craft_c_typeKind;
+		static constexpr cpp::CppStaticDescKindEnum kind = TType::craft_c_typeKind;
 		inline static cpp::TypePtr typeDesc() { return TType::craft_s_typeDesc(); }
 	};
 
@@ -191,7 +178,7 @@ namespace types
 	public:
 		virtual ~IFeatureManager() = default;
 
-		virtual cpp::CppTypeKindEnum featureKind() const = 0;
+		virtual cpp::CppStaticDescKindEnum featureKind() const = 0;
 		virtual std::string featureName() const = 0;
 		virtual cpp::TypePtr featureDesc() const = 0;
 
@@ -244,12 +231,12 @@ namespace types
 	public:
 		virtual ~IProviderManager() = default;
 
-		static const cpp::CppTypeKindEnum craft_c_managedTypeKind = cpp::CppTypeKindEnum::LegacyProvider;
+		static const cpp::CppStaticDescKindEnum craft_c_managedTypeKind = cpp::CppStaticDescKindEnum::LegacyProvider;
 
 		//
 		// IFeatureManager
 		//
-		inline virtual cpp::CppTypeKindEnum featureKind() const override { return craft_c_managedTypeKind; }
+		inline virtual cpp::CppStaticDescKindEnum featureKind() const override { return craft_c_managedTypeKind; }
 
 		//
 		// IProviderManager
@@ -317,12 +304,12 @@ namespace types
 	public:
 		virtual ~IAspectManager() = default;
 
-		static const cpp::CppTypeKindEnum craft_c_managedTypeKind = cpp::CppTypeKindEnum::LegacyAspect;
+		static const cpp::CppStaticDescKindEnum craft_c_managedTypeKind = cpp::CppStaticDescKindEnum::LegacyAspect;
 
 		//
 		// IFeatureManager
 		//
-		inline virtual cpp::CppTypeKindEnum featureKind() const override { return craft_c_managedTypeKind; }
+		inline virtual cpp::CppStaticDescKindEnum featureKind() const override { return craft_c_managedTypeKind; }
 
 		//
 		// IAspectManager
@@ -397,8 +384,7 @@ namespace types
 		{
 			enum class Kind
 			{
-				Type,
-				Info,
+				StaticDesc,
 				Marker
 			};
 
@@ -429,8 +415,10 @@ namespace types
 		~CppSystem();
 
 		friend inline void boot();
-		friend inline char const* dll_begin(char const*);
-		friend inline void dll_finish(char const*);
+		friend inline char const* _dll_begin(char const*);
+		friend inline void _dll_finish(char const*);
+
+		friend inline void load_dll(std::string const&);
 
 		void _init_insertEntries(_Entries* entries, size_t start);
 		void _init_runEntries(_Entries* entries, size_t start);
@@ -455,8 +443,7 @@ namespace types
 		inline Identifiers& identifiers() { return *_identifiers; }
 		inline Graph& graph() { return *_graph; }
 
-		CRAFT_TYPES_EXPORTED void _registerType(cpp::TypePtr);
-		CRAFT_TYPES_EXPORTED void _registerInfo(cpp::info_desc const*);
+		CRAFT_TYPES_EXPORTED void _register(cpp::static_desc const*);
 
 	public:
 
@@ -482,7 +469,7 @@ namespace types
 			auto m = getManager(feature_desc);
 
 			if (m == nullptr)
-				const_cast<cpp::type_desc*>(feature_desc.desc)->repr = static_cast<IFeatureManager*>(new typename TFeature::TManager());
+				const_cast<cpp::static_desc*>(feature_desc.desc)->repr = static_cast<IFeatureManager*>(new typename TFeature::TManager());
 
 			return static_cast<typename TFeature::TManager*>(getManager(feature_desc));
 		}
@@ -497,21 +484,21 @@ namespace types
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyAspect >::type* = nullptr>
 			static inline TFeature* typeGetFeature(instance<> const& inst)
 		{
 			return static_cast<TFeature*>(static_cast<IAspectManager*>(getManager<TFeature>())->getAspect(inst.typeId(), inst.get()));
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			static inline TFeature* typeGetFeature(instance<> const& inst)
 		{
 			return static_cast<TFeature*>(static_cast<IProviderManager*>(getManager<TFeature>())->getProvider(inst.typeId()));
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			static inline TFeature* typeGetFeature(cpp::TypePtr const& type)
 		{
 			return static_cast<TFeature*>(static_cast<IProviderManager*>(getManager<TFeature>())->getProvider(type));
@@ -544,28 +531,28 @@ namespace types
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyAspect >::type* = nullptr>
 			static inline bool typeHasFeature(instance<> const& inst)
 		{
 			return static_cast<IAspectManager*>(getManager<TFeature>())->hasAspect(inst.typeId(), inst.get());
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			static inline bool typeHasFeature(instance<> const& inst)
 		{
 			return static_cast<IProviderManager*>(getManager<TFeature>())->hasProvider(inst.typeId());
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyAspect >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyAspect >::type* = nullptr>
 			static inline bool typeHasFeature(cpp::TypePtr const& type)
 		{
 			return static_cast<IAspectManager*>(getManager<TFeature>())->hasAspect(type, nullptr);
 		}
 
 		template<typename TFeature,
-			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppTypeKindEnum::LegacyProvider >::type* = nullptr>
+			typename std::enable_if< cpptype<TFeature>::kind == cpp::CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
 			static inline bool typeHasFeature(cpp::TypePtr const& type)
 		{
 			return static_cast<IProviderManager*>(getManager<TFeature>())->hasProvider(type);
@@ -602,19 +589,14 @@ namespace types
 		return CppSystem::global_instance().graph();
 	}
 
-	inline cpp::type_desc::type_desc(CppTypeKindEnum kind_, _fn_register_type_init init_)
+	inline cpp::static_desc::static_desc(CppStaticDescKindEnum kind_, void* repr_, _fn_register_static_init initer_)
 	{
-		initer = init_;
-		kind = kind_;
-		system()._registerType(this);
-	}
-	inline cpp::info_desc::info_desc(CppInfoKindEnum kind_, _fn_register_info_init init_, void* repr_)
-	{
-		initer = init_;
+		initer = initer_;
 		kind = kind_;
 		repr = repr_;
-		system()._registerInfo(this);
+		system()._register(this);
 	}
+	inline cpp::static_desc& cpp::static_desc::operator<< (cpp::_fn_register_static_init initer_) { initer = initer_; }
 
 	template<typename TFeature>
 	inline bool TypeId::hasFeature() const
@@ -638,11 +620,11 @@ namespace types
 			: public types::Multimethod<Function, TDispatcher>
 		{
 		private:
-			info_desc __id;
+			static_desc __id;
 
 		public:
-			inline Multimethod(_fn_register_info_init init)
-				: __id(CppInfoKindEnum::MultimethodRoot, init, this)
+			inline Multimethod(_fn_register_static_init init)
+				: __id(CppStaticDescKindEnum::MultiMethod, this, init)
 			{
 
 			}
@@ -754,7 +736,7 @@ namespace types
 		};
 	};
 
-	using cpp::CppTypeKindEnum;
+	using cpp::CppStaticDescKindEnum;
 }}
 
 #define _CRAFT_PP_CONCAT_0(a, b) _CRAFT_PP_CONCAT_1(a, b)
@@ -762,42 +744,42 @@ namespace types
 #define _CRAFT_PP_CONCAT_2(p, res) res
 
 #define CRAFT_DEFINE(x) \
-	::craft::types::cpp::type_desc x::__td(x::craft_c_typeKind, (::craft::types::cpp::_fn_register_type_init)&x::__craft_s_types_init); \
-	void x::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
+	::craft::types::cpp::static_desc x::__td(x::craft_c_typeKind, nullptr, (::craft::types::cpp::_fn_register_static_init)&x::__craft_s_static_init); \
+	void x::__craft_s_static_init(::craft::types::cpp::DefineHelper<x> _)
 
 #define CRAFT_TYPE_DEFINE(x) \
-	::craft::types::cpp::type_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, (::craft::types::cpp::_fn_register_type_init)&::craft::types::cpptype<x>::__craft_s_types_init); \
-	void ::craft::types::cpptype<x>::__craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _)
+	::craft::types::cpp::static_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, nullptr, (::craft::types::cpp::_fn_register_static_init)&::craft::types::cpptype<x>::__craft_s_static_init); \
+	void ::craft::types::cpptype<x>::__craft_s_static_init(::craft::types::cpp::DefineHelper<x> _)
 
 #define CRAFT_MULTIMETHOD_DEFINE(x) \
-	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<decltype(x)> _); \
-	decltype(x) x ((::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
-	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<decltype(x)> _)
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<decltype(x)> _); \
+	decltype(x) x ((::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<decltype(x)> _)
 
 #define CRAFT_INFO_MORE(x) \
-	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _); \
-	::craft::types::cpp::info_desc _CRAFT_PP_CONCAT_0(__id_, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, (::craft::types::cpp::_fn_register_info_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
-	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::InfoDefineHelper<x> _)
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<x> _); \
+	::craft::types::cpp::static_desc _CRAFT_PP_CONCAT_0(__id_, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, nullptr, (::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
+	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<x> _)
 
 #define CRAFT_FORWARD_DECLARE(x, kind) \
 namespace craft { namespace types { \
 	template <> struct cpptype< x > \
 		: public cpptype<void> \
 	{ \
-		static constexpr bool isObject = kind == cpp::CppTypeKindEnum::Object; \
-		static constexpr bool isRawType = kind == cpp::CppTypeKindEnum::RawType; \
-		static constexpr bool isLegacyFeature = kind == cpp::CppTypeKindEnum::LegacyAspect || TType::craft_c_typeKind == cpp::CppTypeKindEnum::LegacyProvider; \
-		inline static constexpr cpp::CppTypeKindEnum kind() { return kind; } \
+		static constexpr bool isObject = kind == cpp::CppStaticDescKindEnum::Object; \
+		static constexpr bool isRawType = kind == cpp::CppStaticDescKindEnum::RawType; \
+		static constexpr bool isLegacyFeature = kind == cpp::CppStaticDescKindEnum::LegacyAspect || TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyProvider; \
+		inline static constexpr cpp::CppStaticDescKindEnum kind() { return kind; } \
 		inline static cpp::TypePtr typeDesc() { return x::craft_s_typeDesc(); } \
 	}; \
 }} \
 
 #define CRAFT_OBJECT_DECLARE(x) \
-    static ::craft::types::cpp::type_desc __td; \
+    static ::craft::types::cpp::static_desc __td; \
 private: \
-    static void __craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _); \
+    static void __craft_s_static_init(::craft::types::cpp::DefineHelper<x> _); \
 public: \
-	static const ::craft::types::cpp::CppTypeKindEnum craft_c_typeKind = ::craft::types::cpp::CppTypeKindEnum::Object; \
+	static const ::craft::types::cpp::CppStaticDescKindEnum craft_c_typeKind = ::craft::types::cpp::CppStaticDescKindEnum::Object; \
     static inline ::craft::types::cpp::TypePtr craft_s_typeDesc() { return &x::__td; } \
 	static inline ::std::string craft_s_typeName() { return #x; } \
 protected: \
@@ -808,22 +790,15 @@ public: \
 private:
 
 
-#define CRAFT_OBJECT_ABSTRACT_DECLARE(x) \
-private: \
-    template<typename T> friend class ::craft::types::_details::TypeDefineHelper; \
-	template<typename T> \
-    inline static void __craft_s_types_init(::craft::types::_details::TypeDefineHelper<T> _)
-
-
 #define CRAFT_LEGACY_FEATURE_DECLARE(x, name, manager) \
-    static ::craft::types::cpp::type_desc __td; \
+    static ::craft::types::cpp::static_desc __td; \
 public: \
 	typedef manager < x > TManager; \
 private: \
 	friend TManager; \
-    static void __craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _); \
+    static void __craft_s_static_init(::craft::types::cpp::DefineHelper<x> _); \
 public: \
-	static const ::craft::types::cpp::CppTypeKindEnum craft_c_typeKind = TManager::craft_c_managedTypeKind; \
+	static const ::craft::types::cpp::CppStaticDescKindEnum craft_c_typeKind = TManager::craft_c_managedTypeKind; \
     static inline ::craft::types::cpp::TypePtr craft_s_typeDesc() { return &x::__td; } \
 	static inline ::std::string craft_s_typeName() { return #x; } \
 	static inline ::std::string craft_s_featureName() { return name; } \
@@ -841,11 +816,11 @@ namespace craft { namespace types { \
 		: public cpptype<void> \
 	{ \
 	private: \
-		_dll static ::craft::types::cpp::type_desc __td; \
-		static void __craft_s_types_init(::craft::types::cpp::TypeDefineHelper<x> _); \
+		_dll static ::craft::types::cpp::static_desc __td; \
+		static void __craft_s_static_init(::craft::types::cpp::DefineHelper<x> _); \
 	public: \
 		static constexpr bool isRawType = true; \
-		static constexpr cpp::CppTypeKindEnum kind = cpp::CppTypeKindEnum::RawType; \
+		static constexpr cpp::CppStaticDescKindEnum kind = cpp::CppStaticDescKindEnum::RawType; \
 		inline static cpp::TypePtr typeDesc() { return &__td; } \
 	}; \
 }}

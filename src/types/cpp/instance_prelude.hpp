@@ -114,7 +114,7 @@ namespace types
 		{ }
 
 		// Other features:
-		inline TypeId typeId() const { return _meta == nullptr ? (TypeId)0 : _meta->typeId; }
+		inline TypeId typeId() const { return _meta == nullptr ? None : _meta->typeId; }
 
 		inline operator bool() const { return !isNull(); }
 

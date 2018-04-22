@@ -26,8 +26,8 @@ namespace types
 // Components Subsystems
 //
 
-#include "system/identifiers.h"
 #include "system/graph.h"
+#include "system/identifiers.h"
 #include "system/expression/expression.h"
 #include "system/expression/queries.h"
 #include "system/expression_cache.h"
@@ -53,6 +53,7 @@ namespace types
 
 #include "boot/system_into_cpp.h"
 
+#include "cpp/graph.hpp"
 #include "cpp/expressions.hpp"
 #include "system/ExpressionDispatcher.hpp"
 
@@ -86,8 +87,7 @@ namespace types
 //
 
 #include "helpers.h"
-#include "cpp/TypeDefineHelper.hpp"
-#include "cpp/InfoDefineHelper.hpp"
+#include "cpp/DefineHelper.hpp"
 
 //
 // Built in types

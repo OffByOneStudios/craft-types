@@ -73,7 +73,7 @@ std::string instance<void>::toString(instance<void> const& inst, FeatureId fid, 
 
 std::string TypeId::toString(bool verbose) const
 {
-	if (id == None.id)
+	if (node == nullptr)
 	{
 		if (verbose)
 			return "<Type|None>";
@@ -86,12 +86,12 @@ std::string TypeId::toString(bool verbose) const
 	if (hasFeature<PIdentifier>())
 	{
 		from = std::string(PIdentifier::craft_s_typeName()) + " (#)";
-		name = fmt::format("{0} ({1})", getFeature<PIdentifier>()->identifier(), std::to_string(id));
+		name = fmt::format("{0} ({1})", getFeature<PIdentifier>()->identifier(), std::to_string((uintptr_t)node));
 	}
 	else
 	{
 		from = "#";
-		name = std::to_string(id);
+		name = std::to_string((uintptr_t)node);
 	}
 
 	if (verbose)

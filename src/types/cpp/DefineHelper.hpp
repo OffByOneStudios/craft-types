@@ -11,16 +11,16 @@ namespace types
 		
 		*/
 		template<typename TType, typename TFeature>
-		class TypeDefineHelper_WithFeature
+		class DefineHelper_WithFeature
 		{
 		private:
-			TypeDefineHelper_WithFeature()
+			DefineHelper_WithFeature()
 			{ }
 
-			TypeDefineHelper_WithFeature(TypeDefineHelper_WithFeature const&) = default;
+			DefineHelper_WithFeature(DefineHelper_WithFeature const&) = default;
 
 			friend class ::craft::types::CppSystem;
-			friend class TypeDefineHelper<TType>;
+			friend class DefineHelper<TType>;
 
 		public:
 			// TODO type check these
@@ -108,7 +108,7 @@ namespace types
 
 			template<template <typename> class TConcreate,
 				typename _T = TFeature,
-				typename std::enable_if<cpptype<_T>::kind == cpp::CppTypeKindEnum::LegacyProvider>::type* = nullptr>
+				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyProvider>::type* = nullptr>
 				inline TConcreate<TType>* byConfiguring()
 			{
 				auto tc = new TConcreate<TType>();
@@ -118,7 +118,7 @@ namespace types
 
 			template<template <typename> class TConcreate,
 				typename _T = TFeature,
-				typename std::enable_if<cpptype<_T>::kind == cpp::CppTypeKindEnum::LegacyAspect>::type* = nullptr>
+				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyAspect>::type* = nullptr>
 			inline TConcreate<TType>* byConfiguring()
 			{
 				auto tc = new TConcreate<TType>();
@@ -127,19 +127,19 @@ namespace types
 			}
 		};
 
-		template<typename TType>
-		class TypeDefineHelper
+		template<typename TDefine>
+		class DefineHelper
 		{
 		private:
-			type_desc* _td;
-			TypeDefineHelper* _parent;
+			static_desc* _sd;
+			DefineHelper* _parent;
 
-			TypeDefineHelper(type_desc* td, TypeDefineHelper* parent = nullptr)
-				: _td(td), _parent(parent)
+			DefineHelper(static_desc* sd, DefineHelper* parent = nullptr)
+				: _sd(sd), _parent(parent)
 			{
 			}
 
-			TypeDefineHelper(TypeDefineHelper const&) = default;
+			DefineHelper(DefineHelper const&) = default;
 
 			friend class ::craft::types::CppSystem;
 
@@ -151,11 +151,11 @@ namespace types
 
 		public:
 			template<typename TInterface>
-			inline TypeDefineHelper_WithFeature<TType, TInterface>
+			inline DefineHelper_WithFeature<TDefine, TInterface>
 				use ()
 			{
 				CppSystem::ensureManager<TInterface>();
-				return TypeDefineHelper_WithFeature<TType, TInterface>();
+				return DefineHelper_WithFeature<TDefine, TInterface>();
 			}
 
 		public:
@@ -170,34 +170,61 @@ namespace types
 				typename std::enable_if< !(cpptype<TParent>::isObject) >::type* = nullptr>
 				inline void parent()
 			{
-				TParent::template __craft_s_types_init<TType>(TypeDefineHelper(this));
+				TParent::template __craft_s_types_init<TDefine>(TypeDefineHelper(this));
 			}
 
-			template<typename _T = TType,
+			template<typename _T = TDefine,
 				typename std::enable_if<cpptype<_T>::isObject>::type* = nullptr>
 			inline void defaults()
 			{
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				auto const id = cpptype<TType>::typeDesc();
+				auto const id = cpptype<TDefine>::typeDesc();
 				if (!system().typeHasFeature<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
 				if (!system().typeHasFeature<PConstructor>(id)) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
 
-			template<typename _T = TType,
+			template<typename _T = TDefine,
 				typename std::enable_if<cpptype<_T>::isLegacyFeature>::type* = nullptr>
 			inline void defaults()
 			{
 				if (_parent != nullptr) return;
 
 				// Instantiate the manager
-				CppSystem::ensureManager<TType>();
+				CppSystem::ensureManager<TDefine>();
 
 				// Add defaults
-				auto const id = cpptype<TType>::typeDesc();
+				auto const id = cpptype<TDefine>::typeDesc();
 				if (!system().typeHasFeature<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
 			}
+
+			//
+			// MultiMethods
+			//
+		public:
+
+			// Basic function
+			template<
+				typename T,
+				typename TInfoType_ = TDefine,
+				typename std::enable_if< stdext::is_specialization<TInfoType_, cpp::Multimethod>::value >::type* = nullptr>
+				inline void add_method(T actual)
+			{
+				((TInfoType_*)(_sd->repr))->add(actual);
+			}
+
+			template<
+				typename T,
+				typename TTemp,
+				typename TInfoType_ = TDefine,
+				typename std::enable_if< stdext::is_specialization<TInfoType_, cpp::Multimethod>::value >::type* = nullptr>
+				inline void add_method_lambdaHack(TTemp actual)
+			{
+				T temp = actual;
+				((TInfoType_*)(_sd->repr))->add(temp);
+			}
+
 		};
 	}
 }}

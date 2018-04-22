@@ -1,6 +1,6 @@
 #pragma once
-#include "../common.h"
-#include "../core.h"
+#include "types/common.h"
+#include "types/core.h"
 
 namespace craft {
 namespace types
@@ -18,7 +18,7 @@ namespace types
 
 	inline IExpression* to_expression(TypeId tid)
 	{
-		return new ExpressionConcrete(graph().get(tid));
+		return new ExpressionConcrete(tid.node);
 	}
 
 	inline IExpression* to_expression_tuple(std::vector<TypeId> const& tids)
@@ -49,7 +49,7 @@ namespace types
 		typename std::enable_if< stdext::is_specialization<T, instance>::value && !std::is_same<typename T::instance_type, void>::value >::type* = nullptr>
 		inline IExpression* to_expression()
 	{
-		return new ExpressionConcrete(graph().recoverNode(cpptype<typename T::instance_type>::typeDesc().asNode()));
+		return new ExpressionConcrete(cpptype<typename T::instance_type>::typeDesc());
 	}
 
 	template<typename T,
@@ -124,10 +124,10 @@ namespace types
 
 	inline instance<> invoke(ExpressionStore const& exs, Function const& f, GenericInvoke const& i)
 	{
-		assert(exs.root()->kind().ptr() == cpptype<ExpressionArrow>::typeDesc().asNode());
+		assert(exs.root()->kind() == cpptype<ExpressionArrow>::typeDesc().asId());
 		auto arrow = (ExpressionArrow const*)exs.root();
 
-		assert(arrow->input->kind().ptr() == cpptype<ExpressionTuple>::typeDesc().asNode());
+		assert(arrow->input->kind() == cpptype<ExpressionTuple>::typeDesc().asId());
 		auto tuple = (ExpressionTuple const*)arrow->input;
 
 		auto t_size = tuple->entries.size();
