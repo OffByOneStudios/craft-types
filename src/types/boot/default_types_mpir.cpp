@@ -1,10 +1,12 @@
-#include "../common.h"
+#include "types/common.h"
 
 #include "default_types_mpir.h"
 
 CRAFT_TYPE_DEFINE(mpz_class)
 {
-	_.use<PIdentifier>().singleton<SimpleIdentifier>("int");
+	_.add<GraphPropertyName>("gmplib.integer");
+	_.add<GraphPropertyCppName>("mpz_class");
+
 	_.use<PParse>().singleton<FunctionalParse>([](std::string s) {
 		try
 		{
@@ -23,7 +25,9 @@ CRAFT_TYPE_DEFINE(mpz_class)
 
 CRAFT_TYPE_DEFINE(mpq_class)
 {
-	_.use<PIdentifier>().singleton<SimpleIdentifier>("rational");
+	_.add<GraphPropertyName>("gmplib.rational");
+	_.add<GraphPropertyCppName>("mpq_class");
+
 	_.use<PParse>().singleton<FunctionalParse>([](std::string s) {
 		try
 		{
@@ -42,7 +46,9 @@ CRAFT_TYPE_DEFINE(mpq_class)
 
 CRAFT_TYPE_DEFINE(mpf_class)
 {
-	_.use<PIdentifier>().singleton<SimpleIdentifier>("float");
+	_.add<GraphPropertyName>("gmplib.float");
+	_.add<GraphPropertyCppName>("mpf_class");
+
 	_.use<PParse>().singleton<FunctionalParse>([](std::string s) {
 		try
 		{

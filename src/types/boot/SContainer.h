@@ -12,7 +12,7 @@ namespace types
 	class SContainer abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SContainer, "types.container", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::SContainer, "types.container", FactoryAspectManager);
 
 	public:
 		struct Description

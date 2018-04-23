@@ -12,7 +12,7 @@ namespace types
 	class SObjectFungible abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SObjectFungible, "types.fungible", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::SObjectFungible, "types.fungible", FactoryAspectManager);
 
 	public:
 		/* T:

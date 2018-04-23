@@ -15,7 +15,7 @@ namespace types
 	class PConversion abstract
 		: public Provider
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PConversion, "types.convert", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::PConversion, "types.convert", SingletonProviderManager);
 
 	public:
 		virtual std::set<TypeId> const& possibleConversions(instance<> converting, TypeId toType) const = 0;

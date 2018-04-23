@@ -83,10 +83,10 @@ std::string TypeId::toString(bool verbose) const
 
 	std::string from, name;
 
-	if (hasFeature<PIdentifier>())
+	if (graph().hasProp<GraphPropertyName>(node))
 	{
-		from = std::string(PIdentifier::craft_s_typeName()) + " (#)";
-		name = fmt::format("{0} ({1})", getFeature<PIdentifier>()->identifier(), std::to_string((uintptr_t)node));
+		from = "graph:name";
+		name = fmt::format("{0} ({1})", graph().getFirstPropValue<GraphPropertyName>(node), std::to_string((uintptr_t)node));
 	}
 	else
 	{

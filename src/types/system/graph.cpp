@@ -18,8 +18,9 @@ Graph::~Graph()
 
 }
 
-Graph::Node* Graph::ensureMeta(GraphMeta::Kind kind, char const* name, GraphMeta* (*builder)())
+Graph::Node* Graph::ensureMeta(GraphMeta::Kind kind, char const* name, GraphMeta* (*builder)(Node*))
 {
+	// choose meta map
 	std::map<std::string, Node*>* meta_map;
 	switch (kind)
 	{
@@ -29,15 +30,20 @@ Graph::Node* Graph::ensureMeta(GraphMeta::Kind kind, char const* name, GraphMeta
 	default: throw stdext::exception("Unknown meta kind {0}", (size_t)kind);
 	}
 
+	// fast exit
 	auto rit = meta_map->find(name);
 	if (rit != meta_map->end())
 		return rit->second;
 
+	// pre-allocate node
+	auto node = &*_nodes.insert({ nullptr, nullptr });
+
+	// build it
 	if (builder == nullptr)
 		throw stdext::exception("Not passed builder for {0}.", name);
-	auto built = builder();
+	auto built = builder(node);
 
-	auto node = &*_nodes.insert({ nullptr, built });
+	node->value = built;
 	meta_map->insert({ name, node });
 
 	// add some system properties
@@ -80,6 +86,16 @@ void Graph::addEdge(Node* label, void* value, std::vector<Node*> const& edges)
 		edge_node->edges.push_back(edge);
 }
 
+Graph::Node* Graph::getNodeByValue(void* value)
+{
+	auto it = std::find_if(
+		_nodes.begin(), _nodes.end(),
+		[value](auto v) { return v.value == value; });
+
+	if (it == _nodes.end())
+		return nullptr;
+	return &*it;
+}
 Graph::Prop* Graph::getProp(Node* on_node, Node* prop_label)
 {
 	for (auto p : on_node->props)
@@ -88,26 +104,62 @@ Graph::Prop* Graph::getProp(Node* on_node, Node* prop_label)
 	return nullptr;
 }
 
-std::string Graph::dumpNode(Node* n) const
+std::string Graph::dumpNode(Node* n)
 {
+	std::ostringstream ss;
+
+	// Prime node
 	if (n->isMeta())
 	{
 		GraphMeta* meta = (GraphMeta*)n->value;
 
-		return fmt::format("META {0} {1}", (uint8_t)meta->kind, meta->name);
+		ss << fmt::format("META {0} {1}", (uint8_t)meta->kind, meta->name);
+	}
+	else if (n->label->isMeta()) // Order 1, TODO order N
+	{
+		ss << fmt::format("{0}", n->getInterface()->name);
 	}
 	else
 	{
-		// Order 1
-		if (n->label->isMeta())
-		{
-			return fmt::format("{0}", n->getInterface()->name);
-		}
+		ss << "unknown";
+	}
+	ss << std::endl;
 
-		// TODO
+	// Properties:
+	for (auto p : n->props)
+	{
+		auto interface = p->getInterface();
+
+		ss << "\t" << interface->name;
+		auto printer = getFirstPropValue<GraphPropertyPrinter>(p->label);
+		if (printer != nullptr)
+			ss << "\t" << printer(p->value);
+		ss << std::endl;
 	}
 
-	return "unknown";
+	// Edges: // TODO (use a printer property? rip it out of property?)
+	for (auto e : n->edges)
+	{
+		auto interface = e->getInterface();
+
+		ss << "\t" << interface->name;
+		auto printer = getFirstPropValue<GraphPropertyPrinter>(e->label);
+		if (printer != nullptr)
+			ss << "\t" << printer(e->value);
+		ss << std::endl;
+
+		for (auto n : e->between)
+		{
+			ss << "\t\t" << n->getInterface()->name;
+			auto printer = getFirstPropValue<GraphPropertyPrinter>(n->label);
+			if (printer != nullptr)
+				ss << "\t" << printer(n->value);
+			ss << std::endl;
+		}
+	}
+
+	// Result
+	return ss.str();
 }
 
 /******************************************************************************

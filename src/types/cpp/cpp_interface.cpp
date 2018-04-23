@@ -86,6 +86,7 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 					} break;
 					case CppStaticDescKindEnum::MultiMethod:
 					{
+						auto node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
 
 					} break;
 				}

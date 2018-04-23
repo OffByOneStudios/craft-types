@@ -16,7 +16,7 @@ namespace types
 	class PParse abstract
 		: public Provider
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PParse, "types.parse", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::PParse, "types.parse", SingletonProviderManager);
 
 	public:
 		virtual instance<> parse(std::string str) const noexcept = 0;

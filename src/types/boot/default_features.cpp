@@ -4,7 +4,6 @@
 using namespace craft::types;
 
 // Core Providers
-CRAFT_DEFINE(PIdentifier) { _.defaults(); };
 CRAFT_DEFINE(PConstructor) { _.defaults(); };
 CRAFT_DEFINE(PStringer) { _.defaults(); };
 CRAFT_DEFINE(PRepr) { _.defaults(); };

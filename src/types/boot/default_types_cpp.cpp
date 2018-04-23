@@ -6,7 +6,9 @@
 // stdlib
 CRAFT_TYPE_DEFINE(std::string)
 {
-	_.use<PIdentifier>().singleton<SimpleIdentifier>("std.string");
+	_.add<GraphPropertyName>("cpp.string");
+	_.add<GraphPropertyCppName>("std::string");
+
 	_.use<PClone>().singleton<DefaultCopyConstructor>();
 	_.use<PParse>().singleton<FunctionalParse>( [](std::string s) { return instance<std::string>::make(s); });
 	_.use<PStringer>().singleton<FunctionalStringer>( [](::craft::instance<std::string> _this) { return  *_this; } );
@@ -17,7 +19,9 @@ CRAFT_TYPE_DEFINE(std::string)
 // stdlib
 CRAFT_TYPE_DEFINE(bool)
 {
-	_.use<PIdentifier>().singleton<SimpleIdentifier>("bool");
+	_.add<GraphPropertyName>("boolean");
+	_.add<GraphPropertyCppName>("bool");
+
 	_.use<PParse>().singleton<FunctionalParse>([](std::string s)
 	{
 		if (s == "true" || s == "True")

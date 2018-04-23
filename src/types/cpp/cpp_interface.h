@@ -830,6 +830,7 @@ namespace craft { namespace types { \
 		static constexpr bool isRawType = true; \
 		static constexpr cpp::CppStaticDescKindEnum kind = cpp::CppStaticDescKindEnum::RawType; \
 		inline static cpp::TypePtr typeDesc() { return &__td; } \
+		static inline char const* typeName() { return #x; } \
 	}; \
 }}
 

@@ -11,7 +11,7 @@ using namespace craft::types;
 ******************************************************************************/
 
 ExpressionAny ExpressionAny::Value;
-CRAFT_TYPE_DEFINE(ExpressionAny) { }
+CRAFT_TYPE_DEFINE(ExpressionAny) { _.defaults(); }
 
 TypeId ExpressionAny::kind() const { return cpptype<ExpressionAny>::typeDesc(); }
 void* ExpressionAny::ptr() const { return (void*)this; }
@@ -24,7 +24,7 @@ IExpression* ExpressionAny::clone() const { return &Value; }
 
 
 ExpressionVoid ExpressionVoid::Value;
-CRAFT_TYPE_DEFINE(ExpressionVoid) { }
+CRAFT_TYPE_DEFINE(ExpressionVoid) { _.defaults(); }
 
 TypeId ExpressionVoid::kind() const { return cpptype<ExpressionVoid>::typeDesc(); }
 void* ExpressionVoid::ptr() const { return (void*)this; }
@@ -37,7 +37,7 @@ IExpression* ExpressionVoid::clone() const { return &Value; }
 
 
 ExpressionBottom ExpressionBottom::Value;
-CRAFT_TYPE_DEFINE(ExpressionBottom) { }
+CRAFT_TYPE_DEFINE(ExpressionBottom) { _.defaults(); }
 
 TypeId ExpressionBottom::kind() const { return cpptype<ExpressionBottom>::typeDesc(); }
 void* ExpressionBottom::ptr() const { return (void*)this; }
@@ -56,7 +56,7 @@ IExpression* ExpressionBottom::clone() const { return &Value; }
 
 CRAFT_TYPE_DEFINE(ExpressionConcrete)
 {
-
+	_.defaults();
 }
 
 ExpressionConcrete::ExpressionConcrete(TypeId tid)
@@ -106,7 +106,7 @@ IExpression* ExpressionConcrete::clone() const
 
 CRAFT_TYPE_DEFINE(ExpressionArrow)
 {
-
+	_.defaults();
 }
 
 ExpressionArrow::ExpressionArrow(IExpression* input, IExpression* output)
@@ -158,7 +158,7 @@ IExpression* ExpressionArrow::clone() const
 
 CRAFT_TYPE_DEFINE(ExpressionTuple)
 {
-
+	_.defaults();
 }
 
 ExpressionTuple::ExpressionTuple(std::vector<IExpression*> const& entries, IExpression* varType)
@@ -213,7 +213,7 @@ IExpression* ExpressionTuple::clone() const
 
 CRAFT_TYPE_DEFINE(ExpressionStore)
 {
-
+	_.defaults();
 }
 
 ExpressionStore::ExpressionStore()

@@ -12,7 +12,7 @@ namespace types
 	class SObjectManipulation abstract
 		: public Aspect
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(SObjectManipulation, "types.funcs", FactoryAspectManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::SObjectManipulation, "types.funcs", FactoryAspectManager);
 
 	public:
 

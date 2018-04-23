@@ -8,6 +8,8 @@ using namespace craft::types;
 
 CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 {
+	_.add<GraphPropertyMultiMethodSymbol>("is-subtype");
+
 	_.add_method([](ExpressionVoid* left, ExpressionVoid* right) -> uintptr_t { return true; });
 
 	_.add_method([](void* left, ExpressionAny* right) -> uintptr_t { return true; });

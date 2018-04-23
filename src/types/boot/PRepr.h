@@ -16,7 +16,7 @@ namespace craft {
 		class PRepr abstract
 			: public Provider
 		{
-			CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PRepr, "types.repr", SingletonProviderManager);
+			CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::PRepr, "types.repr", SingletonProviderManager);
 
 		public:
 			virtual std::string toRepr(instance<> inst) const = 0;

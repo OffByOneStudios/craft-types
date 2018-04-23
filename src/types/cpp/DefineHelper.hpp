@@ -139,7 +139,7 @@ namespace types
 			DefineHelper(static_desc* sd, DefineHelper* parent = nullptr)
 				: _sd(sd), _parent(parent)
 			{
-				_node = identifiers().get(sd).node.node;
+				_node = graph().getNodeByValue(sd);
 			}
 
 			DefineHelper(DefineHelper const&) = default;
@@ -160,18 +160,12 @@ namespace types
 				return DefineHelper_WithFeature<TDefine, TInterface>();
 			}
 
-			//
-			// Identifiers
-			//
-		protected:
-
-			template<typename _T = T,
-				typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
-				inline _defaultName() { return T::craft_s_featureName(); }
-
-			template<typename _T = T,
-				typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
-				inline _defaultName() { return T::craft_s_typeName(); }
+			template<typename TGraphMeta
+				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
+			void inline add(typename TGraphMeta::value_type value)
+			{
+				graph().add<TGraphMeta>(_node, value);
+			}
 
 			//
 			// Types
@@ -198,9 +192,20 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				auto const id = cpptype<TDefine>::typeDesc();
-				if (!graph().nodeHasProp<GraphPropertyCppName>(_node)) graph().add(_node, );
-				if (!system().typeHasFeature<PConstructor>(id)) use<PConstructor>().template singleton<DefaultConstructor>();
+				if (!graph().hasProp<GraphPropertyName>(_node)) graph().add<GraphPropertyName>(_node, _T::craft_s_typeName());
+				if (!graph().hasProp<GraphPropertyCppName>(_node)) graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
+				if (!system().typeHasFeature<PConstructor>(TypeId(_node))) use<PConstructor>().template singleton<DefaultConstructor>();
+			}
+
+			template<typename _T = TDefine,
+				typename std::enable_if<cpptype<_T>::isRawType>::type* = nullptr>
+				inline void defaults()
+			{
+				if (_parent != nullptr) return;
+
+				// Add defaults
+				if (!graph().hasProp<GraphPropertyName>(_node)) graph().add<GraphPropertyName>(_node, cpptype<_T>::typeName());
+				if (!graph().hasProp<GraphPropertyCppName>(_node)) graph().add<GraphPropertyCppName>(_node, cpptype<_T>::typeName());
 			}
 
 			template<typename _T = TDefine,
@@ -213,8 +218,8 @@ namespace types
 				CppSystem::ensureManager<TDefine>();
 
 				// Add defaults
-				auto const id = cpptype<TDefine>::typeDesc();
-				if (!system().typeHasFeature<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
+				if (!graph().hasProp<GraphPropertyName>(_node)) graph().add<GraphPropertyName>(_node, _T::craft_s_featureName());
+				if (!graph().hasProp<GraphPropertyCppName>(_node)) graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
 			}
 
 			//

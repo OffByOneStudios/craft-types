@@ -6,6 +6,28 @@ namespace craft {
 namespace types
 {
 	/******************************************************************************
+	** system - GraphProperties
+	******************************************************************************/
+
+	// Semantic name of the multimethod
+	struct GraphPropertyMultiMethodSymbol final
+	{
+		// is a   `char const*`
+		typedef char const* value_type;
+	private:
+		GraphPropertyMultiMethodSymbol() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
+		static constexpr char const* craftTypes_metaProp_name = "system.multi-method.symbol";
+		static GraphPropMeta* craftTypes_metaProp_builder(Graph::Node* metanode)
+		{
+			graph().add<GraphPropertyPrinter>(metanode,
+				[](void* v) -> std::string { return (value_type)v; });
+			return GraphPropMeta::Singular(craftTypes_metaProp_name);
+		}
+	};
+
+	/******************************************************************************
 	** cpp - GraphNodes
 	******************************************************************************/
 
@@ -18,7 +40,10 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
 		static constexpr char const* craftTypes_metaNode_name = "cpp.type.class";
-		static GraphNodeMeta* craftTypes_metaNode_builder() { return GraphNodeMeta::Named(craftTypes_metaNode_name); }
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
 	};
 
 	struct GraphNodeCppObject final
@@ -30,7 +55,10 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
 		static constexpr char const* craftTypes_metaNode_name = "cpp.type.object";
-		static GraphNodeMeta* craftTypes_metaNode_builder() { return GraphNodeMeta::Named(craftTypes_metaNode_name); }
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
 	};
 
 	struct GraphNodeCppFeatureLegacy final
@@ -42,7 +70,10 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
 		static constexpr char const* craftTypes_metaNode_name = "cpp.type.feature|legacy";
-		static GraphNodeMeta* craftTypes_metaNode_builder() { return GraphNodeMeta::Named(craftTypes_metaNode_name); }
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
 	};
 
 	struct GraphNodeCppFunction final
@@ -54,7 +85,10 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
 		static constexpr char const* craftTypes_metaNode_name = "cpp.type.function";
-		static GraphNodeMeta* craftTypes_metaNode_builder() { return GraphNodeMeta::Named(craftTypes_metaNode_name); }
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
 	};
 
 	struct GraphNodeCppMethod final
@@ -66,7 +100,24 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
 		static constexpr char const* craftTypes_metaNode_name = "cpp.type.method";
-		static GraphNodeMeta* craftTypes_metaNode_builder() { return GraphNodeMeta::Named(craftTypes_metaNode_name); }
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
+	};
+
+	struct GraphNodeCppMultiMethod final
+	{
+		typedef void* value_type;
+	private:
+		GraphNodeCppMultiMethod() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
+		static constexpr char const* craftTypes_metaNode_name = "cpp.multi-method";
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
 	};
 
 	/******************************************************************************
@@ -82,7 +133,12 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
 		static constexpr char const* craftTypes_metaProp_name = "cpp.size";
-		static GraphPropMeta* craftTypes_metaProp_builder() { return GraphPropMeta::Singular(craftTypes_metaProp_name); }
+		static GraphPropMeta* craftTypes_metaProp_builder(Graph::Node* metanode)
+		{
+			graph().add<GraphPropertyPrinter>(metanode,
+				[](void* v) -> std::string { return std::to_string((value_type)v); });
+			return GraphPropMeta::Singular(craftTypes_metaProp_name);
+		}
 	};
 
 	struct GraphPropertyCppName final
@@ -94,7 +150,11 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
 		static constexpr char const* craftTypes_metaProp_name = "cpp.name";
-		static GraphPropMeta* craftTypes_metaProp_builder() { return GraphPropMeta::Singular(craftTypes_metaProp_name); }
+		static GraphPropMeta* craftTypes_metaProp_builder(Graph::Node* metanode)
+		{
+			graph().add<GraphPropertyPrinter>(metanode,
+				[](void* v) -> std::string { return (value_type)v; });
+			return GraphPropMeta::Singular(craftTypes_metaProp_name);
+		}
 	};
-
 }}

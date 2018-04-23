@@ -15,15 +15,15 @@
 
 #include "types/system/expression/expression.h"
 
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionAny);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionVoid);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionBottom);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionAny);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionVoid);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionBottom);
 
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionConcrete);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionArrow);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionTuple);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionConcrete);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionArrow);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionTuple);
 
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, ::craft::types::ExpressionStore);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::ExpressionStore);
 
 /******************************************************************************
 ** /types/system/expression/queries.h

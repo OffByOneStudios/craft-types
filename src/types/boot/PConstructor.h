@@ -19,7 +19,7 @@ namespace types
 	class PConstructor abstract
 		: public Provider
 	{
-		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(PConstructor, "types.constructor", SingletonProviderManager);
+		CRAFT_TYPES_EXPORTED CRAFT_LEGACY_FEATURE_DECLARE(craft::types::PConstructor, "types.constructor", SingletonProviderManager);
 
 	public:
 		typedef uintptr_t ListingId;
