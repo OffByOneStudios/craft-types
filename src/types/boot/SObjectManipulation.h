@@ -201,7 +201,7 @@ namespace types
 			typename ListingActual::FuncPtr fp;
 			fp.assign((instance<>(_TType::*)())mem);
 
-			registerWith(name, fp, false, 0, argTypes);
+			registerWith(name, fp, false, nullptr, argTypes);
 
 			return this;
 		}

@@ -86,7 +86,7 @@ std::string TypeId::toString(bool verbose) const
 	if (graph().hasProp<GraphPropertyName>(node))
 	{
 		from = "graph:name";
-		name = fmt::format("{0} ({1})", graph().getFirstPropValue<GraphPropertyName>(node), std::to_string((uintptr_t)node));
+		name = fmt::format("{0}", graph().getFirstPropValue<GraphPropertyName>(node));
 	}
 	else
 	{
