@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 
 	for (;;)
 	{
+		std::cout << ">>> ";
 		std::string input;
 		std::getline(std::cin, input);
 
@@ -21,23 +22,44 @@ int main(int argc, char** argv)
 		std::string args;
 		if (has_args)
 		{
-			args = input.substr(cmd_break);
-			input = input.substr(0, cmd_break - 1);
+			args = input.substr(cmd_break + 1);
+			input = input.substr(0, cmd_break);
 		}
 		else
 			cmd_break = input.size();
 
+		std::cout << std::endl;
+
 		try
 		{
-			//if (input == "dump")
-			//	craft::types::dump();
-			//else
+			if (input == "dump")
+			{
+				graph().forEachNode(
+					[](Graph& g, Graph::Node* n)
+				{
+					std::cout << g.dumpNode(n) << std::endl;
+				});
+			}
+			else if (input == "load")
+			{
+				auto start = (signed)identifiers().count();
+				craft::types::load_dll(path::absolute(args));
+				auto end = identifiers().count();
+
+				for (auto i = start; i < end; ++i)
+					std::cout << graph().dumpNode(identifiers().getByIndex(i).node.node) << std::endl;
+
+				std::cout << std::endl << "loaded " << (end - start) << " types." << std::endl;
+			}
+			else
 				throw stdext::exception("unknown command `{0}`", input);
 		}
 		catch (std::exception const& ex)
 		{
 			std::cout << ex.what() << std::endl;
 		}
+
+		std::cout << std::endl;
 	}
 }
 

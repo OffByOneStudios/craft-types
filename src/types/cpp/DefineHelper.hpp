@@ -134,9 +134,12 @@ namespace types
 			static_desc* _sd;
 			DefineHelper* _parent;
 
+			Graph::Node* _node;
+
 			DefineHelper(static_desc* sd, DefineHelper* parent = nullptr)
 				: _sd(sd), _parent(parent)
 			{
+				_node = identifiers().get(sd).node.node;
 			}
 
 			DefineHelper(DefineHelper const&) = default;
@@ -145,7 +148,6 @@ namespace types
 
 			inline static void _build_default_providers()
 			{
-				CppSystem::ensureManager<PIdentifier>();
 				CppSystem::ensureManager<PConstructor>();
 			}
 
@@ -158,6 +160,22 @@ namespace types
 				return DefineHelper_WithFeature<TDefine, TInterface>();
 			}
 
+			//
+			// Identifiers
+			//
+		protected:
+
+			template<typename _T = T,
+				typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
+				inline _defaultName() { return T::craft_s_featureName(); }
+
+			template<typename _T = T,
+				typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
+				inline _defaultName() { return T::craft_s_typeName(); }
+
+			//
+			// Types
+			//
 		public:
 
 			//template<class TParent,
@@ -181,7 +199,7 @@ namespace types
 
 				// Add defaults
 				auto const id = cpptype<TDefine>::typeDesc();
-				if (!system().typeHasFeature<PIdentifier>(id)) use<PIdentifier>().template singleton<DefaultIdentifier>();
+				if (!graph().nodeHasProp<GraphPropertyCppName>(_node)) graph().add(_node, );
 				if (!system().typeHasFeature<PConstructor>(id)) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
 

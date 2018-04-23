@@ -99,5 +99,7 @@ namespace types
 
 		CRAFT_TYPES_EXPORTED Record const& get(TypeId id) const;
 		CRAFT_TYPES_EXPORTED Record const& get(void* ptr) const;
+
+		CRAFT_TYPES_EXPORTED Record const& getByIndex(size_t index) const;
 	};
 }}

@@ -21,6 +21,9 @@ namespace types
 	public:
 		size_t length;
 		T* data;
+
+	public:
+		inline void push() { };
 	};
 
 	/******************************************************************************
@@ -44,7 +47,7 @@ namespace types
 	};
 
 	/******************************************************************************
-	** IGraphNodeMeta
+	** GraphNodeMeta
 	******************************************************************************/
 
 	// This represents the meta interface for nodes
@@ -63,11 +66,11 @@ namespace types
 	};
 
 	/******************************************************************************
-	** IGraphPropertyMeta
+	** GraphPropMeta
 	******************************************************************************/
 
 	// This represents the meta interface for properties
-	struct GraphPropertyMeta : GraphMeta
+	struct GraphPropMeta : GraphMeta
 	{
 	public:
 		enum class Mode : size_t
@@ -86,9 +89,9 @@ namespace types
 		inline bool isIndex() const { return ((size_t)mode & 4) == 1; }
 
 	public:
-		static inline GraphPropertyMeta* Singular(char const* name)
+		static inline GraphPropMeta* Singular(char const* name)
 		{
-			GraphPropertyMeta* ret = new GraphPropertyMeta();
+			GraphPropMeta* ret = new GraphPropMeta();
 			ret->kind = Kind::Prop;
 			ret->name = name;
 			ret->mode = Mode::Singular;
@@ -133,13 +136,14 @@ namespace types
 		{
 			void* value;
 
-			GraphVector<Prop*> props;
-			GraphVector<Edge*> edges;
+			std::vector<Prop*> props; // Properties are stored directly
+			std::vector<Edge*> edges;
 
 		public:
 			Node(Node* label, void* value)
 				: Element(label)
 				, value(value)
+				, props(), edges()
 			{ }
 
 		public:
@@ -153,13 +157,19 @@ namespace types
 			void* value;
 
 		public:
-			inline GraphPropertyMeta* getInterface() { return (GraphPropertyMeta*)label->value; }
+			Prop(Node* label, void* value)
+				: Element(label)
+				, value(value)
+			{ }
+
+		public:
+			inline GraphPropMeta* getInterface() { return (GraphPropMeta*)label->value; }
 		};
 
 		struct Edge final : public Element
 		{
 			void* value;
-			GraphVector<Node*> between;
+			std::vector<Node*> between;
 
 		public:
 			inline GraphEdgeMeta* getInterface() { return (GraphEdgeMeta*)label->value; }
@@ -195,6 +205,8 @@ namespace types
 		CRAFT_TYPES_EXPORTED void addProp(Node* label, void* value, Node* on_node);
 		CRAFT_TYPES_EXPORTED void addEdge(Node* label, void* value, std::vector<Node*> const& edge);
 
+		CRAFT_TYPES_EXPORTED Prop* getProp(Node* on_node, Node* prop_label);
+
 		CRAFT_TYPES_EXPORTED std::string dumpNode(Node*) const;
 
 		// 
@@ -209,13 +221,43 @@ namespace types
 		inline Node* meta() { return ensureMeta(GraphMeta::Kind::Edge, T::craftTypes_metaEdge_name, (GraphMeta* (*)())&T::craftTypes_metaEdge_builder); }
 
 		template<typename T>
-		inline Node* add(T* value) { return addNode(meta<T>(), value); }
+		inline Node* add(typename T::value_type* value) { return addNode(meta<T>(), value); }
 		template<typename T>
-		inline void add(Node* on_node, T* value) { return addProp(meta<T>(), value, on_node); }
+		inline void add(Node* on_node, typename T::value_type* value) { return addProp(meta<T>(), value, on_node); }
 		template<typename T>
-		inline void add(T* value, std::vector<Node*> const& edge) { return addEdge(meta<T>(), value, edge); }
+		inline void add(typename T::value_type* value, std::vector<Node*> const& edge) { return addEdge(meta<T>(), value, edge); }
 
+		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
+		inline Node* getFirstProp(Node* on_node) { return getProp(on_node, ensureMeta<T>()); }
+		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
+		inline Node* hasProp(Node* on_node) { return getProp(on_node, ensureMeta<T>()) != nullptr; }
 
+		template<typename TFunc>
+		inline void forEachNode(TFunc const& func)
+		{
+			for (auto it = _nodes.begin(); it != _nodes.end(); ++it)
+			{
+				func(*this, &*it);
+			}
+		}
+	};
+
+	/******************************************************************************
+	** GraphTypeAbstract
+	******************************************************************************/
+
+	struct GraphNodeTypeAbstract final
+	{
+		// is a   `GraphNodeTypeAbstract*`
+		typedef GraphNodeTypeAbstract* value_type;
+	public:
+		char const* abstract_name;
+	private:
+		GraphNodeTypeAbstract() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
+		static constexpr char const* craftTypes_metaNode_name = "type.abstract";
+		static GraphNodeMeta* craftTypes_metaNode_builder() { return GraphNodeMeta::Named(craftTypes_metaNode_name); }
 	};
 
 	/******************************************************************************
@@ -231,6 +273,6 @@ namespace types
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
 		static constexpr char const* craftTypes_metaProp_name = "name";
-		static GraphPropertyMeta* craftTypes_metaProp_builder() { return GraphPropertyMeta::Singular(craftTypes_metaProp_name); }
+		static GraphPropMeta* craftTypes_metaProp_builder() { return GraphPropMeta::Singular(craftTypes_metaProp_name); }
 	};
 }}

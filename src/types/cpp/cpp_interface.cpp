@@ -61,15 +61,32 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 
 				switch (sd->kind)
 				{
+					default:
 					case CppStaticDescKindEnum::None:
 						break;
-					default:
 					case CppStaticDescKindEnum::Object:
 					{
-						auto node = _graph->addNode(_graph->meta<GraphCppStatic>(), sd);
+						auto node = _graph->addNode(_graph->meta<GraphNodeCppObject>(), sd);
 
 						_identifiers->add(node);
-						
+					} break;
+
+					case CppStaticDescKindEnum::RawType:
+					{
+						auto node = _graph->addNode(_graph->meta<GraphNodeCppClass>(), sd);
+
+						_identifiers->add(node);
+					} break;
+					case CppStaticDescKindEnum::LegacyProvider:
+					case CppStaticDescKindEnum::LegacyAspect:
+					{
+						auto node = _graph->addNode(_graph->meta<GraphNodeCppFeatureLegacy>(), sd);
+
+						_identifiers->add(node);
+					} break;
+					case CppStaticDescKindEnum::MultiMethod:
+					{
+
 					} break;
 				}
 			} break;
@@ -101,10 +118,11 @@ void CppSystem::_init()
 {
 	_addEntry({ new std::string("cpp-static-init-finish"), _Entry::Kind::Marker });
 
+	_dllsThatWereStatic = _dllsToUpdate;
+	_dllsToUpdate.clear();
+
 	_identifiers = new Identifiers();
 	_graph = new Graph();
-
-	_current_dll_entries = new _Entries();
 
 	// Set up graph and identifiers
 	_init_insertEntries(_static_entries, 0);
@@ -115,18 +133,26 @@ void CppSystem::_init()
 	_init_runEntries(_static_entries, 0);
 }
 
+bool CppSystem::_hasInited()
+{
+	return _graph != nullptr;
+}
+
 char const* CppSystem::_begin(char const* name)
 {
-	OutputDebugStringA("system::_begin()      ");
-	OutputDebugStringA(name);
-	OutputDebugStringA("\n");
 	// WARNING !! WARNING !! WARNING
 	// This function is called pre-C++-runtime initalize
 	// * Static initalizers have not ran
 	// * Exceptions are not configured
-	// * Stack safety has not been established
+	// * C++ memory management features are not configured
 	// Be very careful
 	// WARNING !! WARNING !! WARNING
+
+#ifdef _WIN32
+	OutputDebugStringA("system::_begin()      ");
+	OutputDebugStringA(name);
+	OutputDebugStringA("\n");
+#endif
 
 	auto ret = __dll_region;
 	__dll_region = name;
@@ -134,41 +160,46 @@ char const* CppSystem::_begin(char const* name)
 }
 void CppSystem::_finish(char const* name)
 {
+#ifdef _WIN32
 	OutputDebugStringA("system._finish()      ");
 	OutputDebugStringA(name);
 	OutputDebugStringA("\n");
+#endif
 
 	auto ret = __dll_region;
 	__dll_region = name;
 
 	_addEntry({ new std::string(fmt::format("cpp-library-finish:{0}", ret)), _Entry::Kind::Marker });
-	// TODO insert the begin marker
+
+	if (_dll_entries.find(ret) != _dll_entries.end())
+		_addEntry({ new std::string("cpp-library-already-exists"), _Entry::Kind::Warning });
+	_dll_entries[ret] = _current_dll_entries;
+	_dllsToUpdate.insert(ret);
+	_current_dll_entries = nullptr;
 }
 
 void CppSystem::_update()
 {
-	auto start = 0;
-	for (start = 0; start < _current_dll_entries->_entries.size(); ++start)
+	for (auto d : _dllsToUpdate)
 	{
-		auto& entry = _current_dll_entries->_entries[start];
-		if (entry.kind == _Entry::Kind::Marker)
-		{
-			break;
-		}
-	}
-	if (start == _current_dll_entries->_entries.size()) start = 0;
-	else if (start == _current_dll_entries->_entries.size() - 1) return; //Multiple invocations to rebuild without new types
+		auto entries = _dll_entries[d];
 
-	_init_insertEntries(_current_dll_entries, start);
-	_init_runEntries(_current_dll_entries, start);
+		_init_insertEntries(entries, 0);
+		_init_runEntries(entries, 0);
+	}
+
+	_dllsToUpdate.clear();
 }
 
 void CppSystem::_addEntry(_Entry && e)
 {
-	if (_current_dll_entries == nullptr)
+	if (!_hasInited())
 		_static_entries->_entries.push_back(e);
-	else
-		_current_dll_entries->_entries.push_back(e);
+
+	if (_current_dll_entries == nullptr)
+		_current_dll_entries = new _Entries();
+
+	_current_dll_entries->_entries.push_back(e);
 }
 
 void CppSystem::_register(cpp::static_desc const* info)

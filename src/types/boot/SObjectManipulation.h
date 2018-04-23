@@ -229,7 +229,7 @@ namespace types
 			typename ListingActual::FuncPtr fp;
 			fp.assign((void (_TType::*)(typename stdext::typechange<TArgs, instance<>>::type...))mem);
 
-			registerWith(name, fp, false, 0, argTypes);
+			registerWith(name, fp, false, nullptr, argTypes);
 
 			return this;
 		}

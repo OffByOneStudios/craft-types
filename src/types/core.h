@@ -67,7 +67,6 @@ namespace types
 // Built in features
 //
 
-#include "boot/PIdentifier.h"
 #include "boot/PConstructor.h"
 #include "boot/PStringer.h"
 #include "boot/PParse.h"

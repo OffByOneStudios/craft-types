@@ -385,7 +385,8 @@ namespace types
 			enum class Kind
 			{
 				StaticDesc,
-				Marker
+				Marker,
+				Warning
 			};
 
 			void* ptr;
@@ -397,13 +398,19 @@ namespace types
 			std::vector<_Entry> _entries;
 		};
 
+	private:
+		// These first for inlined functions
+		// Graph for this cpp-system (todo: invert this / make thread local)
+		Graph* _graph;
+		// Identifiers for this cpp-system (todo: invert this / make thread local)
+		Identifiers* _identifiers;
+
 		_Entries* _static_entries;
 
 		_Entries* _current_dll_entries;
 		std::map<std::string, _Entries*> _dll_entries;
-
-		Graph* _graph;
-		Identifiers* _identifiers;
+		std::set<std::string> _dllsToUpdate;
+		std::set<std::string> _dllsThatWereStatic;
 
 		std::recursive_mutex operation;
 
@@ -426,6 +433,7 @@ namespace types
 		static char const* __dll_region;
 
 		CRAFT_TYPES_EXPORTED void _init();
+		CRAFT_TYPES_EXPORTED bool _hasInited();
 		CRAFT_TYPES_EXPORTED static char const* _begin(char const* name);
 		CRAFT_TYPES_EXPORTED void _finish(char const* name);
 		CRAFT_TYPES_EXPORTED void _update();
@@ -781,7 +789,7 @@ private: \
 public: \
 	static const ::craft::types::cpp::CppStaticDescKindEnum craft_c_typeKind = ::craft::types::cpp::CppStaticDescKindEnum::Object; \
     static inline ::craft::types::cpp::TypePtr craft_s_typeDesc() { return &x::__td; } \
-	static inline ::std::string craft_s_typeName() { return #x; } \
+	static inline char const* craft_s_typeName() { return #x; } \
 protected: \
     inline virtual ::craft::types::cpp::TypePtr craft_typeDesc() const override { return craft_s_typeDesc(); } \
 	inline virtual void* craft_instancePointer() const override { return reinterpret_cast<void*>(static_cast<x*>(const_cast<x*>(this))); } \
@@ -800,8 +808,8 @@ private: \
 public: \
 	static const ::craft::types::cpp::CppStaticDescKindEnum craft_c_typeKind = TManager::craft_c_managedTypeKind; \
     static inline ::craft::types::cpp::TypePtr craft_s_typeDesc() { return &x::__td; } \
-	static inline ::std::string craft_s_typeName() { return #x; } \
-	static inline ::std::string craft_s_featureName() { return name; } \
+	static inline char const* craft_s_typeName() { return #x; } \
+	static inline char const* craft_s_featureName() { return name; } \
 public: \
 	static inline TManager* craft_s_featureManager() \
 	{ return ::craft::types::CppSystem::getManager<x>(); } \

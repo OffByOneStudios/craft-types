@@ -56,3 +56,10 @@ Identifiers::Record const& Identifiers::get(void* ptr) const
 		throw type_identifer_not_found_error("Could not find an identifer for the given static_desc.");
 	return *_contents->types.get_iterator_from_index(it->second - 1);
 }
+
+Identifiers::Record const& Identifiers::getByIndex(size_t index) const
+{
+	if (index >= _contents->types.size())
+		throw type_identifer_not_found_error("Could not find a node at the given index.");
+	return *_contents->types.get_iterator_from_index(index);
+}

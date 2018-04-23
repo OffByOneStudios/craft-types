@@ -14,4 +14,23 @@ Properties represent information about a Node. Edges represent a relationship be
 
 ## Meta Nodes
 
-* `cpp.type.concrete`
+### Nodes
+
+* `cpp.type.class`: An external (likely POD) C/C++ type.
+* `cpp.type.object`: A type using our object helper.
+* `cpp.type.feature|legacy`: A legacy inheritance / virtual function feature.
+* `cpp.func.method`: C++ method for a class.
+* `cpp.func.function`: C/C++ function.
+* `type.abstract`: An abstract type (a symbol).
+* `type.feature`: A description of a set of features a type can have to fulfill this feature.
+* `system.multi-method`: Our implementation of multimethod.
+
+### Properties
+
+* `type-id` An identifier for concrete types.
+* `name` Name of this node (multiple nodes may share a name).
+* `cpp.size`: Size of this type in bytes.
+* `cpp.name`: C++ name for a type
+
+### Edges
+
