@@ -189,6 +189,7 @@ namespace types
 			DefineHelper(DefineHelper const&) = default;
 
 			friend class ::craft::types::CppSystem;
+			template<typename TType> friend class DefineHelper;
 			template<typename TType, typename TFeature> friend class DefineHelper_WithFeature;
 
 			inline static void _build_default_providers()
@@ -245,7 +246,7 @@ namespace types
 			inline void parent()
 			{
 				cpp::static_desc* typeDesc = const_cast<cpp::static_desc*>(cpptype<TParent>::typeDesc().desc);
-				DefineHelper helper(typeDesc, this);
+				DefineHelper<void> helper(typeDesc, (DefineHelper<void>*)this);
 				typeDesc->initer(helper);
 			}
 
@@ -256,10 +257,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				graph().add<GraphPropertyName>(_node, _T::craft_s_typeName());
-				graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
-				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
-				graph().add<GraphPropertyTypeName>(_node, new std::string(_cpp_name_to_type_name(_T::craft_s_typeName())));
+				add<GraphPropertyName>(_T::craft_s_typeName());
+				add<GraphPropertyCppName>(_T::craft_s_typeName());
+				add<GraphPropertyCppSize>(sizeof(_T));
+				add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(_T::craft_s_typeName())));
 
 				if (!system().typeHasFeature<PConstructor>(TypeId(_node))) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
@@ -271,10 +272,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				graph().add<GraphPropertyName>(_node, cpptype<_T>::typeName());
-				graph().add<GraphPropertyCppName>(_node, cpptype<_T>::typeName());
-				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
-				graph().add<GraphPropertyTypeName>(_node, new std::string(_cpp_name_to_type_name(cpptype<_T>::typeName())));
+				add<GraphPropertyName>(cpptype<_T>::typeName());
+				add<GraphPropertyCppName>(cpptype<_T>::typeName());
+				add<GraphPropertyCppSize>(sizeof(_T));
+				add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(cpptype<_T>::typeName())));
 			}
 
 			template<typename _T = TDefine,
@@ -287,9 +288,9 @@ namespace types
 				CppSystem::ensureManager<TDefine>();
 
 				// Add defaults
-				graph().add<GraphPropertyName>(_node, _T::craft_s_featureName());
-				graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
-				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
+				add<GraphPropertyName>(_T::craft_s_featureName());
+				add<GraphPropertyCppName>(_T::craft_s_typeName());
+				add<GraphPropertyCppSize>(sizeof(_T));
 			}
 
 			//

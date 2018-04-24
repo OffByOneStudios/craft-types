@@ -69,7 +69,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED void addOnType(TypeId t_id, instance<> obj);
 
 		template<typename T,
-			typename std::enable_if<cpptype<T>::isObject>::type* = nullptr>
+			typename std::enable_if<cpptype<T>::isObject || cpptype<T>::isLegacyFeature>::type* = nullptr>
 		inline void add(instance<T> obj)
 		{
 			this->addOnType(cpptype<T>::typeDesc(), static_cast<instance<>>(obj));
@@ -79,7 +79,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED void promoteOnType(TypeId t_id, instance<> obj);
 
 		template<typename T,
-			typename std::enable_if<cpptype<T>::isObject>::type* = nullptr>
+			typename std::enable_if<cpptype<T>::isObject || cpptype<T>::isLegacyFeature>::type* = nullptr>
 		inline void promote(instance<T> obj)
 		{
 			this->promoteOnType(cpptype<T>::typeDesc(), static_cast<instance<>>(obj));
@@ -92,7 +92,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED virtual std::shared_ptr<IContextQueryable> byType(TypeId const&) const override;
 		
 		template<typename T,
-			typename std::enable_if<cpptype<T>::isObject>::type* = nullptr>
+			typename std::enable_if<cpptype<T>::isObject || cpptype<T>::isLegacyFeature>::type* = nullptr>
 		inline std::shared_ptr<IContextQueryable> by()
 		{
 			return this->byType(cpptype<T>::typeDesc());

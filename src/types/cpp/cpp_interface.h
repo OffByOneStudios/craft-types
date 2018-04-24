@@ -769,18 +769,21 @@ namespace types
 	::craft::types::cpp::static_desc _CRAFT_PP_CONCAT_0(__id_, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, nullptr, (::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
 	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<x> _)
 
-#define CRAFT_FORWARD_DECLARE(x, kind) \
+#define CRAFT_FORWARD_DECLARE(x, kindv) \
 namespace craft { namespace types { \
 	template <> struct cpptype< x > \
 		: public cpptype<void> \
 	{ \
-		static constexpr bool isObject = kind == cpp::CppStaticDescKindEnum::Object; \
-		static constexpr bool isRawType = kind == cpp::CppStaticDescKindEnum::RawType; \
-		static constexpr bool isLegacyFeature = kind == cpp::CppStaticDescKindEnum::LegacyAspect || TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyProvider; \
-		inline static constexpr cpp::CppStaticDescKindEnum kind() { return kind; } \
-		inline static cpp::TypePtr typeDesc() { return x::craft_s_typeDesc(); } \
+		static constexpr bool isObject = kindv == cpp::CppStaticDescKindEnum::Object; \
+		static constexpr bool isRawType = kindv == cpp::CppStaticDescKindEnum::RawType; \
+		static constexpr bool isLegacyFeature = kindv == cpp::CppStaticDescKindEnum::LegacyAspect || kindv == cpp::CppStaticDescKindEnum::LegacyProvider; \
+		inline static constexpr cpp::CppStaticDescKindEnum kind() { return kindv; } \
+		inline static cpp::TypePtr typeDesc(); \
 	}; \
 }} \
+
+#define CRAFT_FORWARD_DECLARE_COMPLETE(x) \
+inline craft::types::cpp::TypePtr craft::types::cpptype< x >::typeDesc() { return x::craft_s_typeDesc(); }
 
 #define CRAFT_OBJECT_DECLARE(x) \
     static ::craft::types::cpp::static_desc __td; \

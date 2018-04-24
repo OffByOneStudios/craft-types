@@ -132,7 +132,8 @@ namespace types
 				auto& listing = _parent->_listingActual[_parent->_index(id)];
 
 				if (listing.isRaw)
-					return instance<void>(listing.computeRaw(this->tance()), listing.type);
+					// TODO(420)
+					return instance<>(); // instance<void>(listing.computeRaw(this->tance()), listing.type);
 				else
 					return listing.computeInstance(this->tance());
 			}

@@ -85,7 +85,7 @@ namespace types
 
 			inline virtual SContainer::Description container_desc() const override
 			{
-				return SContainer::Description{ _map != nullptr, _vector != nullptr, false, _parent->_hint };
+				return SContainer::Description{ _map != nullptr, _vector != nullptr, false };
 			}
 
 			inline virtual std::vector<std::string> container_keys() const override
