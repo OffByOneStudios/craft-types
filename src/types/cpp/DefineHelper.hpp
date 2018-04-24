@@ -34,6 +34,8 @@ namespace types
 			template<class TSingleton>
 			inline void singleton()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TSingleton();
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -44,6 +46,8 @@ namespace types
 			template<template <typename> class TSingleton>
 			inline void singleton()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TSingleton<TType>();
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -54,6 +58,8 @@ namespace types
 			template<template <typename> class TSingleton, typename... TArgs>
 			inline void singleton(TArgs... args)
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TSingleton<TType>(args...);
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -64,6 +70,8 @@ namespace types
 			template<class TSingleton>
 			inline TSingleton* configureSingleton()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TSingleton();
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -76,6 +84,8 @@ namespace types
 			template<template <typename> class TSingleton>
 			inline TSingleton<TType>* configureSingleton()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TSingleton<TType>();
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -88,6 +98,8 @@ namespace types
 			template<template <typename> class TSingleton, typename... TArgs>
 			inline TSingleton<TType>* configureSingleton(TArgs... args)
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TSingleton<TType>(args...);
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -102,6 +114,8 @@ namespace types
 				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyProvider>::type* = nullptr>
 				inline TConcreate<TType>* byConfiguring()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TConcreate<TType>();
 
 				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
@@ -114,6 +128,8 @@ namespace types
 		public:
 			inline void byCasting()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new CastingAspectFactory<TFeature, TType>();
 
 				system().getManager<TFeature>()->addFactory(_type->_sd, res );
@@ -126,6 +142,8 @@ namespace types
 				typename std::enable_if<std::is_class<_TType>::value>::type* = nullptr>
 			inline void byForwarding(instance<TForwarded> _TType::* mem_ptr)
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new ForwardingAspectFactory<TFeature, _TType, TForwarded>(mem_ptr);
 
 				system().getManager<TFeature>()->addFactory(_type->_sd, res);
@@ -138,6 +156,8 @@ namespace types
 				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyAspect>::type* = nullptr>
 			inline TConcreate<TType>* byConfiguring()
 			{
+				if (_type->_parent != nullptr) throw stdext::exception("adding features with parents not supported");
+
 				auto res = new TConcreate<TType>();
 
 				system().getManager<TFeature>()->addFactory(_type->_sd, res);
@@ -221,10 +241,12 @@ namespace types
 			//	_types._initers[type<TParent>::typeId()](reinterpret_cast<ObjectDefineHelper<void>&>(ObjectDefineHelper(_types, this)));
 			//}
 			template<class TParent,
-				typename std::enable_if< !(cpptype<TParent>::isObject) >::type* = nullptr>
+				typename std::enable_if<cpptype<TParent>::isObject || cpptype<TParent>::isRawType>::type* = nullptr>
 			inline void parent()
 			{
-				TParent::template __craft_s_types_init<TDefine>(DefineHelper(this));
+				cpp::static_desc* typeDesc = const_cast<cpp::static_desc*>(cpptype<TParent>::typeDesc().desc);
+				DefineHelper helper(typeDesc, this);
+				typeDesc->initer(helper);
 			}
 
 			template<typename _T = TDefine,
@@ -252,6 +274,7 @@ namespace types
 				graph().add<GraphPropertyName>(_node, cpptype<_T>::typeName());
 				graph().add<GraphPropertyCppName>(_node, cpptype<_T>::typeName());
 				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
+				graph().add<GraphPropertyTypeName>(_node, new std::string(_cpp_name_to_type_name(cpptype<_T>::typeName())));
 			}
 
 			template<typename _T = TDefine,

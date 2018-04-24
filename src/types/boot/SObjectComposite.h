@@ -190,7 +190,7 @@ namespace types
 
 		inline ObjectCompositer* withOffsetDynamic(std::string name, size_t offset)
 		{
-			registerWith(name, offset, 0);
+			registerWith(name, offset, nullptr);
 			return this;
 		}
 
