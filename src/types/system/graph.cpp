@@ -140,7 +140,7 @@ std::string Graph::dumpNode(Node* n)
 		ss << "\t" << interface->name;
 		auto printer = getFirstPropValue<GraphPropertyPrinter>(p->label);
 		if (printer != nullptr)
-			ss << "\t" << printer(p->value);
+			ss << "\t" << printer(p);
 		ss << std::endl;
 	}
 
@@ -152,7 +152,7 @@ std::string Graph::dumpNode(Node* n)
 		ss << "\t" << interface->name;
 		auto printer = getFirstPropValue<GraphPropertyPrinter>(e->label);
 		if (printer != nullptr)
-			ss << "\t" << printer(e->value);
+			ss << "\t" << printer(e);
 		ss << std::endl;
 
 		for (auto n : e->between)
@@ -160,7 +160,7 @@ std::string Graph::dumpNode(Node* n)
 			ss << "\t\t" << n->getInterface()->name;
 			auto printer = getFirstPropValue<GraphPropertyPrinter>(n->label);
 			if (printer != nullptr)
-				ss << "\t" << printer(n->value);
+				ss << "\t" << printer(n);
 			else if (hasProp<GraphPropertyName>(n))
 				ss << "\t" << getFirstPropValue<GraphPropertyName>(n);
 			ss << std::endl;

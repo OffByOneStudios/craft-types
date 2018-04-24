@@ -160,7 +160,10 @@ namespace types
 			DefineHelper(static_desc* sd, DefineHelper* parent = nullptr)
 				: _sd(sd), _parent(parent)
 			{
-				_node = graph().getNodeByValue(sd);
+				if (_parent != nullptr)
+					_node = _parent->_node;
+				else
+					_node = graph().getNodeByValue(sd);
 			}
 
 			DefineHelper(DefineHelper const&) = default;
@@ -189,6 +192,23 @@ namespace types
 				graph().add<TGraphMeta>(_node, value);
 			}
 
+		protected:
+			inline std::string _cpp_name_to_type_name(std::string const& s)
+			{
+				std::string result;
+
+				if (s.find("::") == std::string::npos)
+					return "." + s;
+
+				std::vector<std::string> _parts;
+				stdext::split(s, "::", std::back_inserter(_parts));
+				auto end = std::remove_if(_parts.begin(), _parts.end(), [](std::string i) {
+					return i.size() == 0;
+				});
+
+				return stdext::join('.', _parts.begin(), end);
+			}
+
 			//
 			// Types
 			//
@@ -202,9 +222,9 @@ namespace types
 			//}
 			template<class TParent,
 				typename std::enable_if< !(cpptype<TParent>::isObject) >::type* = nullptr>
-				inline void parent()
+			inline void parent()
 			{
-				TParent::template __craft_s_types_init<TDefine>(TypeDefineHelper(this));
+				TParent::template __craft_s_types_init<TDefine>(DefineHelper(this));
 			}
 
 			template<typename _T = TDefine,
@@ -217,6 +237,7 @@ namespace types
 				graph().add<GraphPropertyName>(_node, _T::craft_s_typeName());
 				graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
 				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
+				graph().add<GraphPropertyTypeName>(_node, new std::string(_cpp_name_to_type_name(_T::craft_s_typeName())));
 
 				if (!system().typeHasFeature<PConstructor>(TypeId(_node))) use<PConstructor>().template singleton<DefaultConstructor>();
 			}

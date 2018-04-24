@@ -73,7 +73,8 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 
 	_.add_method([](ExpressionArrow* left, ExpressionArrow* right) -> uintptr_t
 	{
-		return isSubtype(left->input, right->input) && isSubtype(left->output, right->output);
+		return isSubtype(left->input, right->input) // co variant
+			&& isSubtype(right->output, left->output); // conta variant
 	});
 
 	_.add_method([](void* left, void* right) -> uintptr_t { return false; });

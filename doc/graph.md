@@ -28,8 +28,10 @@ Properties represent information about a Node. Edges represent a relationship be
 
 ### Properties
 
-* `type-id` An identifier for concrete types.
+* `type.id` An integer index for concrete types for performance.
+* `type.name` A canonical public name for concrete types.
 * `name` Name of this node (multiple nodes may share a name).
+* `meta.index` Property for property meta nodes to store their index in.
 * `cpp.size`: Size of this type in bytes.
 * `cpp.name`: C++ name for a type
 
