@@ -78,7 +78,7 @@ namespace types
 			Singular = 0,
 			Ordered = 1,
 			Set = 3,
-			Index = 4,
+			Index = (1 << 2),
 		};
 
 	public:
@@ -86,7 +86,7 @@ namespace types
 
 	public:
 		inline bool isSingular() const { return ((size_t)mode & 3) == 0; }
-		inline bool isIndex() const { return ((size_t)mode & 4) == 1; }
+		inline bool isIndex() const { return ((size_t)mode & (1 << 2)) != 0; }
 
 	public:
 		static inline GraphPropMeta* Singular(char const* name)
@@ -107,8 +107,29 @@ namespace types
 	struct GraphEdgeMeta : GraphMeta
 	{
 	public:
+		enum class Mode : size_t
+		{
+			Generic = 0,
+			Directional = 1 << 0,
+			Common = 1 << 1, // An optimization that says this is a common edge, and hence should be sorted lower
+		};
 
 	public:
+		Mode mode;
+
+	public:
+		inline bool isDirectional() const { return ((size_t)mode & (1 << 0)) != 0; }
+		inline bool isCommon() const { return ((size_t)mode & (1 << 1)) != 0; }
+
+	public:
+		static inline GraphEdgeMeta* Directional(char const* name)
+		{
+			GraphEdgeMeta* ret = new GraphEdgeMeta();
+			ret->kind = Kind::Edge;
+			ret->name = name;
+			ret->mode = Mode::Directional;
+			return ret;
+		}
 	};
 
 	/******************************************************************************
@@ -207,6 +228,7 @@ namespace types
 
 		CRAFT_TYPES_EXPORTED Node* getNodeByValue(void* value);
 		CRAFT_TYPES_EXPORTED Prop* getProp(Node* on_node, Node* prop_label);
+		CRAFT_TYPES_EXPORTED Edge* getEdgeDirectionalTo(Node* on_node, Node* edge_label, Node* to_node);
 
 		CRAFT_TYPES_EXPORTED std::string dumpNode(Node*);
 
@@ -245,6 +267,15 @@ namespace types
 				func(*this, &*it);
 			}
 		}
+
+		template<typename TFunc>
+		inline void forEachEdgeOnNode(Node* on_node, TFunc const& func)
+		{
+			for (auto it = on_node->edges.begin(); it != on_node->edges.end(); ++it)
+			{
+				func(*this, &*it);
+			}
+		}
 	};
 
 	/******************************************************************************
@@ -268,27 +299,6 @@ namespace types
 	};
 
 	/******************************************************************************
-	** GraphTypeAbstract
-	******************************************************************************/
-
-	struct GraphNodeTypeAbstract final
-	{
-		// is a   `GraphNodeTypeAbstract*`
-		typedef GraphNodeTypeAbstract* value_type;
-	public:
-		char const* abstract_name;
-	private:
-		GraphNodeTypeAbstract() = delete;
-	public:
-		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
-		static constexpr char const* craftTypes_metaNode_name = "type.abstract";
-		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
-		{
-			return GraphNodeMeta::Named(craftTypes_metaNode_name);
-		}
-	};
-
-	/******************************************************************************
 	** GraphPropertyName
 	******************************************************************************/
 
@@ -306,6 +316,46 @@ namespace types
 			graph().add<GraphPropertyPrinter>(metanode,
 				[](void* v) -> std::string { return (value_type)v; });
 			return GraphPropMeta::Singular(craftTypes_metaProp_name);
+		}
+	};
+
+	/******************************************************************************
+	** GraphNodeTypeAbstract
+	******************************************************************************/
+
+	struct GraphNodeTypeAbstract final
+	{
+		// is a   `GraphNodeTypeAbstract*`
+		typedef GraphNodeTypeAbstract* value_type;
+	public:
+		char const* abstract_name;
+	private:
+		GraphNodeTypeAbstract() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
+		static constexpr char const* craftTypes_metaNode_name = "abstract";
+		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
+	};
+
+	/******************************************************************************
+	** GraphEdgeIsA
+	******************************************************************************/
+
+	struct GraphEdgeIsA final
+	{
+		// is nothing
+		typedef void* value_type;
+	private:
+		GraphEdgeIsA() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Edge; // needed?
+		static constexpr char const* craftTypes_metaEdge_name = "is-a";
+		static GraphEdgeMeta* craftTypes_metaEdge_builder(Graph::Node* metanode)
+		{
+			return GraphEdgeMeta::Directional(craftTypes_metaEdge_name);
 		}
 	};
 }}

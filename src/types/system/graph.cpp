@@ -103,6 +103,13 @@ Graph::Prop* Graph::getProp(Node* on_node, Node* prop_label)
 			return p;
 	return nullptr;
 }
+Graph::Edge* Graph::getEdgeDirectionalTo(Node* on_node, Node* edge_label, Node* to_node)
+{
+	for (auto e : on_node->edges)
+		if (e->label == edge_label && e->between[1] == to_node)
+			return e;
+	return nullptr;
+}
 
 std::string Graph::dumpNode(Node* n)
 {
@@ -154,6 +161,8 @@ std::string Graph::dumpNode(Node* n)
 			auto printer = getFirstPropValue<GraphPropertyPrinter>(n->label);
 			if (printer != nullptr)
 				ss << "\t" << printer(n->value);
+			else if (hasProp<GraphPropertyName>(n))
+				ss << "\t" << getFirstPropValue<GraphPropertyName>(n);
 			ss << std::endl;
 		}
 	}

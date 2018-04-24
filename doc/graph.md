@@ -16,14 +16,15 @@ Properties represent information about a Node. Edges represent a relationship be
 
 ### Nodes
 
-* `cpp.type.class`: An external (likely POD) C/C++ type.
-* `cpp.type.object`: A type using our object helper.
-* `cpp.type.feature|legacy`: A legacy inheritance / virtual function feature.
-* `cpp.func.method`: C++ method for a class.
-* `cpp.func.function`: C/C++ function.
-* `type.abstract`: An abstract type (a symbol).
-* `type.feature`: A description of a set of features a type can have to fulfill this feature.
-* `system.multi-method`: Our implementation of multimethod.
+* `cpp.class`: An external (likely POD) C/C++ type.
+* `cpp.object`: A type using our object helper.
+* `cpp.feature|legacy`: A legacy inheritance / virtual function feature.
+* `cpp.method`: C++ method for a class.
+* `cpp.function`: C/C++ function.
+* `cpp.multi-method`: C++ static multi-method.
+* `abstract`: An abstract type (a symbol).
+* `feature`: A description of a set of features a type can have to fulfill this feature.
+* `multi-method`: Our implementation of multimethod.
 
 ### Properties
 
@@ -34,3 +35,7 @@ Properties represent information about a Node. Edges represent a relationship be
 
 ### Edges
 
+- `is-a` An edge representing the `is-a` relationship:
+  This edge has no value. This is the edge used by the `is-subtype` checker. Types which satisfy features have these, abstract tags use these. This is a directional relationship, the first type *is* the second type.
+- `cpp.implements|legacy` An edge representing a legacy feature implementation.
+  The value of this edge is the implementation object (factory or singleton). This is the edge used by the `getFeature` and `hasFeature` runtime checks.

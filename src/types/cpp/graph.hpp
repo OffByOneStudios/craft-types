@@ -39,7 +39,7 @@ namespace types
 		GraphNodeCppClass() = delete;
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
-		static constexpr char const* craftTypes_metaNode_name = "cpp.type.class";
+		static constexpr char const* craftTypes_metaNode_name = "cpp.class";
 		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
 		{
 			return GraphNodeMeta::Named(craftTypes_metaNode_name);
@@ -54,7 +54,7 @@ namespace types
 		GraphNodeCppObject() = delete;
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
-		static constexpr char const* craftTypes_metaNode_name = "cpp.type.object";
+		static constexpr char const* craftTypes_metaNode_name = "cpp.object";
 		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
 		{
 			return GraphNodeMeta::Named(craftTypes_metaNode_name);
@@ -69,7 +69,7 @@ namespace types
 		GraphNodeCppFeatureLegacy() = delete;
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
-		static constexpr char const* craftTypes_metaNode_name = "cpp.type.feature|legacy";
+		static constexpr char const* craftTypes_metaNode_name = "cpp.feature|legacy";
 		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
 		{
 			return GraphNodeMeta::Named(craftTypes_metaNode_name);
@@ -84,7 +84,7 @@ namespace types
 		GraphNodeCppFunction() = delete;
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
-		static constexpr char const* craftTypes_metaNode_name = "cpp.type.function";
+		static constexpr char const* craftTypes_metaNode_name = "cpp.function";
 		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
 		{
 			return GraphNodeMeta::Named(craftTypes_metaNode_name);
@@ -99,7 +99,7 @@ namespace types
 		GraphNodeCppMethod() = delete;
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
-		static constexpr char const* craftTypes_metaNode_name = "cpp.type.method";
+		static constexpr char const* craftTypes_metaNode_name = "cpp.method";
 		static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
 		{
 			return GraphNodeMeta::Named(craftTypes_metaNode_name);
@@ -155,6 +155,25 @@ namespace types
 			graph().add<GraphPropertyPrinter>(metanode,
 				[](void* v) -> std::string { return (value_type)v; });
 			return GraphPropMeta::Singular(craftTypes_metaProp_name);
+		}
+	};
+
+	/******************************************************************************
+	** cpp - GraphEdges
+	******************************************************************************/
+
+	struct GraphEdgeImplements final
+	{
+		// is itself
+		typedef void* value_type;
+	private:
+		GraphEdgeImplements() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Edge; // needed?
+		static constexpr char const* craftTypes_metaEdge_name = "cpp.implements|legacy";
+		static GraphEdgeMeta* craftTypes_metaEdge_builder(Graph::Node* metanode)
+		{
+			return GraphEdgeMeta::Directional(craftTypes_metaEdge_name);
 		}
 	};
 }}

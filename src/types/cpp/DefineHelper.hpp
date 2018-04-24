@@ -14,8 +14,14 @@ namespace types
 		class DefineHelper_WithFeature
 		{
 		private:
-			DefineHelper_WithFeature()
-			{ }
+			DefineHelper<TType>* _type;
+			Graph::Node* _node;
+
+			DefineHelper_WithFeature(DefineHelper<TType>* type)
+			{
+				_type = type;
+				_node = graph().getNodeByValue((void*)cpptype<TFeature>::typeDesc().desc);
+			}
 
 			DefineHelper_WithFeature(DefineHelper_WithFeature const&) = default;
 
@@ -28,38 +34,42 @@ namespace types
 			template<class TSingleton>
 			inline void singleton()
 			{
-				system().getManager<TFeature>()->addSingleton(
-					cpptype<TType>::typeDesc(),
-					new TSingleton()
-				);
+				auto res = new TSingleton();
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
 			}
 
 			template<template <typename> class TSingleton>
 			inline void singleton()
 			{
-				system().getManager<TFeature>()->addSingleton(
-					cpptype<TType>::typeDesc(),
-					new TSingleton<TType>()
-				);
+				auto res = new TSingleton<TType>();
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
 			}
 
 			template<template <typename> class TSingleton, typename... TArgs>
 			inline void singleton(TArgs... args)
 			{
-				system().getManager<TFeature>()->addSingleton(
-					cpptype<TType>::typeDesc(),
-					new TSingleton<TType>(args...)
-				);
+				auto res = new TSingleton<TType>(args...);
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
 			}
 
 			template<class TSingleton>
 			inline TSingleton* configureSingleton()
 			{
 				auto res = new TSingleton();
-				system().getManager<TFeature>()->addSingleton(
-					cpptype<TType>::typeDesc(),
-					res
-				);
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
 				return res;
 			}
 
@@ -67,10 +77,11 @@ namespace types
 			inline TSingleton<TType>* configureSingleton()
 			{
 				auto res = new TSingleton<TType>();
-				system().getManager<TFeature>()->addSingleton(
-					cpptype<TType>::typeDesc(),
-					res
-				);
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
 				return res;
 			}
 
@@ -78,19 +89,36 @@ namespace types
 			inline TSingleton<TType>* configureSingleton(TArgs... args)
 			{
 				auto res = new TSingleton<TType>(args...);
-				system().getManager<TFeature>()->addSingleton(
-					cpptype<TType>::typeDesc(),
-					res
-				);
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
 				return res;
 			}
 
+			template<template <typename> class TConcreate,
+				typename _T = TFeature,
+				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyProvider>::type* = nullptr>
+				inline TConcreate<TType>* byConfiguring()
+			{
+				auto res = new TConcreate<TType>();
+
+				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
+				return res;
+			}
+
+		public:
 			inline void byCasting()
 			{
-				system().getManager<TFeature>()->addFactory(
-					cpptype<TType>::typeDesc(),
-					new CastingAspectFactory<TFeature, TType>()
-				);
+				auto res = new CastingAspectFactory<TFeature, TType>();
+
+				system().getManager<TFeature>()->addFactory(_type->_sd, res );
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
 			}
 
 			template<typename TForwarded,
@@ -98,22 +126,11 @@ namespace types
 				typename std::enable_if<std::is_class<_TType>::value>::type* = nullptr>
 			inline void byForwarding(instance<TForwarded> _TType::* mem_ptr)
 			{
-				system().getManager<TFeature>()->addFactory(
-					cpptype<_TType>::typeDesc(),
-					new ForwardingAspectFactory<TFeature, _TType, TForwarded>(mem_ptr)
-				);
-			}
+				auto res = new ForwardingAspectFactory<TFeature, _TType, TForwarded>(mem_ptr);
 
-		public:
-
-			template<template <typename> class TConcreate,
-				typename _T = TFeature,
-				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyProvider>::type* = nullptr>
-				inline TConcreate<TType>* byConfiguring()
-			{
-				auto tc = new TConcreate<TType>();
-				system().getManager<TFeature>()->addSingleton(cpptype<TType>::typeDesc(), tc);
-				return tc;
+				system().getManager<TFeature>()->addFactory(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
 			}
 
 			template<template <typename> class TConcreate,
@@ -121,9 +138,13 @@ namespace types
 				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyAspect>::type* = nullptr>
 			inline TConcreate<TType>* byConfiguring()
 			{
-				auto tc = new TConcreate<TType>();
-				system().getManager<TFeature>()->addFactory(cpptype<TType>::typeDesc(), tc);
-				return tc;
+				auto res = new TConcreate<TType>();
+
+				system().getManager<TFeature>()->addFactory(_type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
+				return res;
 			}
 		};
 
@@ -145,6 +166,7 @@ namespace types
 			DefineHelper(DefineHelper const&) = default;
 
 			friend class ::craft::types::CppSystem;
+			template<typename TType, typename TFeature> friend class DefineHelper_WithFeature;
 
 			inline static void _build_default_providers()
 			{
@@ -157,7 +179,7 @@ namespace types
 				use ()
 			{
 				CppSystem::ensureManager<TInterface>();
-				return DefineHelper_WithFeature<TDefine, TInterface>();
+				return DefineHelper_WithFeature<TDefine, TInterface>(this);
 			}
 
 			template<typename TGraphMeta
@@ -192,8 +214,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				if (!graph().hasProp<GraphPropertyName>(_node)) graph().add<GraphPropertyName>(_node, _T::craft_s_typeName());
-				if (!graph().hasProp<GraphPropertyCppName>(_node)) graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
+				graph().add<GraphPropertyName>(_node, _T::craft_s_typeName());
+				graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
+				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
+
 				if (!system().typeHasFeature<PConstructor>(TypeId(_node))) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
 
@@ -204,8 +228,9 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				if (!graph().hasProp<GraphPropertyName>(_node)) graph().add<GraphPropertyName>(_node, cpptype<_T>::typeName());
-				if (!graph().hasProp<GraphPropertyCppName>(_node)) graph().add<GraphPropertyCppName>(_node, cpptype<_T>::typeName());
+				graph().add<GraphPropertyName>(_node, cpptype<_T>::typeName());
+				graph().add<GraphPropertyCppName>(_node, cpptype<_T>::typeName());
+				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
 			}
 
 			template<typename _T = TDefine,
@@ -218,8 +243,9 @@ namespace types
 				CppSystem::ensureManager<TDefine>();
 
 				// Add defaults
-				if (!graph().hasProp<GraphPropertyName>(_node)) graph().add<GraphPropertyName>(_node, _T::craft_s_featureName());
-				if (!graph().hasProp<GraphPropertyCppName>(_node)) graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
+				graph().add<GraphPropertyName>(_node, _T::craft_s_featureName());
+				graph().add<GraphPropertyCppName>(_node, _T::craft_s_typeName());
+				graph().add<GraphPropertyCppSize>(_node, sizeof(_T));
 			}
 
 			//

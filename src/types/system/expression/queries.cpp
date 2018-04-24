@@ -19,12 +19,7 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 
 	_.add_method([](ExpressionConcrete* left, ExpressionConcrete* right) -> uintptr_t
 	{
-		if (left->node == right->node)
-			return true;
-
-		// Type System
-
-		return false;
+		return isSubtype(left->node, right->node);
 	});
 
 	_.add_method([](ExpressionTuple* left, ExpressionTuple* right) -> uintptr_t
@@ -82,6 +77,14 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 	});
 
 	_.add_method([](void* left, void* right) -> uintptr_t { return false; });
+}
+
+bool craft::types::isSubtype(Graph::Node* left, Graph::Node* right)
+{
+	if (left == right)
+		return true;
+
+	return graph().getEdgeDirectionalTo(left, graph().meta<GraphEdgeIsA>(), right) != nullptr;
 }
 
 bool craft::types::isSubtype(IExpression const* left, IExpression const* right)
