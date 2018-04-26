@@ -20,27 +20,30 @@ namespace types
 	{
 		TypeId typeId;
 		void* actual;
-		uintptr_t gcInfo;
+		uintptr_t memInfo;
+		void* memManager;
 		// value goes here std::byte[sizeof(T)] see gh#17
 		
-		InstanceHeader(TypeId tid, void* actual, void* gcInfo = nullptr)
+		InstanceHeader(TypeId tid, void* actual, uintptr_t memInfo = 0, void* memManager = nullptr)
 			: typeId(tid)
 			, actual(actual)
-			, gcInfo((uintptr_t)gcInfo)
+			, memInfo(memInfo)
+			, memManager(memManager)
 		{
 
 		}
 
 		static inline InstanceHeader* safe_inc(InstanceHeader* this_)
 		{
-			if (this_ != nullptr)
-				this_->gcInfo++;
+			if (this_ != nullptr && this_->memManager == nullptr)
+				this_->memInfo++;
 			return this_;
 		}
-		static inline void safe_dec(InstanceHeader* this_)
+		static inline bool safe_dec(InstanceHeader* this_)
 		{
-			if (this_ != nullptr)
-				this_->gcInfo--;
+			if (this_ != nullptr && this_->memManager == nullptr)
+				return 0 == --(this_->memInfo);
+			return false;
 		}
 	};
 
@@ -112,18 +115,44 @@ namespace types
 			, _actual(nullptr)
 		{ }
 
-		// Other features:
+	//
+	// Core features:
+	//
+	public:
 		inline TypeId typeId() const { return _meta == nullptr ? None : _meta->typeId; }
 
-		inline operator bool() const { return !isNull(); }
+		inline bool isNull() const
+		{
+			return _meta == nullptr || _meta->actual == nullptr;
+		}
 
 		inline void* get() const { return _meta == nullptr ? nullptr : _meta->actual; }
 
+		inline operator bool() const { return !isNull(); }
+
+	//
+	// Pointer features:
+	//
+	public:
 		// Warning, this returns the internal pointer of the instance.
 		// You loose all memory management!
 		inline void* asInternalPointer() const { return _meta; }
+
+		// Don't forget to decref if you asked for an incref
 		static inline instance<void> fromInternalPointer(void* ptr) { return instance<void>((InstanceHeader*)ptr); }
 
+		// Memory leaks are bad, make sure to decref
+		inline void incref() { InstanceHeader::safe_inc(_meta); }
+
+		inline void decref() { InstanceHeader::safe_dec(_meta); }
+
+		// DO NOT RELY ON THIS, for diagnostic information ONLY
+		inline uintptr_t refCount() const { return _meta->memInfo; }
+
+	//
+	// Other Features
+	//
+	public:
 		template<typename T>
 		inline instance<T> asType() const
 		{
@@ -138,11 +167,6 @@ namespace types
 		inline instance<T> asFeature() const
 		{
 			return instance<T>(_meta);
-		}
-
-		inline bool isNull() const
-		{
-			return _meta == nullptr || _meta->actual == nullptr;
 		}
 
 		inline bool isType(TypeId id) const

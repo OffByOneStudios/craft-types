@@ -258,6 +258,25 @@ namespace types
 		inline explicit operator bool () const { return !isNull(); }
 
 	//
+	// Pointer features:
+	//
+	public:
+		// Warning, this returns the internal pointer of the instance.
+		// You loose all memory management!
+		inline void* asInternalPointer() const { return _meta; }
+
+		// Don't forget to decref if you asked for an incref
+		static inline instance<T> fromInternalPointer(void* ptr) { return instance<T>((InstanceHeader*)ptr); }
+
+		// Memory leaks are bad, make sure to decref
+		inline void incref() { InstanceHeader::safe_inc(_meta); }
+
+		inline void decref() { InstanceHeader::safe_dec(_meta); }
+
+		// DO NOT RELY ON THIS, for diagnostic information ONLY
+		inline uintptr_t refCount() const { _meta->memInfo; }
+
+	//
 	// Stringing
 	//
 	public:
