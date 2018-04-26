@@ -197,22 +197,6 @@ namespace types
 				CppSystem::ensureManager<PConstructor>();
 			}
 
-		public:
-			template<typename TInterface>
-			inline DefineHelper_WithFeature<TDefine, TInterface>
-				use ()
-			{
-				CppSystem::ensureManager<TInterface>();
-				return DefineHelper_WithFeature<TDefine, TInterface>(this);
-			}
-
-			template<typename TGraphMeta
-				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
-			void inline add(typename TGraphMeta::value_type value)
-			{
-				graph().add<TGraphMeta>(_node, value);
-			}
-
 		protected:
 			inline std::string _cpp_name_to_type_name(std::string const& s)
 			{
@@ -228,6 +212,46 @@ namespace types
 				});
 
 				return stdext::join('.', _parts.begin(), end);
+			}
+
+			//
+			// Graph
+			//
+		public:
+
+			template<typename TGraphMeta
+				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
+			void inline add(typename TGraphMeta::value_type value)
+			{
+				graph().add<TGraphMeta>(_node, value);
+			}
+
+			template<typename TGraphMeta
+				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
+			bool inline has()
+			{
+				return graph().hasProp<TGraphMeta>(_node);
+			}
+
+			//
+			// Identifiers
+			//
+		public:
+
+			void inline identify_asEffectiveCppName(char const* c)
+			{
+				add<GraphPropertyName>(c);
+				add<GraphPropertyCppName>(c);
+				// TODO if constexpr (!isLegacyFeature)
+				add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(c)));
+			}
+
+			void inline identify_verbose(char const* c_name, char const* c_type_name = nullptr, char const* c_cpp_name = nullptr)
+			{
+				add<GraphPropertyName>(c_name);
+				add<GraphPropertyCppName>(c_cpp_name);
+				// TODO if constexpr (!isLegacyFeature)
+				add<GraphPropertyTypeName>(new std::string(c_type_name));
 			}
 
 			//
@@ -250,6 +274,13 @@ namespace types
 				typeDesc->initer(helper);
 			}
 
+			template<typename TInterface>
+			inline DefineHelper_WithFeature<TDefine, TInterface> use()
+			{
+				CppSystem::ensureManager<TInterface>();
+				return DefineHelper_WithFeature<TDefine, TInterface>(this);
+			}
+
 			template<typename _T = TDefine,
 				typename std::enable_if<cpptype<_T>::isObject>::type* = nullptr>
 			inline void defaults()
@@ -257,10 +288,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				add<GraphPropertyName>(_T::craft_s_typeName());
-				add<GraphPropertyCppName>(_T::craft_s_typeName());
-				add<GraphPropertyCppSize>(sizeof(_T));
-				add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(_T::craft_s_typeName())));
+				if (!has<GraphPropertyName>()) add<GraphPropertyName>(_T::craft_s_typeName());
+				if (!has<GraphPropertyCppName>()) add<GraphPropertyCppName>(_T::craft_s_typeName());
+				if (!has<GraphPropertyCppSize>()) add<GraphPropertyCppSize>(sizeof(_T));
+				if (!has<GraphPropertyTypeName>()) add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(_T::craft_s_typeName())));
 
 				if (!system().typeHasFeature<PConstructor>(TypeId(_node))) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
@@ -272,10 +303,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				add<GraphPropertyName>(cpptype<_T>::typeName());
-				add<GraphPropertyCppName>(cpptype<_T>::typeName());
-				add<GraphPropertyCppSize>(sizeof(_T));
-				add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(cpptype<_T>::typeName())));
+				if (!has<GraphPropertyName>()) add<GraphPropertyName>(cpptype<_T>::typeName());
+				if (!has<GraphPropertyCppName>()) add<GraphPropertyCppName>(cpptype<_T>::typeName());
+				if (!has<GraphPropertyCppSize>()) add<GraphPropertyCppSize>(sizeof(_T));
+				if (!has<GraphPropertyTypeName>()) add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(cpptype<_T>::typeName())));
 			}
 
 			template<typename _T = TDefine,
@@ -288,9 +319,9 @@ namespace types
 				CppSystem::ensureManager<TDefine>();
 
 				// Add defaults
-				add<GraphPropertyName>(_T::craft_s_featureName());
-				add<GraphPropertyCppName>(_T::craft_s_typeName());
-				add<GraphPropertyCppSize>(sizeof(_T));
+				if (!has<GraphPropertyName>()) add<GraphPropertyName>(_T::craft_s_featureName());
+				if (!has<GraphPropertyCppName>()) add<GraphPropertyCppName>(_T::craft_s_typeName());
+				if (!has<GraphPropertyCppSize>()) add<GraphPropertyCppSize>(sizeof(_T));
 			}
 
 			//
