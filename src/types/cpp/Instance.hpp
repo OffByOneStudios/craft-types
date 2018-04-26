@@ -41,10 +41,11 @@ namespace types
 	template<typename T>
 	struct instance<T>
 	{
-	/* Data section, 2 pointers wide. */
+
+		/* Data section, 2 pointers wide. */
 	private:
-		mutable T*					_actual;
 		mutable InstanceHeader*		_meta;
+		mutable T*                  _actual; // Actual should always be assumed null
 
 		template<typename TOther, typename T_> friend struct instance;
 
@@ -62,8 +63,8 @@ namespace types
 	public:
 		// Rule of 5 plus default constructor
 		inline instance()
-			: _actual(nullptr)
-			, _meta(nullptr)
+			: _meta(nullptr)
+			, _actual(nullptr)
 		{ }
 
 		inline ~instance()
@@ -72,74 +73,64 @@ namespace types
 		}
 
 		inline instance(instance<T> const& inst)
-			: _actual(inst._actual)
-			, _meta(InstanceHeader::safe_inc(inst._meta))
+			: _meta(InstanceHeader::safe_inc(inst._meta))
+			, _actual(nullptr)
 		{ }
 
 		inline instance(instance<T> && inst)
-			: _actual(nullptr)
-			, _meta(nullptr)
+			: _meta(nullptr)
+			, _actual(nullptr)
 		{
-			std::swap(_actual, inst._actual);
 			std::swap(_meta, inst._meta);
 		}
 
 		inline instance<T>& operator=(instance<T> const& _that)
 		{
-			_actual = _that._actual;
 			InstanceHeader::safe_dec(_meta);
 			_meta = InstanceHeader::safe_inc(_that._meta);
+			_actual = nullptr;
 			return *this;
 		}
 
 		inline instance<T>& operator=(instance<T> && _that)
 		{
-			std::swap(_actual, _that._actual);
 			std::swap(_meta, _that._meta);
+			_actual = nullptr;
 			return *this;
 		}
 
-		// Void instances
-
+		// From generic instance
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
 		inline instance(instance<void> const& inst)
-			: _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
-			, _meta(InstanceHeader::safe_inc(inst._meta))
+			: _meta(InstanceHeader::safe_inc(inst._meta))
+			, _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
 		{
 		}
 
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr>
 		inline instance(instance<void> const& inst)
-			: _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
-			, _meta(InstanceHeader::safe_inc(inst._meta))
+			: _meta(InstanceHeader::safe_inc(inst._meta))
+			, _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
 		{
 		}
 
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
 		inline instance(instance<void> const& inst)
-			: _actual(inst.getFeature<_T>())
-			, _meta(InstanceHeader::safe_inc(inst._meta))
+			: _meta(InstanceHeader::safe_inc(inst._meta))
+			, _actual(inst.getFeature<_T>())
 		{
 		}
 
-		// From pointers:
 
+		// From pointers:
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
 		inline instance(_T* const& ptr)
-			: _actual(ptr)
-			, _meta(InstanceHeader::safe_inc(static_cast<Object*>(ptr)->craft_header))
-		{
-		}
-
-		template<typename _T = T,
-			typename std::enable_if< cpptype<_T>::kind == CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
-			inline instance(_T* const& ptr)
-			: _actual(ptr)
-			, _meta(nullptr)
+			: _meta(InstanceHeader::safe_inc(static_cast<Object*>(ptr)->craft_header))
+			, _actual(ptr)
 		{
 		}
 
@@ -151,8 +142,8 @@ namespace types
                 && (cpptype<TObject>::isObject || cpptype<TObject>::isRawType)
 			>::type* = nullptr >
 		inline instance(instance<TObject> const& inst)
-			: _actual(inst.template getFeature<_T>())
-			, _meta(InstanceHeader::safe_inc(inst._meta))
+			: _meta(InstanceHeader::safe_inc(inst._meta))
+			, _actual(inst.template getFeature<_T>())
 		{
 		}
 
@@ -167,23 +158,6 @@ namespace types
 			InstanceHeader::safe_dec(_meta);
 			_meta = InstanceHeader::safe_inc(_that._meta);
 			return *this;
-		}
-
-		template<typename TType,
-			typename _T = T,
-			typename std::enable_if< cpptype<_T>::kind == CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
-		static inline instance<_T> forType()
-		{
-			return forType(cpptype<TType>::typeDesc());
-		}
-
-		template<typename _T = T,
-			typename std::enable_if< cpptype<_T>::kind == CppStaticDescKindEnum::LegacyProvider >::type* = nullptr>
-			static inline instance<_T> forType(TypeId type)
-		{
-			auto actual = type.getFeature<_T>();
-
-			return instance<_T>(actual);
 		}
 
 		template<typename _T = T,
@@ -236,29 +210,39 @@ namespace types
 			return _meta->typeId;
 		}
 
-		inline T* get() { return _actual; }
-		inline T const* get() const { return _actual; }
-
-		inline T& value() { return *_actual; }
-		inline T const& value() const { return *_actual; }
-
 		template<typename _T = T,
-			typename std::enable_if< cpptype<_T>::isObject >::type* = nullptr>
-			inline bool isNull() const
+			typename std::enable_if< cpptype<_T>::isObject || cpptype<_T>::isRawType >::type* = nullptr>
+		inline void ensureActual() const
 		{
-			return _actual == nullptr;
+			if (_actual == nullptr && _meta != nullptr)
+				_actual = (T*)_meta->actual;
 		}
 		template<typename _T = T,
-			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr>
+			typename std::enable_if< cpptype<_T>::isLegacyFeature  >::type* = nullptr>
+		inline void ensureActual() const
+		{
+			if (_actual == nullptr && _meta != nullptr)
+				_actual = getFeature<_T>();
+		}
+
+		inline T* get() { ensureActual(); return _actual; }
+		inline T const* get() const { ensureActual(); return _actual; }
+
+		inline T& value() { ensureActual(); return *_actual; }
+		inline T const& value() const { ensureActual(); return *_actual; }
+
+		template<typename _T = T,
+			typename std::enable_if< cpptype<_T>::isObject || cpptype<_T>::isRawType >::type* = nullptr>
 			inline bool isNull() const
 		{
-			return _actual == nullptr;
+			return _meta == nullptr || _meta->actual == nullptr;
 		}
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isLegacyFeature >::type* = nullptr>
 			inline bool isNull() const
 		{
-			return _meta == nullptr || _meta->actual == nullptr;
+			ensureActual();
+			return _actual == nullptr;
 		}
 	//
 	// Operators
@@ -349,8 +333,9 @@ namespace types
 	template<typename T>
 	inline bool operator==(instance<T> const& _this, instance<T> const& _that)
 	{
-		if (_this._actual == nullptr || _that._actual == nullptr) return _this._actual == _that._actual;
-		return _this._actual == _that._actual;
+		auto thisp = _this.get(); auto thatp = _that.get();
+		if (thisp == nullptr || thatp == nullptr) return thisp == thatp;
+		return thisp == thatp;
 	}
 
 	template<typename T>
@@ -360,16 +345,24 @@ namespace types
 	template<typename T>
 	inline bool operator<(instance<T> const& _this, instance<T> const& _that)
 	{
-		if (_that._actual == nullptr) return false; // thAT or both null
-		if (_this._actual == nullptr) return true;
-		return _this._actual < _that._actual;
+		auto thatp = _that.get();
+		if (thatp == nullptr) return false; // thAT or both null
+
+		auto thisp = _this.get();
+		if (thisp == nullptr) return true;
+
+		return thisp < thatp;
 	}
 	template<typename T>
 	inline bool operator>(instance<T> const& _this, instance<T> const& _that)
 	{
-		if (_this._actual == nullptr) return false; // thIS or both null
-		if (_that._actual == nullptr) return true;
-		return _this._actual > _that._actual;
+		auto thisp = _this.get();
+		if (thisp == nullptr) return false; // thIS or both null
+
+		auto thatp = _that.get();
+		if (thatp == nullptr) return true;
+
+		return thisp > thatp;
 	}
 
 	template<typename T>

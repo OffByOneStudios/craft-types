@@ -21,7 +21,8 @@ namespace types
 		TypeId typeId;
 		void* actual;
 		uintptr_t gcInfo;
-
+		// value goes here std::byte[sizeof(T)] see gh#17
+		
 		InstanceHeader(TypeId tid, void* actual, void* gcInfo = nullptr)
 			: typeId(tid)
 			, actual(actual)
@@ -54,11 +55,13 @@ namespace types
 	template<>
 	struct instance<void>
 	{
+
 		/* Data section, 2 pointers wide. */
 	private:
-		mutable void*               _actual;
 		mutable InstanceHeader*     _meta;
+		mutable void*               _actual;
 
+	private:
 		template<typename T, typename T_> friend struct instance;
 
 		template<typename T> friend bool operator==(instance<T> const&, instance<T> const&);
@@ -71,8 +74,8 @@ namespace types
 	public:
 		// Rule of 5 plus default constructor
 		inline instance()
-			: _actual(nullptr)
-			, _meta(nullptr)
+			: _meta(nullptr)
+			, _actual(nullptr)
 		{ }
 
 		inline ~instance()
@@ -81,36 +84,32 @@ namespace types
 		}
 
 		inline instance(instance<void> const& inst)
-			: _actual(inst._actual)
-			, _meta(InstanceHeader::safe_inc(inst._meta))
+			: _meta(InstanceHeader::safe_inc(inst._meta))
+			, _actual(nullptr)
 		{ }
 
 		inline instance(instance<void> && inst)
-			: _actual(nullptr)
-			, _meta(nullptr)
+			: _meta(nullptr)
+			, _actual(nullptr)
 		{
-			std::swap(_actual, inst._actual);
 			std::swap(_meta, inst._meta);
 		}
 
 		inline instance<void>& operator=(instance<void> const& _that)
 		{
-			_actual = _that._actual;
 			_meta = InstanceHeader::safe_inc(_that._meta);
 			return *this;
 		}
 		inline instance<void>& operator=(instance<void> && _that)
 		{
-			std::swap(_actual, _that._actual);
 			std::swap(_meta, _that._meta);
 			return *this;
 		}
 
 		// Restore constructor
 		inline instance(InstanceHeader* meta)
-			// By supporting nullptr we get nullptr conversion (for a single pointer)
-			: _actual(meta == nullptr ? nullptr : meta->actual)
-			, _meta(InstanceHeader::safe_inc(meta))
+			: _meta(InstanceHeader::safe_inc(meta))
+			, _actual(nullptr)
 		{ }
 
 		// Other features:
@@ -118,7 +117,12 @@ namespace types
 
 		inline operator bool() const { return !isNull(); }
 
-		inline void* get() const { return _actual; }
+		inline void* get() const { return _meta == nullptr ? nullptr : _meta->actual; }
+
+		// Warning, this returns the internal pointer of the instance.
+		// You loose all memory management!
+		inline void* asInternalPointer() const { return _meta; }
+		static inline instance<void> fromInternalPointer(void* ptr) { return instance<void>((InstanceHeader*)ptr); }
 
 		template<typename T>
 		inline instance<T> asType() const
@@ -138,12 +142,7 @@ namespace types
 
 		inline bool isNull() const
 		{
-			return _actual == nullptr;
-		}
-
-		inline bool isFinal() const
-		{
-			return _actual == _meta->actual;
+			return _meta == nullptr || _meta->actual == nullptr;
 		}
 
 		inline bool isType(TypeId id) const

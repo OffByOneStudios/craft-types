@@ -108,5 +108,102 @@ go_bandit([]()
 			describe("empty providers,", std::bind(describe_no_empty_providers<TestBasicObject>, t_inst));
 			describe("empty aspects,", std::bind(describe_no_empty_aspects<TestBasicObject>, t_inst));
 		});
+
+
+		describe("as PParse for std::string,", [&]()
+		{
+			// Test holding a provider
+
+			instance<std::string> sinst;
+
+			before_each([&]() {
+				inst = instance<std::string>::make("test");
+				sinst = instance<std::string>::make("test");
+			});
+
+			it("hasFeature is true", [&]()
+			{
+				AssertThat(inst.hasFeature<types::PParse>(), IsTrue());
+				AssertThat(sinst.hasFeature<types::PParse>(), IsTrue());
+			});
+
+			it("construct provider from void", [&]()
+			{
+				instance<types::PParse> prov(inst);
+				AssertThat(prov.isNull(), IsFalse());
+				AssertThat(prov.get(), Equals(inst.getFeature<types::PParse>()));
+
+				instance<std::string> res = prov->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+			it("assign provider from void", [&]()
+			{
+				instance<types::PParse> prov = inst;
+				AssertThat(prov.isNull(), IsFalse());
+				AssertThat(prov.get(), Equals(inst.getFeature<types::PParse>()));
+
+				instance<std::string> res = prov->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+			it("asFeature provider from void", [&]()
+			{
+				AssertThat(inst.asFeature<types::PParse>().isNull(), IsFalse());
+				AssertThat(inst.asFeature<types::PParse>().get(), Equals(inst.getFeature<types::PParse>()));
+
+				instance<std::string> res = inst.asFeature<types::PParse>()->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+			it("by call cast from void", [&]()
+			{
+				typedef instance<types::PParse>(*fn)(instance<void>);
+				fn c = (fn)(+[](instance<types::PParse> p) { return p; });
+				instance<types::PParse> prov = c(inst);
+
+				AssertThat(prov.isNull(), IsFalse());
+				AssertThat(prov.get(), Equals(inst.getFeature<types::PParse>()));
+
+				instance<std::string> res = prov->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+
+			it("construct provider from concrete", [&]()
+			{
+				instance<types::PParse> prov(sinst);
+				AssertThat(prov.isNull(), IsFalse());
+				AssertThat(prov.get(), Equals(sinst.getFeature<types::PParse>()));
+
+				instance<std::string> res = prov->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+			it("assign provider from concrete", [&]()
+			{
+				instance<types::PParse> prov = sinst;
+				AssertThat(prov.isNull(), IsFalse());
+				AssertThat(prov.get(), Equals(sinst.getFeature<types::PParse>()));
+
+				instance<std::string> res = prov->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+			it("asFeature provider from concrete", [&]()
+			{
+				AssertThat(sinst.asFeature<types::PParse>().isNull(), IsFalse());
+				AssertThat(sinst.asFeature<types::PParse>().get(), Equals(sinst.getFeature<types::PParse>()));
+
+				instance<std::string> res = sinst.asFeature<types::PParse>()->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+			it("by call cast from concrete", [&]()
+			{
+				typedef instance<types::PParse>(*fn)(instance<void>);
+				fn c = (fn)(+[](instance<types::PParse> p) { return p; });
+				instance<types::PParse> prov = c(sinst);
+
+				AssertThat(prov.isNull(), IsFalse());
+				AssertThat(prov.get(), Equals(sinst.getFeature<types::PParse>()));
+
+				instance<std::string> res = prov->parse("test");
+				AssertThat(*res, Equals("test"));
+			});
+		});
 	});
 });
