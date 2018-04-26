@@ -20,7 +20,7 @@ Object::Object()
 
 void Object::craft_setupInstance()
 {
-	craft_header = new InstanceHeader(craft_typeDesc(), craft_instancePointer());
+
 }
 
 Object::~Object()

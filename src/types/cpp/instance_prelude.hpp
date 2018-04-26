@@ -22,9 +22,8 @@ namespace types
 		void* actual;
 		uintptr_t memInfo;
 		void* memManager;
-		// value goes here std::byte[sizeof(T)] see gh#17
 		
-		InstanceHeader(TypeId tid, void* actual, uintptr_t memInfo = 0, void* memManager = nullptr)
+		inline InstanceHeader(TypeId tid, void* actual = nullptr, uintptr_t memInfo = 0, void* memManager = nullptr)
 			: typeId(tid)
 			, actual(actual)
 			, memInfo(memInfo)
@@ -45,6 +44,16 @@ namespace types
 				return 0 == --(this_->memInfo);
 			return false;
 		}
+	};
+
+	template<size_t TSize>
+	struct InstanceHeaderSized
+		: InstanceHeader
+	{
+		unsigned char /*std::byte*/ object[TSize];
+
+		inline InstanceHeaderSized(TypeId tid, void* actual = nullptr, uintptr_t memInfo = 0, void* memManager = nullptr)
+			: InstanceHeader(tid, actual, memInfo, memManager) { }
 	};
 
 	/******************************************************************************

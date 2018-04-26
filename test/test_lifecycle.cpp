@@ -83,8 +83,10 @@ go_bandit([]()
 			it("manual pointers", [&]()
 			{
 				AssertThat(inst.refCount(), Equals(1));
+
 				auto p = inst.asInternalPointer();
 				AssertThat(inst.refCount(), Equals(1));
+
 				auto pinst = instance<>::fromInternalPointer(p);
 				AssertThat(inst.get(), Equals(pinst.get()));
 				AssertThat(inst.refCount(), Equals(2));

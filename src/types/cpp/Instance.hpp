@@ -160,22 +160,34 @@ namespace types
 			return *this;
 		}
 
+	//
+	// make
+	//
+	public:
 		template<typename _T = T,
 			typename std::enable_if< cpptype<_T>::isObject  >::type* = nullptr,
 			typename... TArgs>
 		static inline instance<_T> make(TArgs&&... args)
 		{
-			_T* actual = new _T(std::forward<TArgs>(args)...);
-			actual->craft_setupInstance();
+			auto* header = new InstanceHeaderSized<sizeof(T)>(cpptype<T>::typeDesc().asId());
+			T* v = new (header->object) _T(std::forward<TArgs>(args)...);
+			((Object*)v)->craft_header = header; // TODO, do this before calling new
+			header->actual = v;
+			v->craft_setupInstance();
 
-			return instance<_T>(actual);
+			return instance<_T>(header);
 		}
 
-		template<typename _T = T,
+		template<typename F,
+			typename _T = T,
 			typename std::enable_if< cpptype<_T>::isObject  >::type* = nullptr>
-		static inline instance<_T> makeFromPointer(T* actual)
+		static inline instance<_T> makeThroughLambda(F lambda)
 		{
-			actual->craft_setupInstance();
+			auto* header = new InstanceHeaderSized<sizeof(T)>(cpptype<T>::typeDesc());
+			T* v = lambda(header->object);
+			((Object*)v)->craft_header = header;
+			header->actual = v;
+			v->craft_setupInstance();
 
 			return instance<_T>(actual);
 		}
@@ -185,8 +197,8 @@ namespace types
 			typename... TArgs>
 		static inline instance<_T> make(TArgs&&... args)
 		{
-			_T* actual = new _T(std::forward<TArgs>(args)...);
-			InstanceHeader* header = new InstanceHeader(cpptype<_T>::typeDesc(), actual, 0);
+			auto* header = new InstanceHeaderSized<sizeof(T)>(cpptype<T>::typeDesc());
+			header->actual = new (header->object) _T(std::forward<TArgs>(args)...);
 
 			return instance<_T>(header);
 		}
