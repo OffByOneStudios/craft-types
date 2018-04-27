@@ -17,9 +17,9 @@ std::string instance<void>::toString(instance<void> const& inst, bool verbose)
 	}
 
 	if (verbose)
-		return fmt::format("<instance|pointer|{0}>", stdext::to_hex_string(inst._actual));
+		return fmt::format("<instance|pointer|{0}>", stdext::to_hex_string(inst._meta->actual));
 	else
-		return fmt::format("0x{0}", stdext::to_hex_string(inst._actual));
+		return fmt::format("0x{0}", stdext::to_hex_string(inst._meta->actual));
 }
 
 std::string instance<void>::toString(instance<void> const& inst, TypeId tid, bool verbose)
@@ -42,7 +42,7 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 	else
 	{
 		from = "typeId ptr";
-		name = fmt::format("{0} 0x{1}", tid.toString(false), stdext::to_hex_string(inst._actual));
+		name = fmt::format("{0} 0x{1}", tid.toString(false), stdext::to_hex_string(inst._meta->actual));
 	}
 
 

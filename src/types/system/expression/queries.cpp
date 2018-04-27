@@ -85,6 +85,9 @@ bool craft::types::isSubtype(Graph::Node* left, Graph::Node* right)
 	if (left == right)
 		return true;
 
+	if (left == nullptr || right == nullptr)
+		return false;
+
 	return graph().getEdgeDirectionalTo(left, graph().meta<GraphEdgeIsA>(), right) != nullptr;
 }
 
