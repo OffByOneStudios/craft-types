@@ -189,7 +189,7 @@ namespace types
 			header->actual = v;
 			v->craft_setupInstance();
 
-			return instance<_T>(actual);
+			return instance<_T>(header);
 		}
 
 		template<typename _T = T,
