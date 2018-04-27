@@ -66,27 +66,21 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 						break;
 					case CppStaticDescKindEnum::Object:
 					{
-						auto node = _graph->addNode(_graph->meta<GraphNodeCppObject>(), sd);
-
-						_identifiers->add(node);
+						sd->node = _graph->addNode(_graph->meta<GraphNodeCppObject>(), sd);
 					} break;
 
 					case CppStaticDescKindEnum::RawType:
 					{
-						auto node = _graph->addNode(_graph->meta<GraphNodeCppClass>(), sd);
-
-						_identifiers->add(node);
+						sd->node = _graph->addNode(_graph->meta<GraphNodeCppClass>(), sd);
 					} break;
 					case CppStaticDescKindEnum::LegacyProvider:
 					case CppStaticDescKindEnum::LegacyAspect:
 					{
-						auto node = _graph->addNode(_graph->meta<GraphNodeCppFeatureLegacy>(), sd);
-
-						_identifiers->add(node);
+						sd->node = _graph->addNode(_graph->meta<GraphNodeCppFeatureLegacy>(), sd);
 					} break;
 					case CppStaticDescKindEnum::MultiMethod:
 					{
-						auto node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
+						sd->node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
 
 					} break;
 				}
@@ -122,7 +116,6 @@ void CppSystem::_init()
 	_dllsThatWereStatic = _dllsToUpdate;
 	_dllsToUpdate.clear();
 
-	_identifiers = new Identifiers();
 	_graph = new Graph();
 
 	// Set up graph and identifiers
@@ -176,6 +169,7 @@ void CppSystem::_finish(char const* name)
 		_addEntry({ new std::string("cpp-library-already-exists"), _Entry::Kind::Warning });
 	_dll_entries[ret] = _current_dll_entries;
 	_dllsToUpdate.insert(ret);
+	_lastLoadedDll = ret;
 	_current_dll_entries = nullptr;
 }
 
@@ -208,3 +202,15 @@ void CppSystem::_register(cpp::static_desc const* info)
 	_addEntry({ const_cast<cpp::static_desc*>(info), _Entry::Kind::StaticDesc });
 }
 
+std::string CppSystem::getLastLibraryName()
+{
+	return _lastLoadedDll;
+}
+size_t CppSystem::getLibraryCount(std::string const& dll)
+{
+	return _dll_entries[dll]->_entries.size();
+}
+cpp::TypePtr CppSystem::getLibraryEntry(std::string const& dll, size_t index)
+{
+	return reinterpret_cast<cpp::static_desc*>(_dll_entries[dll]->_entries[index].ptr);
+}

@@ -53,6 +53,7 @@ namespace types
 		struct static_desc final
 		{
 		public:
+			Graph::Node* node;
 			_fn_register_static_init initer;
 			CppStaticDescKindEnum kind;
 			void* repr;
@@ -83,7 +84,7 @@ namespace types
 
 			inline TypeId asId() const
 			{
-				return identifiers().get((void*)desc).node;
+				return desc->node;
 			}
 
 			template<typename TType>
@@ -400,10 +401,10 @@ namespace types
 
 	private:
 		// These first for inlined functions
-		// Graph for this cpp-system (todo: invert this / make thread local)
+		// Graph for this cpp-system (todo: invert this, graph is also a static)
 		Graph* _graph;
-		// Identifiers for this cpp-system (todo: invert this / make thread local)
-		Identifiers* _identifiers;
+
+		std::recursive_mutex operation;
 
 		_Entries* _static_entries;
 
@@ -412,7 +413,7 @@ namespace types
 		std::set<std::string> _dllsToUpdate;
 		std::set<std::string> _dllsThatWereStatic;
 
-		std::recursive_mutex operation;
+		std::string _lastLoadedDll;
 
 		// 
 		// Lifecycle
@@ -448,10 +449,13 @@ namespace types
 		void _addEntry(_Entry &&);
 
 	public:
-		inline Identifiers& identifiers() { return *_identifiers; }
 		inline Graph& graph() { return *_graph; }
 
 		CRAFT_TYPES_EXPORTED void _register(cpp::static_desc const*);
+
+		CRAFT_TYPES_EXPORTED std::string getLastLibraryName();
+		CRAFT_TYPES_EXPORTED size_t getLibraryCount(std::string const& dll);
+		CRAFT_TYPES_EXPORTED cpp::TypePtr getLibraryEntry(std::string const& dll, size_t index);
 
 	public:
 
@@ -587,10 +591,6 @@ namespace types
 	inline CppSystem& system()
 	{
 		return CppSystem::global_instance();
-	}
-	inline Identifiers& identifiers()
-	{
-		return CppSystem::global_instance().identifiers();
 	}
 	inline Graph& graph()
 	{

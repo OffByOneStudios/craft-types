@@ -42,14 +42,14 @@ int main(int argc, char** argv)
 			}
 			else if (input == "load")
 			{
-				auto start = (signed)identifiers().count();
 				craft::types::load_dll(path::absolute(args));
-				auto end = identifiers().count();
+				auto last_dll = system().getLastLibraryName();
+				auto end = system().getLibraryCount(last_dll);
 
-				for (auto i = start; i < end; ++i)
-					std::cout << graph().dumpNode(identifiers().getByIndex(i).node.node) << std::endl;
+				for (auto i = 0; i < end; ++i)
+					std::cout << graph().dumpNode(system().getLibraryEntry(last_dll, i).asId().node) << std::endl;
 
-				std::cout << std::endl << "loaded " << (end - start) << " types." << std::endl;
+				std::cout << std::endl << "loaded " << (end) << " types." << std::endl;
 			}
 			else
 				throw stdext::exception("unknown command `{0}`", input);
