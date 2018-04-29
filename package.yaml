@@ -23,7 +23,7 @@ platform-dependencies:
   osx_x64_clang: []
   debian_x64_gcc: []
 
-platform-compiler-flags:
+platform-compile-flags:
   x86_64-pc-windows-msvccoff:
     - "/std:c++latest"
   osx_x64_clang:

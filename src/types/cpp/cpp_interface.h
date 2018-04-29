@@ -5,6 +5,8 @@
 namespace craft {
 namespace types
 {
+	// For the feature redesign: https://stackoverflow.com/questions/4936987/c-class-member-variable-knowing-its-own-offset
+
 	/******************************************************************************
 	** prelude
 	******************************************************************************/

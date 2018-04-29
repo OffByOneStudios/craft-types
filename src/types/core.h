@@ -5,9 +5,6 @@
 namespace craft {
 namespace types
 {
-	class Identifiers;
-	inline Identifiers& identifiers();
-
 	class Graph;
 	inline Graph& graph();
 

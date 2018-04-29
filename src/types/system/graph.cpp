@@ -70,6 +70,10 @@ void Graph::addProp(Node* label, void* value, Node* on_node)
 		throw type_error("Invalid label.");
 
 	on_node->props.push_back(new Prop { label, value });
+
+	auto index = getFirstPropValue<GraphPropertyMetaIndex>(label);
+	if (index != nullptr)
+		index->update(index, value, on_node);
 }
 void Graph::addEdge(Node* label, void* value, std::vector<Node*> const& edges)
 {
