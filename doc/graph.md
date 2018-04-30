@@ -20,8 +20,10 @@ Properties represent information about a Node. Edges represent a relationship be
 * `cpp.object`: A type using our object helper.
 * `cpp.feature|legacy`: A legacy inheritance / virtual function feature.
 * `cpp.method`: C++ method for a class.
-* `cpp.function`: C/C++ function.
+* `cpp.function`: C/C++ function. The source of a `cpp.info-of` edge if it is bound to a type someway.
+* `cpp.variable`: C/C++ variable. The source of a `cpp.info-of` edge if it is bound to a type someway.
 * `cpp.multi-method`: C++ static multi-method.
+* `cpp.user-info`: C++ static user info (for arbitrary usage). The source of a `cpp.info-of` edge if it is bound to a type someway.
 * `abstract`: An abstract type (a symbol).
 * `feature`: A description of a set of features a type can have to fulfill this feature.
 * `multi-method`: Our implementation of multimethod.
@@ -41,3 +43,5 @@ Properties represent information about a Node. Edges represent a relationship be
   This edge has no value. This is the edge used by the `is-subtype` checker. Types which satisfy features have these, abstract tags use these. This is a directional relationship, the first type *is* the second type.
 - `cpp.implements|legacy` An edge representing a legacy feature implementation.
   The value of this edge is the implementation object (factory or singleton). This is the edge used by the `getFeature` and `hasFeature` runtime checks.
+- `cpp.info-of` An edge representing info of a type... might be moved out of cpp namespace.
+  The value of this edge is a description of how the info is bound (static, instance) and the name of it. For example the node on the other end could be a static or member function (static or instance binding respectively), or a static or member variable (static or instance binding respectively), or some other static or instance bound info,
