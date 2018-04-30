@@ -30,6 +30,7 @@ int main(int argc, char** argv)
 
 		std::cout << std::endl;
 
+		auto curcwd = path::absolute();
 		try
 		{
 			if (input == "dump")
@@ -42,7 +43,10 @@ int main(int argc, char** argv)
 			}
 			else if (input == "load")
 			{
-				craft::types::load_dll(path::absolute(args));
+				auto abs = path::absolute(args);
+				path::set_cwd(path::dir(abs));
+
+				craft::types::load_dll(abs);
 				auto last_dll = system().getLastLibraryName();
 				auto end = system().getLibraryCount(last_dll);
 
@@ -58,6 +62,7 @@ int main(int argc, char** argv)
 		{
 			std::cout << ex.what() << std::endl;
 		}
+		path::set_cwd(curcwd);
 
 		std::cout << std::endl;
 	}

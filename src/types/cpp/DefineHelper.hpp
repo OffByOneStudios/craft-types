@@ -20,7 +20,9 @@ namespace types
 			DefineHelper_WithFeature(DefineHelper<TType>* type)
 			{
 				_type = type;
-				_node = graph().getNodeByValue((void*)cpptype<TFeature>::typeDesc().desc);
+				_node = cpptype<TFeature>::typeDesc().desc->node;
+
+				assert(_node != nullptr);
 			}
 
 			DefineHelper_WithFeature(DefineHelper_WithFeature const&) = default;
@@ -183,7 +185,9 @@ namespace types
 				if (_parent != nullptr)
 					_node = _parent->_node;
 				else
-					_node = graph().getNodeByValue(sd);
+					_node = sd->node;
+
+				assert(_node != nullptr);
 			}
 
 			DefineHelper(DefineHelper const&) = default;

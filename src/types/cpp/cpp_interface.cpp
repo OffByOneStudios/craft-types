@@ -180,10 +180,11 @@ void CppSystem::_update()
 {
 	for (auto d : _dllsToUpdate)
 	{
-		auto entries = _dll_entries[d];
-
-		_init_insertEntries(entries, 0);
-		_init_runEntries(entries, 0);
+		_init_insertEntries(_dll_entries[d], 0);
+	}
+	for (auto d : _dllsToUpdate)
+	{
+		_init_runEntries(_dll_entries[d], 0);
 	}
 
 	_dllsToUpdate.clear();
