@@ -50,7 +50,7 @@ namespace types
 	struct InstanceHeaderSized
 		: InstanceHeader
 	{
-		unsigned char /*std::byte*/ object[TSize];
+		std::byte object[TSize];
 
 		inline InstanceHeaderSized(TypeId tid, void* actual = nullptr, uintptr_t memInfo = 0, void* memManager = nullptr)
 			: InstanceHeader(tid, actual, memInfo, memManager) { }

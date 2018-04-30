@@ -779,7 +779,7 @@ namespace craft { namespace types { \
 		static constexpr bool isObject = kindv == cpp::CppStaticDescKindEnum::Object; \
 		static constexpr bool isRawType = kindv == cpp::CppStaticDescKindEnum::RawType; \
 		static constexpr bool isLegacyFeature = kindv == cpp::CppStaticDescKindEnum::LegacyAspect || kindv == cpp::CppStaticDescKindEnum::LegacyProvider; \
-		inline static constexpr cpp::CppStaticDescKindEnum kind() { return kindv; } \
+		static constexpr cpp::CppStaticDescKindEnum kind = kindv; \
 		inline static cpp::TypePtr typeDesc(); \
 	}; \
 }} \

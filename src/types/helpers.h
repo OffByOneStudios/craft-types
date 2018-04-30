@@ -28,7 +28,7 @@ namespace types {
 		auto target = path::normalize(path);
 #ifdef _WIN32
 		auto handle = LoadLibraryA(target.c_str());
-		if (handle == nullptr) throw stdext::exception(platform::windows::GetLastErrorAsString());
+		if (handle == nullptr) throw stdext::exception(util::platform::windows::GetLastErrorAsString());
 #else
 		throw stdext::exception("load_dll not implemented on platform");
 #endif
