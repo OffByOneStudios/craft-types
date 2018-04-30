@@ -510,7 +510,12 @@ namespace types
 			return that_type.node != nullptr && this->node == that_type.node;
 		}
 
-		std::string identifier() const { return graph().getFirstPropValue<GraphPropertyName>(node); }
+		std::string identifier() const
+		{
+			auto name = graph().getFirstPropValue<GraphPropertyName>(node);
+			if (name == nullptr) return "";
+			return name;
+		}
 
 		//
 		// Defined in cpp_interface.h
