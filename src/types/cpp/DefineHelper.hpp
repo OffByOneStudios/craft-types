@@ -219,6 +219,8 @@ namespace types
 			//
 		public:
 
+			inline operator Graph::Node*() const { return _node; }
+
 			template<typename TGraphMeta
 				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
 			void inline add(typename TGraphMeta::value_type value)

@@ -81,7 +81,10 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 					case CppStaticDescKindEnum::MultiMethod:
 					{
 						sd->node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
-
+					} break;
+					case CppStaticDescKindEnum::UserInfo:
+					{
+						sd->node = _graph->addNode(_graph->meta<GraphNodeCppUserInfo>(), sd);
 					} break;
 				}
 			} break;

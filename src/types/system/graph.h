@@ -110,7 +110,7 @@ namespace types
 		enum class Mode : size_t
 		{
 			Generic = 0,
-			Directional = 1 << 0,
+			Directional = 1 << 0, // first is source, rest are destinations
 			Common = 1 << 1, // An optimization that says this is a common edge, and hence should be sorted lower
 		};
 
@@ -122,12 +122,13 @@ namespace types
 		inline bool isCommon() const { return ((size_t)mode & (1 << 1)) != 0; }
 
 	public:
-		static inline GraphEdgeMeta* Directional(char const* name)
+		static inline GraphEdgeMeta* Directional(char const* name, bool common = false)
 		{
 			GraphEdgeMeta* ret = new GraphEdgeMeta();
 			ret->kind = Kind::Edge;
 			ret->name = name;
 			ret->mode = Mode::Directional;
+			if (common) ret->mode = (Mode)((size_t)ret->mode | (size_t)Mode::Common);
 			return ret;
 		}
 	};
@@ -229,6 +230,7 @@ namespace types
 
 		CRAFT_TYPES_EXPORTED Node* getNodeByValue(void* value);
 		CRAFT_TYPES_EXPORTED Prop* getProp(Node* on_node, Node* prop_label);
+		CRAFT_TYPES_EXPORTED Edge* getEdge(Node* on_node, Node* edge_label);
 		CRAFT_TYPES_EXPORTED Edge* getEdgeDirectionalTo(Node* on_node, Node* edge_label, Node* to_node);
 
 		CRAFT_TYPES_EXPORTED std::string dumpNode(Node*);
@@ -263,6 +265,11 @@ namespace types
 		template<typename T>
 		inline Node* getByIndex(typename T::index_value_type index);
 
+		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Edge >::type* = nullptr>
+		inline Edge* getFirstEdgeFrom(Node* on_node)
+		{
+			return getEdge(on_node, meta<T>());
+		}
 
 		template<typename TFunc>
 		inline void forEachNode(TFunc const& func)

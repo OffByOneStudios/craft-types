@@ -30,6 +30,7 @@ namespace types
 			LegacyAspect,
 			LegacyProvider,
 			MultiMethod,
+			UserInfo,
 		};
 
 		bool constexpr kindIsMacroControlled(CppStaticDescKindEnum kind)
@@ -47,7 +48,8 @@ namespace types
 		}
 		bool constexpr kindIsInfo(CppStaticDescKindEnum kind)
 		{
-			return kind == CppStaticDescKindEnum::MultiMethod;
+			return kind == CppStaticDescKindEnum::MultiMethod
+				|| kind == CppStaticDescKindEnum::UserInfo;
 		}
 
 		typedef void(*_fn_register_static_init)(DefineHelper<void> _);
@@ -86,6 +88,7 @@ namespace types
 
 			inline TypeId asId() const
 			{
+				if (desc == nullptr) return nullptr;
 				return desc->node;
 			}
 
@@ -636,8 +639,10 @@ namespace types
 			inline Multimethod(_fn_register_static_init init)
 				: __id(CppStaticDescKindEnum::MultiMethod, this, init)
 			{
-
+				// TODO throw exception if not static time
 			}
+
+			inline operator types::Graph::Node*() const { return __id.node; }
 
 		public:
 			template <typename ...TArgs>

@@ -107,6 +107,13 @@ Graph::Prop* Graph::getProp(Node* on_node, Node* prop_label)
 			return p;
 	return nullptr;
 }
+Graph::Edge* Graph::getEdge(Node* on_node, Node* edge_label)
+{
+	for (auto e : on_node->edges)
+		if (e->label == edge_label)
+			return e;
+	return nullptr;
+}
 Graph::Edge* Graph::getEdgeDirectionalTo(Node* on_node, Node* edge_label, Node* to_node)
 {
 	for (auto e : on_node->edges)

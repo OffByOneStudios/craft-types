@@ -108,12 +108,28 @@ namespace types
 
 	struct GraphNodeCppMultiMethod final
 	{
-		typedef void* value_type;
+		// is a   `cpp::static_desc*`
+		typedef cpp::static_desc* value_type;
 	private:
 		GraphNodeCppMultiMethod() = delete;
 	public:
 		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
 		static constexpr char const* craftTypes_metaNode_name = "cpp.multi-method";
+		inline static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
+		{
+			return GraphNodeMeta::Named(craftTypes_metaNode_name);
+		}
+	};
+
+	struct GraphNodeCppUserInfo final
+	{
+		// is a   `cpp::static_desc*`
+		typedef cpp::static_desc* value_type;
+	private:
+		GraphNodeCppUserInfo() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Node; // needed?
+		static constexpr char const* craftTypes_metaNode_name = "cpp.user-info";
 		inline static GraphNodeMeta* craftTypes_metaNode_builder(Graph::Node* metanode)
 		{
 			return GraphNodeMeta::Named(craftTypes_metaNode_name);
@@ -174,6 +190,21 @@ namespace types
 		inline static GraphEdgeMeta* craftTypes_metaEdge_builder(Graph::Node* metanode)
 		{
 			return GraphEdgeMeta::Directional(craftTypes_metaEdge_name);
+		}
+	};
+
+	struct GraphEdgeInfoPartOfType final
+	{
+		// is itself
+		typedef void* value_type;
+	private:
+		GraphEdgeInfoPartOfType() = delete;
+	public:
+		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Edge; // needed?
+		static constexpr char const* craftTypes_metaEdge_name = "cpp.info-of";
+		inline static GraphEdgeMeta* craftTypes_metaEdge_builder(Graph::Node* metanode)
+		{
+			return GraphEdgeMeta::Directional(craftTypes_metaEdge_name, true);
 		}
 	};
 }}
