@@ -34,14 +34,25 @@ namespace types
 
 		static inline InstanceHeader* safe_inc(InstanceHeader* this_)
 		{
-			if (this_ != nullptr && this_->memManager == nullptr)
+			if (this_ != nullptr)
+			{
 				this_->memInfo++;
+			}
 			return this_;
 		}
 		static inline bool safe_dec(InstanceHeader* this_)
 		{
-			if (this_ != nullptr && this_->memManager == nullptr)
-				return 0 == --(this_->memInfo);
+			if (this_ != nullptr)
+			{
+				this_->memInfo--;
+
+				if (this_->memInfo == 0)
+				{
+					if (this_->memManager != nullptr)
+						delete this_;
+					return true;
+				}
+			}
 			return false;
 		}
 	};
