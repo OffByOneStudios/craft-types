@@ -342,6 +342,31 @@ namespace types
 	};
 
 	/******************************************************************************
+	** ParentAspectFactoryWrapper
+	******************************************************************************/
+
+	template <typename TAspect, typename TObject, typename TWrappedAspect>
+	class ParentAspectFactoryWrapper final
+		: public IAspectFactory<TAspect>
+	{
+		void* (*fn_cast)(void*);
+		TWrappedAspect wrapped;
+	public:
+		template<typename ...TArgs>
+		inline ParentAspectFactoryWrapper(void* (*fn_cast)(void*), TArgs&&... args)
+			: fn_cast(fn_cast)
+			, wrapped(std::forward<TArgs>(args)...)
+		{}
+
+		virtual ~ParentAspectFactoryWrapper() = default;
+
+		virtual bool isMultiUseSafe() const override { return wrapped.isMultiUseSafe(); }
+
+		virtual TAspect* build(IAspectManager* man, void* inst) override { return wrapped.build(man, fn_cast(inst)); }
+		virtual void destroy(TAspect* aspect) override { wrapped.destroy(aspect); }
+	};
+
+	/******************************************************************************
 	** CastingAspectFactory
 	******************************************************************************/
 

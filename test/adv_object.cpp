@@ -15,3 +15,4 @@ TestAdvancedObject::TestAdvancedObject(TestAdvancedObject const&)
 {
 
 }
+
