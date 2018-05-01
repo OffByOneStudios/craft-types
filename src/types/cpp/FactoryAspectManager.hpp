@@ -33,7 +33,7 @@ namespace types
 		//
 		virtual cpp::TypePtr featureDesc() const override
 		{
-			return TAspect::craft_s_typeDesc();
+			return TAspect::craft_s_featureDesc();
 		}
 		inline virtual std::string featureName() const override
 		{

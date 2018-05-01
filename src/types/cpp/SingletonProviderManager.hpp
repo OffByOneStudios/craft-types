@@ -23,7 +23,7 @@ namespace types
 		//
 		virtual cpp::TypePtr featureDesc() const override
 		{
-			return TProvider::craft_s_typeDesc();
+			return TProvider::craft_s_featureDesc();
 		}
 		virtual std::string featureName() const override
 		{

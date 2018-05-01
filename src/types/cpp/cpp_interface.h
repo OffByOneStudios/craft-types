@@ -139,6 +139,10 @@ namespace types
 
 		static constexpr cpp::CppStaticDescKindEnum kind = cpp::CppStaticDescKindEnum::None;
 		inline static cpp::TypePtr typeDesc() { return nullptr; }
+
+	protected:
+		template <typename T>
+		inline static cpp::TypePtr typeDescImpl() { if constexpr(cpptype<T>::isLegacyFeature) { return T::craft_s_featureDesc(); } else { return T::craft_s_typeDesc(); } }
 	};
 
 	template <typename TType>
@@ -152,7 +156,7 @@ namespace types
 		static constexpr bool isLegacyFeature = TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyAspect || TType::craft_c_typeKind == cpp::CppStaticDescKindEnum::LegacyProvider;
 
 		static constexpr cpp::CppStaticDescKindEnum kind = TType::craft_c_typeKind;
-		inline static cpp::TypePtr typeDesc() { return TType::craft_s_typeDesc(); }
+		inline static cpp::TypePtr typeDesc() { return cpptype<void>::typeDescImpl<TType>(); }
 	};
 
 	/******************************************************************************
@@ -204,11 +208,11 @@ namespace types
 	public:
 		virtual ~Feature() = default;
 
-		virtual cpp::TypePtr craft_typeDesc() const = 0;
+		virtual cpp::TypePtr craft_featureDesc() const = 0;
 
 		inline IFeatureManager* craft_featureManager() const
 		{
-			return static_cast<IFeatureManager*>(craft_typeDesc().desc->repr);
+			return static_cast<IFeatureManager*>(craft_featureDesc().desc->repr);
 		}
 	};
 
@@ -502,13 +506,13 @@ namespace types
 		template<typename TFeature>
 		static inline typename TFeature::TManager* getManager()
 		{
-			return static_cast<typename TFeature::TManager*>(getManager(TFeature::craft_s_typeDesc()));
+			return static_cast<typename TFeature::TManager*>(getManager(TFeature::craft_s_featureDesc()));
 		}
 
 		template<typename TFeature>
 		static inline typename TFeature::TManager* ensureManager()
 		{
-			cpp::TypePtr feature_desc = TFeature::craft_s_typeDesc();
+			cpp::TypePtr feature_desc = TFeature::craft_s_featureDesc();
 			auto m = getManager(feature_desc);
 
 			if (m == nullptr)
@@ -807,16 +811,18 @@ namespace craft { namespace types { \
 	template <> struct cpptype< x > \
 		: public cpptype<void> \
 	{ \
+		typedef x T; \
 		static constexpr bool isObject = kindv == cpp::CppStaticDescKindEnum::Object; \
 		static constexpr bool isRawType = kindv == cpp::CppStaticDescKindEnum::RawType; \
 		static constexpr bool isLegacyFeature = kindv == cpp::CppStaticDescKindEnum::LegacyAspect || kindv == cpp::CppStaticDescKindEnum::LegacyProvider; \
 		static constexpr cpp::CppStaticDescKindEnum kind = kindv; \
 		inline static cpp::TypePtr typeDesc(); \
+		static_assert(isLegacyFeature); \
 	}; \
 }} \
 
 #define CRAFT_FORWARD_DECLARE_COMPLETE(x) \
-inline craft::types::cpp::TypePtr craft::types::cpptype< x >::typeDesc() { return x::craft_s_typeDesc(); }
+inline craft::types::cpp::TypePtr craft::types::cpptype< x >::typeDesc() { return cpptype<void>::typeDescImpl< x >(); }
 
 #define CRAFT_OBJECT_DECLARE(x) \
     static ::craft::types::cpp::static_desc __td; \
@@ -843,14 +849,14 @@ private: \
     static void __craft_s_static_init(::craft::types::cpp::DefineHelper<x> _); \
 public: \
 	static const ::craft::types::cpp::CppStaticDescKindEnum craft_c_typeKind = TManager::craft_c_managedTypeKind; \
-    static inline ::craft::types::cpp::TypePtr craft_s_typeDesc() { return &x::__td; } \
+    static inline ::craft::types::cpp::TypePtr craft_s_featureDesc() { return &x::__td; } \
 	static inline char const* craft_s_typeName() { return #x; } \
 	static inline char const* craft_s_featureName() { return name; } \
 public: \
 	static inline TManager* craft_s_featureManager() \
 	{ return ::craft::types::CppSystem::getManager<x>(); } \
-	virtual ::craft::types::cpp::TypePtr craft_typeDesc() const override \
-	{ return craft_s_typeDesc(); } \
+	virtual ::craft::types::cpp::TypePtr craft_featureDesc() const override \
+	{ return craft_s_featureDesc(); } \
 private:
 
 
