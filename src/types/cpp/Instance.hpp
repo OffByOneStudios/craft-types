@@ -132,6 +132,7 @@ namespace types
 			: _meta(InstanceHeader::safe_inc(static_cast<Object*>(ptr)->craft_header))
 			, _actual(ptr)
 		{
+			assert(static_cast<Object*>(ptr)->craft_header != nullptr && "object not made correctly, don't use this conversion");
 		}
 
 		// From other instance
