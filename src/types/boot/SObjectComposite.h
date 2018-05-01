@@ -198,7 +198,7 @@ namespace types
 	//
 	// IAspectManager
 	//
-	protected:
+	public:
 		inline virtual bool isMultiUseSafe() const { return true; }
 
 		inline virtual SObjectComposite* build(IAspectManager* man, void* inst)

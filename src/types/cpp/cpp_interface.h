@@ -350,8 +350,9 @@ namespace types
 		: public IAspectFactory<TAspect>
 	{
 		void* (*fn_cast)(void*);
-		TWrappedAspect wrapped;
 	public:
+		TWrappedAspect wrapped;
+
 		template<typename ...TArgs>
 		inline ParentAspectFactoryWrapper(void* (*fn_cast)(void*), TArgs&&... args)
 			: fn_cast(fn_cast)

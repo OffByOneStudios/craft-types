@@ -131,14 +131,21 @@ namespace types
 			inline void byCasting()
 			{
 				IAspectFactory<TFeature>* res;
+				DefineHelper<void>* type;
 				if (_type->_parent != nullptr)
+				{
 					res = new ParentAspectFactoryWrapper<TFeature, TType, CastingAspectFactory<TFeature, TType>>(_type->_fn_cast);
+					type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
+				}
 				else
+				{
 					res = new CastingAspectFactory<TFeature, TType>();
+					type = reinterpret_cast<DefineHelper<void>*>(_type);
+				}
 
-				system().getManager<TFeature>()->addFactory(_type->_sd, res );
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+				system().getManager<TFeature>()->addFactory(type->_sd, res );
+				graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, type->_node });
 			}
 
 			template<typename TForwarded,
@@ -147,14 +154,21 @@ namespace types
 			inline void byForwarding(instance<TForwarded> _TType::* mem_ptr)
 			{
 				IAspectFactory<TFeature>* res;
+				DefineHelper<void>* type;
 				if (_type->_parent != nullptr)
+				{
 					res = new ParentAspectFactoryWrapper<TFeature, TType, ForwardingAspectFactory<TFeature, _TType, TForwarded>>(_type->_fn_cast, mem_ptr);
+					type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
+				}
 				else
+				{
 					res = new ForwardingAspectFactory<TFeature, _TType, TForwarded>(mem_ptr);
+					type = reinterpret_cast<DefineHelper<void>*>(_type);
+				}
 
-				system().getManager<TFeature>()->addFactory(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+				system().getManager<TFeature>()->addFactory(type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, type->_node });
 			}
 
 			template<template <typename> class TConcreate,
@@ -163,16 +177,26 @@ namespace types
 			inline TConcreate<TType>* byConfiguring()
 			{
 				IAspectFactory<TFeature>* res;
+				TConcreate<TType>* ret;
+				DefineHelper<void>* type;
 				if (_type->_parent != nullptr)
+				{
 					res = new ParentAspectFactoryWrapper<TFeature, TType, TConcreate<TType>>(_type->_fn_cast);
+					ret = &((ParentAspectFactoryWrapper<TFeature, TType, TConcreate<TType>>*)res)->wrapped;
+					type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
+				}
 				else
-					res = new TConcreate<TType>();
+				{
+					ret = new TConcreate<TType>();
+					res = ret;
+					type = reinterpret_cast<DefineHelper<void>*>(_type);
+				}
 
-				system().getManager<TFeature>()->addFactory(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+				system().getManager<TFeature>()->addFactory(type->_sd, res);
+				graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
+				graph().add<GraphEdgeImplements>(res, { _node, type->_node });
 
-				return res;
+				return ret;
 			}
 		};
 
