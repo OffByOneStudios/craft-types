@@ -204,6 +204,28 @@ namespace types
 			return instance<_T>(header);
 		}
 
+		template<typename F,
+			typename _T = T,
+			typename std::enable_if< cpptype<_T>::isRawType  >::type* = nullptr>
+			static inline instance<_T> makeThroughLambda(F lambda)
+		{
+			auto* header = new InstanceHeaderSized<sizeof(T)>(cpptype<T>::typeDesc());
+			lambda((T*)header->object);
+			header->actual = header->object;
+
+			return instance<_T>(header);
+		}
+
+		template<typename _T = T,
+			typename std::enable_if< cpptype<_T>::isRawType >::type* = nullptr>
+			static inline instance<_T> makeFromPointerAndMemoryManager(T* actual, void* memory_manager)
+		{
+			assert(memory_manager != nullptr);
+			
+			auto* header = new InstanceHeader(cpptype<T>::typeDesc(), actual, -1, memory_manager);
+			return instance<_T>(header);
+		}
+
 	//
 	// Conversions
 	//
