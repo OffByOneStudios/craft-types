@@ -48,7 +48,7 @@ namespace types
 
 				if (this_->memInfo == 0)
 				{
-					if (this_->memManager != nullptr)
+					if (this_->memManager == nullptr)
 						delete this_;
 					return true;
 				}
