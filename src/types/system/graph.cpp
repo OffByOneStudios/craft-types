@@ -183,8 +183,16 @@ std::string Graph::dumpNode(Node* n)
 }
 
 /******************************************************************************
-** Graph::_Node
+** Graph::Node
 ******************************************************************************/
+
+CRAFT_TYPE_DEFINE(craft::types::Graph::Node)
+{
+	_.use<PStringer>().singleton<FunctionalStringer>([](instance<Graph::Node> n) -> std::string { return graph().getFirstPropValue<GraphPropertyName>(n.get()); });
+
+	_.identify_verbose("craft/types/Graph:Node", "Info", "craft::types::Graph::Node");
+	_.defaults();
+}
 
 bool Graph::Node::isMeta() const
 {

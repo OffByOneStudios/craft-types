@@ -246,7 +246,7 @@ namespace types
 					return i.size() == 0;
 				});
 
-				return stdext::join('.', _parts.begin(), end);
+				return stdext::join('/', _parts.begin(), end);
 			}
 
 			//

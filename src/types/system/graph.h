@@ -263,7 +263,7 @@ namespace types
 		inline bool hasProp(Node* on_node) { return getProp(on_node, meta<T>()) != nullptr; }
 
 		template<typename T>
-		inline Node* getByIndex(typename T::index_value_type index);
+		inline Node* getByIndex(typename T::index_type::input_type key);
 
 		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Edge >::type* = nullptr>
 		inline Edge* getFirstEdgeFrom(Node* on_node)
@@ -307,32 +307,61 @@ namespace types
 	};
 
 	// This represents indexs inside the graph
-	struct GraphIndexString
+	template <typename T>
+	struct BasicGraphIndex
 		: IGraphIndex
 	{
-		inline virtual ~GraphIndexString() = default;
+		typedef T input_type;
 
-		typedef std::string* value_type;
+		inline virtual ~BasicGraphIndex() = default;
 
 		std::map<std::string, Graph::Node*> index;
 
-		static void s_update(IGraphIndex* index, void const* value, Graph::Node* node)
+	private:
+		inline void _update(char const* v, Graph::Node* node)
 		{
-			((GraphIndexString*)index)->index[*(value_type)value] = node;
+			index[v] = node;
 		}
-		static Graph::Node* s_lookup(IGraphIndex* index, void const* value)
+		inline void _update(std::string* v, Graph::Node* node)
 		{
-			auto this_ = ((GraphIndexString*)index);
-			auto it = this_->index.find(*(value_type)value);
-			if (it != this_->index.end())
+			index[*v] = node;
+		}
+
+		inline Graph::Node* _find(char const* v)
+		{
+			auto it = index.find(v);
+			if (it != index.end())
+				return it->second;
+			return nullptr;
+		}
+		inline Graph::Node* _find(std::string* v)
+		{
+			auto it = index.find(*v);
+			if (it != index.end())
 				return it->second;
 			return nullptr;
 		}
 
-		GraphIndexString()
+	public:
+		inline static void s_update(IGraphIndex* index, void const* value, Graph::Node* node)
+		{
+			((BasicGraphIndex<T>*)index)->_update((T)value, node);
+		}
+		inline static Graph::Node* s_lookup(IGraphIndex* index, void const* value)
+		{
+			return ((BasicGraphIndex<T>*)index)->_find((T)value);
+		}
+
+		inline BasicGraphIndex()
 		{
 			update = s_update;
 			lookup = s_lookup;
+		}
+
+		template<typename T>
+		inline static Graph::Node* deindex(IGraphIndex* index, T value)
+		{
+			return ((BasicGraphIndex<T>*)index)->_find(value);
 		}
 	};
 
@@ -357,11 +386,11 @@ namespace types
 	};
 
 	template<typename T>
-	inline Graph::Node* Graph::getByIndex(typename T::index_value_type key)
+	inline Graph::Node* Graph::getByIndex(typename T::index_type::input_type key)
 	{
 		auto metaNode = meta<T>();
 		auto index = (typename T::index_type*)getFirstPropValue<GraphPropertyMetaIndex>(metaNode);
-		return T::deindex(index, key);
+		return T::index_type::deindex(index, key);
 	}
 
 	/******************************************************************************
@@ -411,10 +440,9 @@ namespace types
 
 	struct GraphPropertyTypeName final
 	{
-		// is a   `char const*`
+		// is a   `std::string*`
 		typedef std::string* value_type;
-		typedef GraphIndexString index_type;
-		typedef std::string index_value_type;
+		typedef BasicGraphIndex<value_type> index_type;
 	private:
 		GraphPropertyTypeName() = delete;
 	public:
@@ -426,11 +454,6 @@ namespace types
 				[](Graph::Element* p) -> std::string { return *(value_type)p->value; });
 			graph().add<GraphPropertyMetaIndex>(metanode, new index_type());
 			return GraphPropMeta::Singular(craftTypes_metaProp_name);
-		}
-
-		inline static Graph::Node* deindex(index_type* index_, index_value_type const& key)
-		{
-			return index_->s_lookup(index_, &key);
 		}
 	};
 

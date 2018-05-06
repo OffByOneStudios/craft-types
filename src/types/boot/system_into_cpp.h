@@ -8,6 +8,13 @@
 
 */
 
+/******************************************************************************
+** /types/system/graph.h
+******************************************************************************/
+
+#include "types/system/graph.h"
+
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Graph::Node);
 
 /******************************************************************************
 ** /types/system/expression/expression.h

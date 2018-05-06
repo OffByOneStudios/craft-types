@@ -6,8 +6,7 @@
 // stdlib
 CRAFT_TYPE_DEFINE(std::string)
 {
-	_.add<GraphPropertyName>("cpp.string");
-	_.add<GraphPropertyCppName>("std::string");
+	_.identify_verbose("string", "String", "std::string");
 
 	_.use<PClone>().singleton<DefaultCopyConstructor>();
 	_.use<PParse>().singleton<FunctionalParse>( [](std::string s) { return instance<std::string>::make(s); });
@@ -19,8 +18,7 @@ CRAFT_TYPE_DEFINE(std::string)
 // stdlib
 CRAFT_TYPE_DEFINE(bool)
 {
-	_.add<GraphPropertyName>("boolean");
-	_.add<GraphPropertyCppName>("bool");
+	_.identify_verbose("boolean", "Bool", "bool");
 
 	_.use<PParse>().singleton<FunctionalParse>([](std::string s)
 	{
