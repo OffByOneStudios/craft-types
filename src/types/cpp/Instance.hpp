@@ -375,8 +375,8 @@ namespace types
 			>::type* = nullptr>
 		inline instance<TType> asType() const
 		{
-			if (_meta == nullptr || cpptype<TType>::typeDesc().asId() != _meta->typeId)
-				throw stdext::exception("instance<void>::asType() | T.id != instance.id");
+			if (_meta == nullptr || !isSubtype(_meta->typeId, cpptype<T>::typeDesc().asId()))
+				throw stdext::exception("instance<T>::asType() | isSubtype(instance.id, T:id)");
 			return instance<TType>(instance<>(_meta));
 		}
 	};
