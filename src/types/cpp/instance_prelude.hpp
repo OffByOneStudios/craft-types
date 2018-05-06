@@ -177,8 +177,8 @@ namespace types
 		inline instance<T> asType() const
 		{
 			assert(_meta != nullptr
-				&& cpptype<T>::typeDesc().asId() == _meta->typeId
-				&& "instance<void>::asType() | T.id != instance.id");
+				&& isSubtype(_meta->typeId, cpptype<T>::typeDesc().asId())
+				&& "instance<void>::asType() | isSubtype(instance.id, T:id)");
 
 			return instance<T>(_meta);
 		}

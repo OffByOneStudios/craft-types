@@ -106,7 +106,7 @@ namespace types
 			: _meta(InstanceHeader::safe_inc(inst._meta))
 			, _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
 		{
-			assert(inst._meta == nullptr || cpptype<_T>::typeDesc() == inst._meta->typeId && "bad runtime conversion");
+			assert(inst._meta == nullptr || isSubtype(inst._meta->typeId, (TypeId)cpptype<_T>::typeDesc()) && "bad runtime conversion");
 		}
 
 		template<typename _T = T,
@@ -115,7 +115,7 @@ namespace types
 			: _meta(InstanceHeader::safe_inc(inst._meta))
 			, _actual(inst._meta != nullptr ? (_T*)inst._meta->actual : nullptr)
 		{
-			assert(inst._meta == nullptr || cpptype<_T>::typeDesc() == inst._meta->typeId && "bad runtime conversion");
+			assert(inst._meta == nullptr || isSubtype(inst._meta->typeId, (TypeId)cpptype<_T>::typeDesc()) && "bad runtime conversion");
 		}
 
 		template<typename _T = T,

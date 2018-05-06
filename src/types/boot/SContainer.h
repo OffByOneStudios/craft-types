@@ -59,7 +59,8 @@ namespace types
 	public:
 		ContainerViaStds()
 		{
-
+			_member_map = nullptr;
+			_member_vector = nullptr;
 		}
 
 	private:
