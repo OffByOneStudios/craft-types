@@ -358,7 +358,6 @@ namespace types
 			lookup = s_lookup;
 		}
 
-		template<typename T>
 		inline static Graph::Node* deindex(IGraphIndex* index, T value)
 		{
 			return ((BasicGraphIndex<T>*)index)->_find(value);

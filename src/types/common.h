@@ -24,8 +24,13 @@
 
 
 // Vendor
+#ifndef _WIN32
+#include "mpir/mpir-x86_64-pc-linux-gnu.h"
+#else 
 #include "mpir/mpir.h"
 #include "mpir/mpirxx.h"
+#endif 
+
 // Deps
 #include "util/all.h"
 #include "util/vendor/plf_colony.hpp"
