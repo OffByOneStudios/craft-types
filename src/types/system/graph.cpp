@@ -188,7 +188,13 @@ std::string Graph::dumpNode(Node* n)
 
 CRAFT_TYPE_DEFINE(craft::types::Graph::Node)
 {
-	_.use<PStringer>().singleton<FunctionalStringer>([](instance<Graph::Node> n) -> std::string { return graph().getFirstPropValue<GraphPropertyName>(n.get()); });
+	_.use<PStringer>().singleton<FunctionalStringer>([](instance<Graph::Node> n) -> std::string
+	{
+		if (graph().hasProp<GraphPropertyTypeName>(n.get()))
+			return *graph().getFirstPropValue<GraphPropertyTypeName>(n.get());
+		else
+			return fmt::format("<<{0}>>", graph().getFirstPropValue<GraphPropertyName>(n.get()));
+	});
 
 	_.identify_verbose("craft/types/Graph:Node", "Info", "craft::types::Graph::Node");
 	_.defaults();
