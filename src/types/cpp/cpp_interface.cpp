@@ -2,8 +2,9 @@
 #include "../core.h"
 #include "cpp_interface.h"
 
+#ifdef _WIN32
 #include "Windows.h"
-
+#endif
 // here be dragons
 
 using namespace craft;

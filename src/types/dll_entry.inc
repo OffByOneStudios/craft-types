@@ -21,3 +21,15 @@ extern "C" BOOLEAN __stdcall _craft_types_DLLMAIN(LPVOID var1, DWORD var2, LPVOI
 }
 
 #endif
+
+#ifdef __GNUC__
+__attribute__((constructor)) void _craft_types_DLLMAIN()
+{
+	/*
+	auto save = ::craft::types::_dll_begin(CRAFT_CURRENT_PACKAGE_NAMESPACE "/" CRAFT_CURRENT_PACKAGE_ID "/" CRAFT_CURRENT_ARTIFACT_NAME);
+	
+	::craft::types::_dll_finish(save);
+	return ret;
+	*/
+}
+#endif 

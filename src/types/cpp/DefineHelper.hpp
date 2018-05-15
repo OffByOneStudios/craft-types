@@ -7,6 +7,10 @@ namespace types
 {
 	namespace cpp
 	{
+		/******************************************************************************
+		** DefineHelper_WithFeature - Declaratino
+		******************************************************************************/
+
 		/* Helper with a specific compiler time feature referenced
 		
 		*/
@@ -34,171 +38,45 @@ namespace types
 			// TODO type check these
 
 			template<class TSingleton>
-			inline void singleton()
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TSingleton();
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-			}
+			inline void singleton();
 
 			template<template <typename> class TSingleton>
-			inline void singleton()
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TSingleton<TType>();
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-			}
+			inline void singleton();
 
 			template<template <typename> class TSingleton, typename... TArgs>
-			inline void singleton(TArgs... args)
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TSingleton<TType>(args...);
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-			}
+			inline void singleton(TArgs... args);
 
 			template<class TSingleton>
-			inline TSingleton* configureSingleton()
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TSingleton();
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-
-				return res;
-			}
+			inline TSingleton* configureSingleton();
 
 			template<template <typename> class TSingleton>
-			inline TSingleton<TType>* configureSingleton()
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TSingleton<TType>();
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-
-				return res;
-			}
+			inline TSingleton<TType>* configureSingleton();
 
 			template<template <typename> class TSingleton, typename... TArgs>
-			inline TSingleton<TType>* configureSingleton(TArgs... args)
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TSingleton<TType>(args...);
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-
-				return res;
-			}
+			inline TSingleton<TType>* configureSingleton(TArgs... args);
 
 			template<template <typename> class TConcreate,
 				typename _T = TFeature,
 				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyProvider>::type* = nullptr>
-				inline TConcreate<TType>* byConfiguring()
-			{
-				if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
-
-				auto res = new TConcreate<TType>();
-
-				system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
-
-				return res;
-			}
+			inline TConcreate<TType>* byConfiguring();
 
 		public:
-			inline void byCasting()
-			{
-				IAspectFactory<TFeature>* res;
-				DefineHelper<void>* type;
-				if (_type->_parent != nullptr)
-				{
-					res = new ParentAspectFactoryWrapper<TFeature, TType, CastingAspectFactory<TFeature, TType>>(_type->_fn_cast);
-					type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
-				}
-				else
-				{
-					res = new CastingAspectFactory<TFeature, TType>();
-					type = reinterpret_cast<DefineHelper<void>*>(_type);
-				}
-
-				system().getManager<TFeature>()->addFactory(type->_sd, res );
-				graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, type->_node });
-			}
+			inline void byCasting();
 
 			template<typename TForwarded,
 				typename _TType = TType,
 				typename std::enable_if<std::is_class<_TType>::value>::type* = nullptr>
-			inline void byForwarding(instance<TForwarded> _TType::* mem_ptr)
-			{
-				IAspectFactory<TFeature>* res;
-				DefineHelper<void>* type;
-				if (_type->_parent != nullptr)
-				{
-					res = new ParentAspectFactoryWrapper<TFeature, TType, ForwardingAspectFactory<TFeature, _TType, TForwarded>>(_type->_fn_cast, mem_ptr);
-					type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
-				}
-				else
-				{
-					res = new ForwardingAspectFactory<TFeature, _TType, TForwarded>(mem_ptr);
-					type = reinterpret_cast<DefineHelper<void>*>(_type);
-				}
-
-				system().getManager<TFeature>()->addFactory(type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, type->_node });
-			}
+			inline void byForwarding(instance<TForwarded> _TType::* mem_ptr);
 
 			template<template <typename> class TConcreate,
 				typename _T = TFeature,
 				typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyAspect>::type* = nullptr>
-			inline TConcreate<TType>* byConfiguring()
-			{
-				IAspectFactory<TFeature>* res;
-				TConcreate<TType>* ret;
-				DefineHelper<void>* type;
-				if (_type->_parent != nullptr)
-				{
-					res = new ParentAspectFactoryWrapper<TFeature, TType, TConcreate<TType>>(_type->_fn_cast);
-					ret = &((ParentAspectFactoryWrapper<TFeature, TType, TConcreate<TType>>*)res)->wrapped;
-					type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
-				}
-				else
-				{
-					ret = new TConcreate<TType>();
-					res = ret;
-					type = reinterpret_cast<DefineHelper<void>*>(_type);
-				}
-
-				system().getManager<TFeature>()->addFactory(type->_sd, res);
-				graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
-				graph().add<GraphEdgeImplements>(res, { _node, type->_node });
-
-				return ret;
-			}
+			inline TConcreate<TType>* byConfiguring();
 		};
+
+		/******************************************************************************
+		** DefineHelper - Specialized Definition
+		******************************************************************************/
 
 		template<typename TDefine>
 		class DefineHelper
@@ -390,5 +268,183 @@ namespace types
 			}
 
 		};
+
+		/******************************************************************************
+		** DefineHelper_WithFeature - Definition
+		******************************************************************************/
+		template<typename TType, typename TFeature>
+		template<class TSingleton>
+		inline void DefineHelper_WithFeature<TType, TFeature>::singleton()
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TSingleton();
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+		}
+
+		template<typename TType, typename TFeature>
+		template<template <typename> class TSingleton>
+		inline void DefineHelper_WithFeature<TType, TFeature>::singleton()
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TSingleton<TType>();
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+		}
+
+		template<typename TType, typename TFeature>
+		template<template <typename> class TSingleton, typename... TArgs>
+		inline void DefineHelper_WithFeature<TType, TFeature>::singleton(TArgs... args)
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TSingleton<TType>(args...);
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+		}
+
+		template<typename TType, typename TFeature>
+		template<class TSingleton>
+		inline TSingleton* DefineHelper_WithFeature<TType, TFeature>::configureSingleton()
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TSingleton();
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
+			return res;
+		}
+
+		template<typename TType, typename TFeature>
+		template<template <typename> class TSingleton>
+		inline TSingleton<TType>* DefineHelper_WithFeature<TType, TFeature>::configureSingleton()
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TSingleton<TType>();
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
+			return res;
+		}
+
+		template<typename TType, typename TFeature>
+		template<template <typename> class TSingleton, typename... TArgs>
+		inline TSingleton<TType>* DefineHelper_WithFeature<TType, TFeature>::configureSingleton(TArgs... args)
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TSingleton<TType>(args...);
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
+			return res;
+		}
+
+		template<typename TType, typename TFeature>
+		template<template <typename> class TConcreate,
+			typename _T,
+			typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyProvider>::type*>
+			inline TConcreate<TType>* DefineHelper_WithFeature<TType, TFeature>::byConfiguring()
+		{
+			if (_type->_parent != nullptr) throw stdext::exception("adding providers with parents not supported");
+
+			auto res = new TConcreate<TType>();
+
+			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+
+			return res;
+		}
+
+		template<typename TType, typename TFeature>
+		inline void DefineHelper_WithFeature<TType, TFeature>::byCasting()
+		{
+			IAspectFactory<TFeature>* res;
+			DefineHelper<void>* type;
+			if (_type->_parent != nullptr)
+			{
+				res = new ParentAspectFactoryWrapper<TFeature, TType, CastingAspectFactory<TFeature, TType>>(_type->_fn_cast);
+				type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
+			}
+			else
+			{
+				res = new CastingAspectFactory<TFeature, TType>();
+				type = reinterpret_cast<DefineHelper<void>*>(_type);
+			}
+
+			system().getManager<TFeature>()->addFactory(type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, type->_node });
+		}
+
+		template<typename TType, typename TFeature>
+		template<typename TForwarded,
+			typename _TType,
+			typename std::enable_if<std::is_class<_TType>::value>::type*>
+			inline void DefineHelper_WithFeature<TType, TFeature>::byForwarding(instance<TForwarded> _TType::* mem_ptr)
+		{
+			IAspectFactory<TFeature>* res;
+			DefineHelper<void>* type;
+			if (_type->_parent != nullptr)
+			{
+				res = new ParentAspectFactoryWrapper<TFeature, TType, ForwardingAspectFactory<TFeature, _TType, TForwarded>>(_type->_fn_cast, mem_ptr);
+				type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
+			}
+			else
+			{
+				res = new ForwardingAspectFactory<TFeature, _TType, TForwarded>(mem_ptr);
+				type = reinterpret_cast<DefineHelper<void>*>(_type);
+			}
+
+			system().getManager<TFeature>()->addFactory(type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, type->_node });
+		}
+
+		template<typename TType, typename TFeature>
+		template<template <typename> class TConcreate,
+			typename _T,
+			typename std::enable_if<cpptype<_T>::kind == cpp::CppStaticDescKindEnum::LegacyAspect>::type*>
+			inline TConcreate<TType>* DefineHelper_WithFeature<TType, TFeature>::byConfiguring()
+		{
+			IAspectFactory<TFeature>* res;
+			TConcreate<TType>* ret;
+			DefineHelper<void>* type;
+			if (_type->_parent != nullptr)
+			{
+				res = new ParentAspectFactoryWrapper<TFeature, TType, TConcreate<TType>>(_type->_fn_cast);
+				ret = &((ParentAspectFactoryWrapper<TFeature, TType, TConcreate<TType>>*)res)->wrapped;
+				type = reinterpret_cast<DefineHelper<void>*>(_type->_parent);
+			}
+			else
+			{
+				ret = new TConcreate<TType>();
+				res = ret;
+				type = reinterpret_cast<DefineHelper<void>*>(_type);
+			}
+
+			system().getManager<TFeature>()->addFactory(type->_sd, res);
+			graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
+			graph().add<GraphEdgeImplements>(res, { _node, type->_node });
+
+			return ret;
+		}
 	}
 }}

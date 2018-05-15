@@ -26,6 +26,7 @@
 // Vendor
 #ifndef _WIN32
 #include "mpir/mpir-x86_64-pc-linux-gnu.h"
+#include "mpir/mpirxx.h"
 #else 
 #include "mpir/mpir.h"
 #include "mpir/mpirxx.h"

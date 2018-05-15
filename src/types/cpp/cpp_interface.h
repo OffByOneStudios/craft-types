@@ -687,14 +687,14 @@ namespace types
 			{
 				typename TDispatcher::Dispatch d;
 
-				typename TDispatcher::invokeIntoDispatch(invoke, d);
+				TDispatcher::invokeIntoDispatch(invoke, d);
 
 				auto res = this->dispatchWithRecord(d);
 				auto callable = std::get<0>(res);
 				if (callable == nullptr) throw stdext::exception("bad dispatch");
 				auto dispatchRecord = std::get<1>(res);
 
-				return typename TDispatcher::invoke(callable, dispatchRecord, std::move(invoke));
+				return TDispatcher::invoke(callable, dispatchRecord, std::move(invoke));
 			}
 
 		public:
@@ -703,7 +703,7 @@ namespace types
 			{
 				auto res = TDispatcher::cppFunctionToRecordAndFunction(fn);
 
-				addRecord(std::get<0>(res), std::get<1>(res));
+				this->addRecord(std::get<0>(res), std::get<1>(res));
 			}
 		};
 	}

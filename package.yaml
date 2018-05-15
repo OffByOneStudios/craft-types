@@ -17,7 +17,7 @@ vendor-dependencies:
   x86_64-pc-linux-gnu:
     - mpir
     - mpirxx
-
+    
 platform-dependencies:
   x86_64-pc-windows-msvccoff: []
   osx_x64_clang: []

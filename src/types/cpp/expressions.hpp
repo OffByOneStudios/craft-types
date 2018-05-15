@@ -8,7 +8,7 @@ namespace types
 	template<typename T>
 	struct VarArgs final
 	{
-		typedef typename T value_type;
+		typedef T value_type;
 		std::vector<T> args;
 	};
 
