@@ -459,7 +459,7 @@ namespace types
 
 		friend inline void boot();
 		friend inline char const* _dll_begin(char const*);
-		friend inline void _dll_finish(char const*);
+		friend inline void _dll_finish(char const*, char const*);
 
 		friend inline void load_dll(std::string const&);
 
@@ -471,7 +471,7 @@ namespace types
 		CRAFT_TYPES_EXPORTED void _init();
 		CRAFT_TYPES_EXPORTED bool _hasInited();
 		CRAFT_TYPES_EXPORTED static char const* _begin(char const* name);
-		CRAFT_TYPES_EXPORTED void _finish(char const* name);
+		CRAFT_TYPES_EXPORTED void _finish(char const* save, char const* name);
 		CRAFT_TYPES_EXPORTED void _update();
 
 	public:
@@ -784,26 +784,32 @@ namespace types
 	using cpp::CppStaticDescKindEnum;
 }}
 
+#ifdef __GNUC__
+#define CRAFT_INIT_PRIORITY __attribute__((init_priority (1500)))
+#else
+#define CRAFT_INIT_PRIORITY
+#endif
+
 #define _CRAFT_PP_CONCAT_0(a, b) _CRAFT_PP_CONCAT_1(a, b)
 #define _CRAFT_PP_CONCAT_1(a, b) _CRAFT_PP_CONCAT_2(~, a ## b)
 #define _CRAFT_PP_CONCAT_2(p, res) res
 
 #define CRAFT_DEFINE(x) \
-	::craft::types::cpp::static_desc x::__td(x::craft_c_typeKind, nullptr, (::craft::types::cpp::_fn_register_static_init)&x::__craft_s_static_init); \
+	CRAFT_INIT_PRIORITY ::craft::types::cpp::static_desc x::__td(x::craft_c_typeKind, nullptr, (::craft::types::cpp::_fn_register_static_init)&x::__craft_s_static_init); \
 	void x::__craft_s_static_init(::craft::types::cpp::DefineHelper<x> _)
 
 #define CRAFT_TYPE_DEFINE(x) \
-	::craft::types::cpp::static_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, nullptr, (::craft::types::cpp::_fn_register_static_init)&::craft::types::cpptype<x>::__craft_s_static_init); \
+	CRAFT_INIT_PRIORITY ::craft::types::cpp::static_desc craft::types::cpptype<x>::__td(::craft::types::cpptype<x>::kind, nullptr, (::craft::types::cpp::_fn_register_static_init)&::craft::types::cpptype<x>::__craft_s_static_init); \
 	void ::craft::types::cpptype<x>::__craft_s_static_init(::craft::types::cpp::DefineHelper<x> _)
 
 #define CRAFT_MULTIMETHOD_DEFINE(x) \
 	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<decltype(x)> _); \
-	decltype(x) x ((::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
+	CRAFT_INIT_PRIORITY decltype(x) x ((::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
 	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<decltype(x)> _)
 
 #define CRAFT_INFO_MORE(x) \
 	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<x> _); \
-	::craft::types::cpp::static_desc _CRAFT_PP_CONCAT_0(__id_, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, nullptr, (::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
+	CRAFT_INIT_PRIORITY ::craft::types::cpp::static_desc _CRAFT_PP_CONCAT_0(__id_, __LINE__) (x::craft_c_infoKind + ::craft::types::cpp::CppInfoKindEnum::NoneMore, nullptr, (::craft::types::cpp::_fn_register_static_init) (& _CRAFT_PP_CONCAT_0(__fninit_, __LINE__))); \
 	void _CRAFT_PP_CONCAT_0(__fninit_, __LINE__) (::craft::types::cpp::DefineHelper<x> _)
 
 #define CRAFT_FORWARD_DECLARE(x, kindv) \

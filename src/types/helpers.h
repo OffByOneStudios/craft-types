@@ -18,9 +18,9 @@ namespace types {
 		return CppSystem::_begin(name);
 	}
 
-	inline void _dll_finish(char const* name)
+	inline void _dll_finish(char const* save, char const* name = nullptr)
 	{
-		system()._finish(name);
+		system()._finish(save, name);
 	}
 
 	inline void load_dll(std::string const& path)
@@ -30,7 +30,7 @@ namespace types {
 		auto handle = LoadLibraryA(target.c_str());
 		if (handle == nullptr) throw stdext::exception(util::platform::windows::GetLastErrorAsString());
 #else
-		throw stdext::exception("load_dll not implemented on platform");
+		if (!dlopen(path.c_str(), RTLD_NOW)) throw stdext::exception(dlerror());
 #endif
 		system()._update();
 	}

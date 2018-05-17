@@ -22,6 +22,12 @@
 #include <type_traits>
 #include <functional>
 
+#ifndef _WIN32
+#include <dlfcn.h>
+#else 
+
+#endif
+
 
 // Vendor
 #ifndef _WIN32

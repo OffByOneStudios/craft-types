@@ -51,6 +51,7 @@ CppSystem& CppSystem::global_instance()
 
 void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 {
+	std::cerr << "CppSystem::_init_insertEntries:" << entries->_entries.size() << std::endl;
 	for (auto i = start; i < entries->_entries.size(); ++i)
 	{
 		auto& entry = entries->_entries[i];
@@ -95,6 +96,7 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 
 void CppSystem::_init_runEntries(_Entries* entries, size_t start)
 {
+	std::cerr << "CppSystem::_init_runEntries:" << entries->_entries.size() << std::endl;
 	for (auto i = start; i < entries->_entries.size(); ++i)
 	{
 		auto& entry = entries->_entries[i];
@@ -115,10 +117,16 @@ void CppSystem::_init_runEntries(_Entries* entries, size_t start)
 
 void CppSystem::_init()
 {
+	std::cerr << "CppSystem::_init:" << _static_entries->_entries.size() << std::endl;
+	std::cerr << "CppSystem::_init:toup:" << (_dllsToUpdate.size() == 0 ? 0 : _dll_entries[*_dllsToUpdate.begin()]->_entries.size()) << std::endl;
+	std::cerr << "CppSystem::_init:stat:" << (_dllsThatWereStatic.size() == 0 ? 0 : _dll_entries[*_dllsThatWereStatic.begin()]->_entries.size()) << std::endl;
+
 	_addEntry({ new std::string("cpp-static-init-finish"), _Entry::Kind::Marker });
 
 	_dllsThatWereStatic = _dllsToUpdate;
 	_dllsToUpdate.clear();
+	_lastLoadedDll = "";
+	_current_dll_entries = nullptr;
 
 	_graph = new Graph();
 
@@ -129,6 +137,9 @@ void CppSystem::_init()
 	cpp::DefineHelper<void>::_build_default_providers();
 
 	_init_runEntries(_static_entries, 0);
+
+	std::cerr << "CppSystem::_init:curr" << (_current_dll_entries == nullptr ? "OKOKOK" : "BADBAD") << std::endl;
+	std::cerr << "CppSystem::_init:toup" << (_dllsToUpdate.size() == 0 ? 0 : _dll_entries[*_dllsToUpdate.begin()]->_entries.size()) << std::endl;
 }
 
 bool CppSystem::_hasInited()
@@ -156,29 +167,32 @@ char const* CppSystem::_begin(char const* name)
 	__dll_region = name;
 	return ret;
 }
-void CppSystem::_finish(char const* name)
+void CppSystem::_finish(char const* save, char const* name)
 {
 #ifdef _WIN32
 	OutputDebugStringA("system._finish()      ");
 	OutputDebugStringA(name);
 	OutputDebugStringA("\n");
 #endif
+	if (name == nullptr)
+	{
+		name = __dll_region;
+		__dll_region = save;
+	}
 
-	auto ret = __dll_region;
-	__dll_region = name;
+	_addEntry({ new std::string(fmt::format("cpp-library-finish:{0}", name)), _Entry::Kind::Marker });
 
-	_addEntry({ new std::string(fmt::format("cpp-library-finish:{0}", ret)), _Entry::Kind::Marker });
-
-	if (_dll_entries.find(ret) != _dll_entries.end())
+	if (_dll_entries.find(name) != _dll_entries.end())
 		_addEntry({ new std::string("cpp-library-already-exists"), _Entry::Kind::Warning });
-	_dll_entries[ret] = _current_dll_entries;
-	_dllsToUpdate.insert(ret);
-	_lastLoadedDll = ret;
+	_dll_entries[name] = _current_dll_entries;
+	_dllsToUpdate.insert(name);
+	_lastLoadedDll = name;
 	_current_dll_entries = nullptr;
 }
 
 void CppSystem::_update()
 {
+	std::cerr << "CppSystem::_update:" << _dll_entries[*_dllsToUpdate.begin()]->_entries.size() << std::endl;
 	for (auto d : _dllsToUpdate)
 	{
 		_init_insertEntries(_dll_entries[d], 0);
@@ -193,6 +207,17 @@ void CppSystem::_update()
 
 void CppSystem::_addEntry(_Entry && e)
 {
+	if(e.kind == _Entry::Kind::Marker)
+		std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Marker:" << *(std::string*)e.ptr << std::endl;
+	else if (e.kind == _Entry::Kind::StaticDesc)
+	{
+		auto sd = ((cpp::static_desc*)e.ptr);
+
+		std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Desc:" << (uint32_t)sd->kind << std::endl;
+	}
+	else if (e.kind == _Entry::Kind::Warning)
+		std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Warning:" << *(std::string*)e.ptr << std::endl;
+
 	if (!_hasInited())
 		_static_entries->_entries.push_back(e);
 
