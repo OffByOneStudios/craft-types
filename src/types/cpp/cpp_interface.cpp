@@ -117,9 +117,9 @@ void CppSystem::_init_runEntries(_Entries* entries, size_t start)
 
 void CppSystem::_init()
 {
-	//std::cerr << "CppSystem::_init:" << _static_entries->_entries.size() << std::endl;
-	//std::cerr << "CppSystem::_init:toup:" << (_dllsToUpdate.size() == 0 ? 0 : _dll_entries[*_dllsToUpdate.begin()]->_entries.size()) << std::endl;
-	//std::cerr << "CppSystem::_init:stat:" << (_dllsThatWereStatic.size() == 0 ? 0 : _dll_entries[*_dllsThatWereStatic.begin()]->_entries.size()) << std::endl;
+	/*std::cerr << "CppSystem::_init:" << _static_entries->_entries.size() << std::endl;
+	std::cerr << "CppSystem::_init:toup:" << (_dllsToUpdate.size() == 0 ? 0 : _dll_entries[*_dllsToUpdate.begin()]->_entries.size()) << std::endl;
+	std::cerr << "CppSystem::_init:stat:" << (_dllsThatWereStatic.size() == 0 ? 0 : _dll_entries[*_dllsThatWereStatic.begin()]->_entries.size()) << std::endl;*/
 
 	_addEntry({ new std::string("cpp-static-init-finish"), _Entry::Kind::Marker });
 
@@ -138,8 +138,10 @@ void CppSystem::_init()
 
 	_init_runEntries(_static_entries, 0);
 
-	//std::cerr << "CppSystem::_init:curr" << (_current_dll_entries == nullptr ? "OKOKOK" : "BADBAD") << std::endl;
-	//std::cerr << "CppSystem::_init:toup" << (_dllsToUpdate.size() == 0 ? 0 : _dll_entries[*_dllsToUpdate.begin()]->_entries.size()) << std::endl;
+	/*std::cerr << "CppSystem::_init:curr" << (_current_dll_entries == nullptr ? "OKOKOK" : "BADBAD") << std::endl;
+	std::cerr << "CppSystem::_init:toup" << (_dllsToUpdate.size() == 0 ? 0 : _dll_entries[*_dllsToUpdate.begin()]->_entries.size()) << std::endl;*/
+
+	_update();
 }
 
 bool CppSystem::_hasInited()
@@ -207,16 +209,16 @@ void CppSystem::_update()
 
 void CppSystem::_addEntry(_Entry && e)
 {
-	if (e.kind == _Entry::Kind::Marker) {}
-		//std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Marker:" << *(std::string*)e.ptr << std::endl;
-	else if (e.kind == _Entry::Kind::StaticDesc)
-	{
-		auto sd = ((cpp::static_desc*)e.ptr);
+	//if (e.kind == _Entry::Kind::Marker)
+	//	std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Marker:" << *(std::string*)e.ptr << std::endl;
+	//else if (e.kind == _Entry::Kind::StaticDesc)
+	//{
+	//	auto sd = ((cpp::static_desc*)e.ptr);
 
-		//std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Desc:" << (uint32_t)sd->kind << std::endl;
-	}
-	else if (e.kind == _Entry::Kind::Warning)
-		//std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Warning:" << *(std::string*)e.ptr << std::endl;
+	//	//std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Desc:" << (uint32_t)sd->kind << std::endl;
+	//}
+	//else if (e.kind == _Entry::Kind::Warning)
+	//	//std::cerr << "CppSystem::_addEntry:" << _hasInited() << ":Warning:" << *(std::string*)e.ptr << std::endl;
 
 	if (!_hasInited())
 		_static_entries->_entries.push_back(e);

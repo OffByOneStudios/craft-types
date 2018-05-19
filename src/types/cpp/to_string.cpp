@@ -37,7 +37,10 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 	if (inst.hasFeature<PStringer>())
 	{
 		from = std::string(PStringer::craft_s_typeName());
-		name = fmt::format("{0} {1}", tid.toString(false), inst.getFeature<PStringer>()->toString(inst));
+		if (verbose)
+			name = fmt::format("{0} {1}", tid.toString(false), inst.getFeature<PStringer>()->toString(inst));
+		else
+			name = inst.getFeature<PStringer>()->toString(inst);
 	}
 	else
 	{
