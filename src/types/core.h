@@ -90,8 +90,6 @@ namespace types
 
 #include "boot/default_types_c.h"
 #include "boot/default_types_cpp.h"
-#include "boot/default_types_mpir.h"
-
 // TODO:
 // * Rework objects to manage their own instance meta stuff (rather than from_raw) via SLifecycle
 // * Hookup ->byConfiguring

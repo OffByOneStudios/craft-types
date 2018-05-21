@@ -8,15 +8,9 @@ dependencies:
   - Util
 
 vendor-dependencies:
-  x86_64-pc-windows-msvccoff:
-    - mpir
-    - mpirxx
-  x86_64-apple-macosx-macho:
-    - mpir
-    - mpirxx
-  x86_64-pc-linux-gnu:
-    - mpir
-    - mpirxx
+  x86_64-pc-windows-msvccoff: []
+  x86_64-apple-macosx-macho: []
+  x86_64-pc-linux-gnu: []
     
 platform-dependencies:
   x86_64-pc-windows-msvccoff: []
