@@ -212,7 +212,7 @@ namespace types
 			static inline instance<_T> makeThroughLambda(F lambda)
 		{
 			auto* header = new InstanceHeaderSized<sizeof(T)>(cpptype<T>::typeDesc());
-			lambda((T*)header->object);
+			lambda(header->object);
 			header->actual = header->object;
 
 			return instance<_T>(header);

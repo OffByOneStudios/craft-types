@@ -40,6 +40,7 @@ namespace types
 
 		static inline void invokeIntoDispatch(Invoke const& i, Dispatch& d)
 		{
+			d.reserve(i.size());
 			std::transform(i.begin(), i.end(), std::back_inserter(d), (void* const& (*)(InvokeArgument const&))std::get<0>);
 		}
 

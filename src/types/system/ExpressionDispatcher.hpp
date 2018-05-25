@@ -9,7 +9,7 @@ namespace types
 	** ExpressionDispatcher
 	******************************************************************************/
 
-	class ExpressionDispatcher final
+	class ExpressionDispatcher
 	{
 	public:
 		typedef TypeId DispatchArgument;
@@ -24,6 +24,7 @@ namespace types
 
 		static inline void invokeIntoDispatch(Invoke const& i, Dispatch& d)
 		{
+			d.reserve(i.args.size());
 			std::transform(i.args.begin(), i.args.end(), std::back_inserter(d), [](auto i) { return i.typeId(); });
 		}
 
@@ -97,12 +98,60 @@ namespace types
 	******************************************************************************/
 
 	template<typename TTypeDispatcher>
-	class WithInstancesDispatcher final
+	class WithInstancesDispatcher
 	{
 	public:
 		typedef typename TTypeDispatcher::DispatchArgument DispatchArgument;
 		typedef typename TTypeDispatcher::Dispatch Dispatch;
 		typedef typename TTypeDispatcher::DispatchRecord DispatchRecord;
 		typedef typename TTypeDispatcher::InvokeResult InvokeResult;
+	};
+
+
+	template<typename TTypeDispatcher>
+	class WithCache
+		: public TTypeDispatcher
+	{
+	private:
+		mutable std::map<typename TTypeDispatcher::DispatchArgument, std::tuple<void*, typename TTypeDispatcher::DispatchRecord const*>> _cache_1;
+		mutable std::map<std::tuple<typename TTypeDispatcher::DispatchArgument, typename TTypeDispatcher::DispatchArgument>, std::tuple<void*, typename TTypeDispatcher::DispatchRecord const*>> _cache_2;
+
+	public:
+		std::tuple<void*, typename TTypeDispatcher::DispatchRecord const*> dispatchWithRecord(typename TTypeDispatcher::Dispatch const& d) const
+		{
+			auto const count = d.size();
+			if (count == 1)
+			{
+				auto const k = d[0];
+				auto const lb = _cache_1.lower_bound(k);
+
+				if (lb != _cache_1.end() && !(_cache_1.key_comp()(k, lb->first)))
+					return lb->second;
+				else
+				{
+					auto res = TTypeDispatcher::dispatchWithRecord(d);
+					if (std::get<1>(res) != nullptr)
+						_cache_1.insert(lb, { k, res });
+					return res;
+				}
+			}
+			else if (count == 2)
+			{
+				auto const k = std::make_tuple(d[0], d[1]);
+				auto const lb = _cache_2.lower_bound(k);
+
+				if (lb != _cache_2.end() && !(_cache_2.key_comp()(k, lb->first)))
+					return lb->second;
+				else
+				{
+					auto res = TTypeDispatcher::dispatchWithRecord(d);
+					if (std::get<1>(res) != nullptr)
+						_cache_2.insert(lb, { k, res });
+					return res;
+				}
+			}
+			else
+				return TTypeDispatcher::dispatchWithRecord(d);
+		}
 	};
 }}
