@@ -639,7 +639,7 @@ namespace types
 		repr = repr_;
 		system()._register(this);
 	}
-	inline cpp::static_desc& cpp::static_desc::operator<< (cpp::_fn_register_static_init initer_) { initer = initer_; }
+	inline cpp::static_desc& cpp::static_desc::operator<< (cpp::_fn_register_static_init initer_) { initer = initer_; return *this; }
 
 	template<typename TFeature>
 	inline bool TypeId::hasFeature() const
