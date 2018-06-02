@@ -264,6 +264,8 @@ namespace types
 
 		template<typename T>
 		inline Node* getByIndex(typename T::index_type::input_type key);
+		template<typename T>
+		inline std::vector<Node*> listIndex();
 
 		template<typename T, typename std::enable_if< T::craftTypes_metaKind == GraphMeta::Kind::Edge >::type* = nullptr>
 		inline Edge* getFirstEdgeFrom(Node* on_node)
@@ -342,6 +344,13 @@ namespace types
 			return nullptr;
 		}
 
+		inline std::vector<Graph::Node*> _list()
+		{
+			std::vector<Graph::Node*> res;
+			std::transform(index.begin(), index.end(), std::back_inserter(res), [](auto it) { return it.second; });
+			return res;
+		}
+
 	public:
 		inline static void s_update(IGraphIndex* index, void const* value, Graph::Node* node)
 		{
@@ -361,6 +370,11 @@ namespace types
 		inline static Graph::Node* deindex(IGraphIndex* index, T value)
 		{
 			return ((BasicGraphIndex<T>*)index)->_find(value);
+		}
+
+		inline static std::vector<Graph::Node*> listvalues(IGraphIndex* index)
+		{
+			return ((BasicGraphIndex<T>*)index)->_list();
 		}
 	};
 
@@ -390,6 +404,14 @@ namespace types
 		auto metaNode = meta<T>();
 		auto index = (typename T::index_type*)getFirstPropValue<GraphPropertyMetaIndex>(metaNode);
 		return T::index_type::deindex(index, key);
+	}
+
+	template<typename T>
+	inline std::vector<Graph::Node*> Graph::listIndex()
+	{
+		auto metaNode = meta<T>();
+		auto index = (typename T::index_type*)getFirstPropValue<GraphPropertyMetaIndex>(metaNode);
+		return T::index_type::listvalues(index);
 	}
 
 	/******************************************************************************
