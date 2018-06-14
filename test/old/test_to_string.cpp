@@ -14,7 +14,7 @@ struct feature_test_to_string
 	void operator()()
 	{
 		it ("starts with `T::craft_c_featureName`", []() {
-			AssertThat(T::craft_s_typeDesc().toString(false), StartsWith(T::craft_s_featureName()));
+			AssertThat(T::craft_s_featureDesc().toString(false), StartsWith(T::craft_s_featureName()));
 		});
 	};
 };

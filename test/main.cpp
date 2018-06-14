@@ -1,8 +1,8 @@
-#include "common.h"
+#include "types/common.h"
+#include "types/core.h"
 
-#include "external_struct.h"
-#include "basic_object.h"
-#include "adv_object.h"
+#include <spdlog/spdlog.h>
+#include <bandit/bandit.h>
 
 int main(int argc, char const *argv[])
 {

@@ -21,6 +21,7 @@ platform-dependencies:
 platform-compile-flags:
   x86_64-pc-windows-msvccoff:
     - "/std:c++latest"
+    # - "/Zc:__cplusplus" # whoops no string join
   x86_64-apple-macosx-macho:
     - "-std=c++1z"
     - "-stdlib=libc++"
