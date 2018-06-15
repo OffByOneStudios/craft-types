@@ -170,6 +170,37 @@ namespace types
 			}
 
 			//
+			// Members
+			//
+		public:
+
+			// value mem-pointer
+			template<class TMemberType,
+				typename _TDefine = TDefine,
+				typename std::enable_if<cpptype<_TDefine>::isObject || cpptype<_TDefine>::isRawType>::type* = nullptr>
+			void inline member(char const* name, TMemberType _TDefine::*member)
+			{
+			}
+
+			// func mem-pointer
+			template<class TMemberFuncReturn, class ...TMemberFuncArgs,
+				typename _TDefine = TDefine,
+				typename std::enable_if<cpptype<_TDefine>::isObject || cpptype<_TDefine>::isRawType>::type* = nullptr>
+				void inline member(char const* name, TMemberFuncReturn(_TDefine::*member)(TMemberFuncArgs...))
+			{
+			}
+
+			// property mem-pointer
+			// todo, literate interface?
+			// todo, reference args to get/set?
+			template<class TMemberType,
+				typename _TDefine = TDefine,
+				typename std::enable_if<cpptype<_TDefine>::isObject || cpptype<_TDefine>::isRawType>::type* = nullptr>
+			void inline member(char const* name, TMemberType(_TDefine::*getter)(), void(_TDefine::*setter)(TMemberType))
+			{
+			}
+
+			//
 			// Types
 			//
 		public:
@@ -189,6 +220,11 @@ namespace types
 					+[](void* v) -> void* { return static_cast<TParent*>((TDefine*)v); });
 				typeDesc->initer(helper);
 				graph().add<GraphEdgeIsA>(nullptr, { _node, typeDesc->node });
+			}
+
+			template<typename ...TParents>
+			inline void parents()
+			{
 			}
 
 			template<typename TInterface>
