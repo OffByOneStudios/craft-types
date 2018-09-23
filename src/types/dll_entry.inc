@@ -11,7 +11,7 @@ extern "C" BOOLEAN __stdcall _craft_types_DLLMAIN(LPVOID var1, DWORD var2, LPVOI
 {
 	if (var2 == DLL_PROCESS_ATTACH)
 	{
-		auto save = ::craft::types::_dll_begin(CRAFT_CURRENT_PACKAGE_NAMESPACE "/" CRAFT_CURRENT_PACKAGE_ID "/" CRAFT_CURRENT_ARTIFACT_NAME);
+		auto save = ::craft::types::_dll_begin(CULT_CURRENT_PACKAGE);
 		auto ret = _DllMainCRTStartup(var1, var2, var3);
 		::craft::types::_dll_finish(save);
 		return ret;
@@ -27,13 +27,13 @@ __attribute__ ((visibility ("internal")))
 __attribute__((constructor (1000)))
 void _craft_types_DLLMAIN_begin()
 {
-	::craft::types::_dll_begin(CRAFT_CURRENT_PACKAGE_NAMESPACE "/" CRAFT_CURRENT_PACKAGE_ID "/" CRAFT_CURRENT_ARTIFACT_NAME);
+	::craft::types::_dll_begin(CULT_CURRENT_PACKAGE);
 }
 
 __attribute__ ((visibility ("internal"))) 
 __attribute__((constructor (2000))) 
 void _craft_types_DLLMAIN_finish()
 {
-	::craft::types::_dll_finish(nullptr, CRAFT_CURRENT_PACKAGE_NAMESPACE "/" CRAFT_CURRENT_PACKAGE_ID "/" CRAFT_CURRENT_ARTIFACT_NAME);
+	::craft::types::_dll_finish(nullptr, CULT_CURRENT_PACKAGE);
 }
 #endif 
