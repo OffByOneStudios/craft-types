@@ -7,7 +7,7 @@ cc_library(
     "src/types/dll_entry.inc",
   ],
   includes = ["src"],
-  
+  visibility = ["//visibility:public"],
   deps = ["@boost//:callable_traits", "//util"]
 )
 
@@ -26,16 +26,25 @@ cc_binary(
     defines = ["CULTLANG_TYPES_DLL", "CULT_CURRENT_PACKAGE=\\\"org_cultlang_types\\\""],
 )
 
-filegroup(
-    name = "org_cultlang_types_import",
-    srcs = ["org_cultlang_types.dll"],
-    output_group = "interface_library",
+genrule(
+  visibility = ["//visibility:public"],
+  name = "types_importlib",
+  outs = ["org_cultlang_types.lib"],
+  srcs = ["org_cultlang_types.dll"],
+  cmd = "cp ./$(location org_cultlang_types.dll).if.lib \"$@\"",
 )
 
 cc_import(
   name = "types_lib",
-  interface_library = ":org_cultlang_types_import",
+  interface_library = "org_cultlang_types.lib",
+  visibility = ["//visibility:public"],
   shared_library = "org_cultlang_types.dll",
+)
+
+cc_library(
+    visibility = ["//visibility:public"],
+    name = "org_cultlang_type_import",
+    srcs = ["org_cultlang_types.lib"],
 )
 
 cc_library(
