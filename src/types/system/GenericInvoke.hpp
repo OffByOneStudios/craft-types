@@ -20,6 +20,10 @@ namespace types
 		{
 			args.reserve(presize);
 		}
+		inline GenericInvoke(instance<>* argv, size_t argc)
+		{
+			args.insert(args.end(), argv, argv + argc);
+		}
 		inline GenericInvoke(std::initializer_list<instance<>> l)
 		{
 			args.insert(args.end(), l.begin(), l.end());
