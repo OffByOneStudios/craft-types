@@ -1,3 +1,17 @@
+The type system is a "universal middle" (e.g. LLVM IR) style architecture. It generally is composed of three parts:
+
+* Reflection system. This part is the reflection of a source type system. It's goal is to perserve all the information it can, as effeciently as it can.
+* Graph system. This part is the total graph of all relevant information. It's goal is to allow queries across types and functions.
+* Artifact system. This part is the target specific output of the graph system. It's goal is to provide effecient as possible runtime execution informed by the type system.
+
+This library contains objects composing the above system, along with some implementations:
+
+* C++ reflector. An in code, programmer controlled, templated reflection system. This allows programmers to describe - by hand - the type data of arbitrary C++ types. Some of this information may be availble at template time as well. At the moment this writes directly into the graph, rather than a faster intermediate layer.
+* C++ runtime. A library of features which can translate between (or be embedded into) the type graph and C++.
+* C++ templated artifacts. A library which combines templated reflector information with the C++ runtime to provide suffciently effecient artifacts for interacting with arbitrary external types while providing fast paths for local natively compiled code.
+
+# OLD
+
 At it's core the type system is an in memory graph of types. The graph has three primary concepts: a Node, an Edge, and a Property. All of these use a node as their type. If a node has a type node that is null then it is a root node. Root nodes are "stringly" typed.
 
 Nodes represent a type or object the system knows about. Types, Functions, Features, etc. Nodes have an arbitrary number of properties and edges.
