@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 				auto last_dll = system().getLastLibraryName();
 				auto end = system().getLibraryCount(last_dll);
 
-				for (auto i = 0; i < end; ++i)
+				for (size_t i =0; i < end; ++i)
 					std::cout << graph().dumpNode(system().getLibraryEntry(last_dll, i).asId().node) << std::endl;
 
 				std::cout << std::endl << "loaded " << (end) << " types." << std::endl;

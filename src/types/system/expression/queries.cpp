@@ -61,7 +61,7 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 		}
 
 		// Time to do the core match
-		for (auto i = 0; i < left_count; ++i)
+		for (size_t i =0; i < left_count; ++i)
 		{
 			auto right_i = (i >= right_count) ? right->varType : right->entries[i];
 			if (!isSubtype(left->entries[i], right_i))

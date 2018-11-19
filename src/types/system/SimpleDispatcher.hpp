@@ -179,7 +179,7 @@ namespace types
 					continue;
 
 				bool all_match = true;
-				for (auto i = 0; i < target_size; ++i)
+				for (size_t i =0; i < target_size; ++i)
 				{
 					auto dispatching_type = rec.dispatch.args[i];
 					if (dispatching_type == Any)
