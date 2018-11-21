@@ -33,4 +33,5 @@
 // Deps
 #include "boost/callable_traits.hpp"
 #include "util/all.h"
+#include "util/graph.hpp"
 #include "util/vendor/plf_colony.hpp"

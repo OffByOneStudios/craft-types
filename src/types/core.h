@@ -1,17 +1,6 @@
 #pragma once
 #include "common.h"
 
-// Forward Declarations
-namespace craft {
-namespace types
-{
-	class Graph;
-	inline Graph& graph();
-
-	class CppSystem;
-	inline CppSystem& system();
-}}
-
 //
 // Forward declares
 //
@@ -20,14 +9,16 @@ namespace types
 #include "exceptions.hpp"
 
 //
-// Components Subsystems
+// Core type system
 //
 
-#include "system/graph.h"
+#include "system/store.h" /* TypeStore, TypeId, TypeGraph (and dependents) */
+#include "system/basic_types.h"
 #include "system/expression/expression.h"
 #include "system/expression/queries.h"
-#include "system/expression_cache.h"
-#include "system/multimethods.h"
+#include "system/native_types.h"
+#include "system/advanced_types.h"
+#include "system/epilogue.h"
 
 //
 // Cpp System
@@ -49,7 +40,8 @@ namespace types
 
 #include "boot/system_into_cpp.h"
 
-#include "cpp/graph.hpp"
+//#include "cpp/graph.hpp"
+#include "cpp/cpp_types.h"
 #include "cpp/expressions.hpp"
 #include "system/ExpressionDispatcher.hpp"
 

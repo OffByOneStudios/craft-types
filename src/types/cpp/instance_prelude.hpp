@@ -10,8 +10,6 @@
 namespace craft {
 namespace types
 {
-	template<typename TType = void, typename T_ = void> struct instance;
-
 	/******************************************************************************
 	** InstanceHeader
 	******************************************************************************/

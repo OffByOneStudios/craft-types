@@ -9,8 +9,12 @@ namespace types
 	** SimpleDispatcher
 	******************************************************************************/
 
-	// Specifically for implementing internals
-	// Provides barebones features
+	/* Specifically designed for implementing internals, this provides a barebones dispatcher.
+
+	This has some limitations. For starters the dispatch cache lasts as long as the object does. It
+	can only really call into cpp function nodes, and it has no concept of qualifiers or affinities
+	and will reject them outright.
+	*/
 	class SimpleDispatcher final
 	{
 		//
@@ -31,6 +35,8 @@ namespace types
 		typedef std::tuple<void*, void*> InvokeArgument;
 		typedef InvokeArgument InvokeResult;
 		typedef std::vector<InvokeArgument> Invoke;
+
+        typedef void (*FunctionPointer)();
 
 		//
 		// Static Helpers
@@ -86,15 +92,15 @@ namespace types
 		}
 
 		template<typename TRet, typename ...TArgs>
-		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(TRet (*fn)(TArgs...))
+		static inline std::tuple<DispatchRecord, FunctionPointer> cppFunctionToRecordAndFunction(TRet (*fn)(TArgs...))
 		{
 			DispatchRecord record = { cppTypesToDispatch<TArgs...>(), cppTypeToDispatchArgument<TRet>() };
-			return std::make_tuple(record, Function(fn));
+			return std::make_tuple(record, FunctionPointer(fn));
 		}
 
 		template<typename T,
 			typename std::enable_if< !std::is_pointer<T>::value >::type* = nullptr>
-			static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
+			static inline std::tuple<DispatchRecord, FunctionPointer> cppFunctionToRecordAndFunction(T fn)
 		{
 			// Decay the lambda
 			return cppFunctionToRecordAndFunction(+fn);
@@ -105,22 +111,22 @@ namespace types
 		//
 	public:
 
-		static inline InvokeResult invoke(Function const* f, DispatchRecord const* d, Invoke && i)
+		static inline InvokeResult invoke(FunctionPointer f, DispatchRecord const* d, Invoke && i)
 		{
 			if (d->ret != nullptr)
 			{
 				switch (i.size())
 				{
 				case 0:
-					return { d->ret, reinterpret_cast<void* (*)()>(f->_fn)() };
+					return { d->ret, reinterpret_cast<void* (*)()>(f)() };
 				case 1:
-					return{ d->ret, reinterpret_cast<void* (*)(void*)>(f->_fn)(std::get<1>(i[0])) };
+					return{ d->ret, reinterpret_cast<void* (*)(void*)>(f)(std::get<1>(i[0])) };
 				case 2:
-					return{ d->ret, reinterpret_cast<void* (*)(void*, void*)>(f->_fn)(std::get<1>(i[0]), std::get<1>(i[1])) };
+					return{ d->ret, reinterpret_cast<void* (*)(void*, void*)>(f)(std::get<1>(i[0]), std::get<1>(i[1])) };
 				case 3:
-					return{ d->ret, reinterpret_cast<void* (*)(void*, void*, void*)>(f->_fn)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2])) };
+					return{ d->ret, reinterpret_cast<void* (*)(void*, void*, void*)>(f)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2])) };
 				case 4:
-					return{ d->ret, reinterpret_cast<void* (*)(void*, void*, void*, void*)>(f->_fn)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2]), std::get<1>(i[3])) };
+					return{ d->ret, reinterpret_cast<void* (*)(void*, void*, void*, void*)>(f)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2]), std::get<1>(i[3])) };
 				default:
 					throw type_runtime_error("Simple dispatcher not compiled for this.");
 				}
@@ -130,15 +136,15 @@ namespace types
 				switch (i.size())
 				{
 				case 0:
-					reinterpret_cast<void(*)()>(f->_fn)(); break;
+					reinterpret_cast<void(*)()>(f)(); break;
 				case 1:
-					reinterpret_cast<void (*)(void*)>(f->_fn)(std::get<1>(i[0])); break;
+					reinterpret_cast<void (*)(void*)>(f)(std::get<1>(i[0])); break;
 				case 2:
-					reinterpret_cast<void (*)(void*, void*)>(f->_fn)(std::get<1>(i[0]), std::get<1>(i[1])); break;
+					reinterpret_cast<void (*)(void*, void*)>(f)(std::get<1>(i[0]), std::get<1>(i[1])); break;
 				case 3:
-					reinterpret_cast<void (*)(void*, void*, void*)>(f->_fn)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2])); break;
+					reinterpret_cast<void (*)(void*, void*, void*)>(f)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2])); break;
 				case 4:
-					reinterpret_cast<void (*)(void*, void*, void*, void*)>(f->_fn)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2]), std::get<1>(i[3])); break;
+					reinterpret_cast<void (*)(void*, void*, void*, void*)>(f)(std::get<1>(i[0]), std::get<1>(i[1]), std::get<1>(i[2]), std::get<1>(i[3])); break;
 				default:
 					throw type_runtime_error("Simple dispatcher not compiled for this.");
 				}

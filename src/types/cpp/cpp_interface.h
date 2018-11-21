@@ -57,10 +57,11 @@ namespace types
 		struct static_desc final
 		{
 		public:
-			Graph::Node* node;
+			TypeGraph::Node* node;
 			_fn_register_static_init initer;
 			CppStaticDescKindEnum kind;
 			void* repr;
+			// TODO: ifdef debug (or trace?) add line numbers and file names
 
 			inline static_desc(CppStaticDescKindEnum kind_, void* repr_ = nullptr, _fn_register_static_init initer_ = nullptr);
 
@@ -80,7 +81,7 @@ namespace types
 
 			inline TypePtr() : desc(nullptr) { }
 			inline TypePtr(static_desc const* const& v) : desc(v) { assert(desc == nullptr || kindIsType(desc->kind)); }
-			inline TypePtr(TypeId const& tid) : desc(static_cast<static_desc const*>(tid.node->value))
+			inline TypePtr(TypeId const& tid) : desc(static_cast<static_desc const*>(static_cast<TypeGraph::Node*>(tid)->data))
 			{
 				// TODO assert cpp type
 				//assert(identifiers().get(tid).ptr_type);
@@ -437,7 +438,7 @@ namespace types
 	private:
 		// These first for inlined functions
 		// Graph for this cpp-system (todo: invert this, graph is also a static)
-		Graph* _graph;
+		TypeStore* _graph;
 
 		std::recursive_mutex operation;
 
@@ -484,7 +485,7 @@ namespace types
 		void _addEntry(_Entry &&);
 
 	public:
-		inline Graph& graph() { return *_graph; }
+		inline TypeStore& graph() { return *_graph; }
 
 		CRAFT_TYPES_EXPORTED void _register(cpp::static_desc const*);
 
@@ -627,7 +628,11 @@ namespace types
 	{
 		return CppSystem::global_instance();
 	}
-	inline Graph& graph()
+	inline TypeStore& global_store()
+	{
+		return CppSystem::global_instance().graph();
+	}
+	inline TypeStore& thread_store()
 	{
 		return CppSystem::global_instance().graph();
 	}
@@ -660,7 +665,6 @@ namespace types
 	{
 		template<typename TDispatcher>
 		class Multimethod final
-			: public types::Multimethod<Function, TDispatcher>
 		{
 		private:
 			static_desc __id;
@@ -672,7 +676,7 @@ namespace types
 				// TODO throw exception if not static time
 			}
 
-			inline operator types::Graph::Node*() const { return __id.node; }
+			inline operator types::TypeGraph::Node*() const { return __id.node; }
 
 		public:
 			template <typename ...TArgs>
