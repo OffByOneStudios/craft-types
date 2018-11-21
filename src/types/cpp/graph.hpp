@@ -136,45 +136,6 @@ namespace types
 		}
 	};
 
-	/******************************************************************************
-	** cpp - GraphProperties
-	******************************************************************************/
-
-	struct GraphPropertyCppSize final
-	{
-		// is a   `size_t`
-		typedef size_t value_type;
-	private:
-		GraphPropertyCppSize() = delete;
-	public:
-		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
-		static constexpr char const* craftTypes_metaProp_name = "cpp.size";
-		inline static GraphPropMeta* craftTypes_metaProp_builder(Graph::Node* metanode)
-		{
-			graph().add<GraphPropertyPrinter>(metanode,
-				[](Graph::Element* p) -> std::string { return std::to_string((value_type)p->value); });
-			return GraphPropMeta::Singular(craftTypes_metaProp_name);
-		}
-	};
-
-	struct GraphPropertyCppName final
-	{
-		// is a   `char const*`
-		typedef char const* value_type;
-		typedef BasicGraphIndex<value_type> index_type;
-	private:
-		GraphPropertyCppName() = delete;
-	public:
-		static constexpr GraphMeta::Kind craftTypes_metaKind = GraphMeta::Kind::Prop; // needed?
-		static constexpr char const* craftTypes_metaProp_name = "cpp.name";
-		inline static GraphPropMeta* craftTypes_metaProp_builder(Graph::Node* metanode)
-		{
-			graph().add<GraphPropertyPrinter>(metanode,
-				[](Graph::Element* p) -> std::string { return (value_type)p->value; });
-			graph().add<GraphPropertyMetaIndex>(metanode, new index_type());
-			return GraphPropMeta::Singular(craftTypes_metaProp_name);
-		}
-	};
 
 	/******************************************************************************
 	** cpp - GraphEdges

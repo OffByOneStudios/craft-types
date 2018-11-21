@@ -18,7 +18,7 @@ namespace types
 
 	inline IExpression* to_expression(TypeId tid)
 	{
-		return new ExpressionConcrete(tid.node);
+		return new ExpressionConcrete(tid);
 	}
 
 	inline IExpression* to_expression_tuple(std::vector<TypeId> const& tids)
@@ -98,7 +98,7 @@ namespace types
 	}
 
 	template<typename TRet, typename ...TArgs>
-	inline std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (*fn)(TArgs...))
+	inline std::tuple<ExpressionStore, void (*)()> to_expression_and_function(TRet (*fn)(TArgs...))
 	{
 		auto arrow = new ExpressionArrow(to_expression_tuple<TArgs...>(), to_expression<TRet>());
 
@@ -106,14 +106,14 @@ namespace types
 	}
 
 	template<typename TClass, typename TRet, typename ...TArgs>
-	inline std::tuple<ExpressionStore, Function> to_expression_and_function(TRet (TClass::*fn)(TArgs...))
+	inline std::tuple<ExpressionStore, void (*)()> to_expression_and_function(TRet (TClass::*fn)(TArgs...))
 	{
 		
 	}
 
 	template<typename T,
 		typename std::enable_if< !std::is_pointer<T>::value >::type* = nullptr>
-		inline std::tuple<ExpressionStore, Function> to_expression_and_function(T fn)
+		inline std::tuple<ExpressionStore, void (*)()> to_expression_and_function(T fn)
 	{
 		return to_expression_and_function(+fn);
 	}
@@ -122,7 +122,7 @@ namespace types
 	// invoke
 	//
 
-	inline instance<> invoke(ExpressionStore const& exs, Function const& f, GenericInvoke const& i)
+	inline instance<> invoke(ExpressionStore const& exs, void (*f)(), GenericInvoke const& i)
 	{
 		assert(exs.root()->kind() == cpptype<ExpressionArrow>::typeDesc().asId());
 		auto arrow = (ExpressionArrow const*)exs.root();
@@ -149,19 +149,19 @@ namespace types
 				switch (t_size)
 				{
 				case 0:
-					return reinterpret_cast<instance<>(*)(VarArgs)>(f._fn)(va);
+					return reinterpret_cast<instance<>(*)(VarArgs)>(f)(va);
 				case 1:
-					return reinterpret_cast<instance<>(*)(instance<>, VarArgs)>(f._fn)(i.args[0], va);
+					return reinterpret_cast<instance<>(*)(instance<>, VarArgs)>(f)(i.args[0], va);
 				case 2:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], va);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], va);
 				case 3:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], va);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], va);
 				case 4:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], va);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], va);
 				case 5:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], va);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], va);
 				case 6:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5], va);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5], va);
 				default:
 					throw type_runtime_error("invoke not compiled for this.");
 				}
@@ -172,19 +172,19 @@ namespace types
 				switch (t_size)
 				{
 				case 0:
-					reinterpret_cast<void(*)(VarArgs)>(f._fn)(va); break;
+					reinterpret_cast<void(*)(VarArgs)>(f)(va); break;
 				case 1:
-					reinterpret_cast<void(*)(instance<>, VarArgs)>(f._fn)(i.args[0], va); break;
+					reinterpret_cast<void(*)(instance<>, VarArgs)>(f)(i.args[0], va); break;
 				case 2:
-					reinterpret_cast<void(*)(instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], va); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], va); break;
 				case 3:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], va); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], va); break;
 				case 4:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], va); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], va); break;
 				case 5:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], va); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], va); break;
 				case 6:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5], va); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>, VarArgs)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5], va); break;
 				default:
 					throw type_runtime_error("invoke not compiled for this.");
 				}
@@ -203,19 +203,19 @@ namespace types
 				switch (t_size)
 				{
 				case 0:
-					return reinterpret_cast<instance<>(*)()>(f._fn)();
+					return reinterpret_cast<instance<>(*)()>(f)();
 				case 1:
-					return reinterpret_cast<instance<>(*)(instance<>)>(f._fn)(i.args[0]);
+					return reinterpret_cast<instance<>(*)(instance<>)>(f)(i.args[0]);
 				case 2:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>)>(f._fn)(i.args[0], i.args[1]);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>)>(f)(i.args[0], i.args[1]);
 				case 3:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2]);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2]);
 				case 4:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3]);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2], i.args[3]);
 				case 5:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4]);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4]);
 				case 6:
-					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5]);
+					return reinterpret_cast<instance<>(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5]);
 				default:
 					throw type_runtime_error("invoke not compiled for this.");
 				}
@@ -226,19 +226,19 @@ namespace types
 				switch (t_size)
 				{
 				case 0:
-					reinterpret_cast<void(*)()>(f._fn)(); break;
+					reinterpret_cast<void(*)()>(f)(); break;
 				case 1:
-					reinterpret_cast<void(*)(instance<>)>(f._fn)(i.args[0]); break;
+					reinterpret_cast<void(*)(instance<>)>(f)(i.args[0]); break;
 				case 2:
-					reinterpret_cast<void(*)(instance<>, instance<>)>(f._fn)(i.args[0], i.args[1]); break;
+					reinterpret_cast<void(*)(instance<>, instance<>)>(f)(i.args[0], i.args[1]); break;
 				case 3:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2]); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2]); break;
 				case 4:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3]); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2], i.args[3]); break;
 				case 5:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4]); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4]); break;
 				case 6:
-					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>)>(f._fn)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5]); break;
+					reinterpret_cast<void(*)(instance<>, instance<>, instance<>, instance<>, instance<>, instance<>)>(f)(i.args[0], i.args[1], i.args[2], i.args[3], i.args[4], i.args[5]); break;
 				default:
 					throw type_runtime_error("invoke not compiled for this.");
 				}

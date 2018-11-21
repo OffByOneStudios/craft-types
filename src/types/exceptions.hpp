@@ -18,12 +18,6 @@ namespace types
 		using type_error::type_error;
 	};
 
-	class type_not_found_by_identifer_error : public type_identifier_error
-	{
-	public:
-		using type_identifier_error::type_identifier_error;
-	};
-
 	class type_identifer_not_found_error : public type_identifier_error
 	{
 	public:
@@ -35,13 +29,6 @@ namespace types
 	{
 	public:
 		using type_error::type_error;
-	};
-
-	// Unimplement feature inside the type graph (not the types themselves).
-	class type_graph_not_implemented_error : public type_graph_error
-	{
-	public:
-		using type_graph_error::type_graph_error;
 	};
 
 	// Only errors in runtime execution will throw this (e.g. C++ glue code, the system runtime not otherwise covered, and the booted system)

@@ -21,7 +21,7 @@ namespace types
 		virtual IExpression* clone() const = 0;
 
 	public:
-		inline std::tuple<void*, void*> invokeArg() const { return std::make_tuple(kind().node, ptr()); }
+		inline std::tuple<void*, void*> invokeArg() const { return std::make_tuple((TypeGraph::Node*)kind(), ptr()); }
 	};
 
 	/******************************************************************************
@@ -93,7 +93,7 @@ namespace types
 		: public IExpression
 	{
 	public:
-		Graph::Node* node;
+		TypeGraph::Node* node;
 
 		CRAFT_TYPES_EXPORTED ExpressionConcrete(TypeId node);
 		CRAFT_TYPES_EXPORTED ~ExpressionConcrete();

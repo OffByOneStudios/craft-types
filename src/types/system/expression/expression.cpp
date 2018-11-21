@@ -61,7 +61,7 @@ CRAFT_TYPE_DEFINE(ExpressionConcrete)
 
 ExpressionConcrete::ExpressionConcrete(TypeId tid)
 	: IExpression()
-	, node(tid.node)
+	, node(tid)
 {
 
 }

@@ -19,7 +19,7 @@ namespace types
 		{
 		private:
 			DefineHelper<TType>* _type;
-			Graph::Node* _node;
+			TypeGraph::Node* _node;
 
 			DefineHelper_WithFeature(DefineHelper<TType>* type)
 			{
@@ -86,7 +86,7 @@ namespace types
 			DefineHelper* _parent;
 			void* (*_fn_cast)(void*);
 
-			Graph::Node* _node;
+			TypeGraph::Node* _node;
 
 			DefineHelper(static_desc* sd, DefineHelper* parent = nullptr, void* (*fn_cast)(void*) = nullptr)
 				: _sd(sd), _parent(parent), _fn_cast(fn_cast)
@@ -124,7 +124,7 @@ namespace types
 					return i.size() == 0;
 				});
 
-				return stdext::join('/', _parts.begin(), end);
+				return stdext::join('.', _parts.begin(), end);
 			}
 
 			//
@@ -132,41 +132,27 @@ namespace types
 			//
 		public:
 
-			inline operator Graph::Node*() const { return _node; }
-
-			template<typename TGraphMeta
-				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
-			void inline add(typename TGraphMeta::value_type value)
-			{
-				graph().add<TGraphMeta>(_node, value);
-			}
-
-			template<typename TGraphMeta
-				, typename std::enable_if< TGraphMeta::craftTypes_metaKind == GraphMeta::Kind::Prop >::type* = nullptr>
-			bool inline has()
-			{
-				return graph().hasProp<TGraphMeta>(_node);
-			}
+			inline operator TypeGraph::Node*() const { return _node; }
 
 			//
 			// Identifiers
 			//
 		public:
 
-			void inline identify_asEffectiveCppName(char const* c)
+			// Add a namespace identity to this object
+			// The `.` character is the canonical namespace seperator
+			void inline identify(char const* c_name)
 			{
-				add<GraphPropertyName>(c);
-				add<GraphPropertyCppName>(c);
-				// TODO if constexpr (!isLegacyFeature)
-				add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(c)));
+				thread_store().addProp<Type_Property_NamespaceIdentifier>(c, _node);
+				// TODO: find end part
+				thread_store().addProp<Type_Property_LocalIdentifier>(c, _node);
 			}
 
-			void inline identify_verbose(char const* c_name, char const* c_type_name = nullptr, char const* c_cpp_name = nullptr)
+			// Provide the C++ name of this object
+			void inline identify_byFullCppName(char const* c)
 			{
-				add<GraphPropertyName>(c_name);
-				add<GraphPropertyCppName>(c_cpp_name);
-				// TODO if constexpr (!isLegacyFeature)
-				add<GraphPropertyTypeName>(new std::string(c_type_name));
+				thread_store().addProp<Type_Property_CppIdentifier>(c, _node);
+				identify(_cpp_name_to_type_name(c));
 			}
 
 			//

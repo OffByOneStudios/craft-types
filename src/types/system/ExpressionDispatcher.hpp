@@ -43,7 +43,7 @@ namespace types
 
 		template<typename T
 			/*typename std::enable_if< std::is_invocable<T>::value >::type* = nullptr*/>
-		static inline std::tuple<DispatchRecord, Function> cppFunctionToRecordAndFunction(T fn)
+		static inline std::tuple<DispatchRecord, void (*)()> cppFunctionToRecordAndFunction(T fn)
 		{
 			return to_expression_and_function(fn);
 		}
@@ -87,7 +87,7 @@ namespace types
 		//
 	public:
 
-		static inline InvokeResult invoke(Function const* f, DispatchRecord const* d, Invoke && i)
+		static inline InvokeResult invoke(void (*f)(), DispatchRecord const* d, Invoke && i)
 		{
 			return types::invoke(*d, *f, i);
 		}
