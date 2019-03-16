@@ -1,6 +1,6 @@
 #include "../common.h"
 #include "../core.h"
-#include "graph.h"
+#include "store.h"
 
 using namespace craft;
 using namespace craft::types;
@@ -15,13 +15,17 @@ TypeStore::TypeStore()
 }
 TypeStore::~TypeStore()
 {
-
+	for (auto s : _strs)
+	{
+		free((void*)s);
+	}
 }
 
-std::string TypeStore::dumpNode(Node* n)
+std::string TypeStore::dumpNode(Node const* n)
 {
 	std::ostringstream ss;
 
+	/*
 	// Prime node
 	if (n->isMeta())
 	{
@@ -73,9 +77,23 @@ std::string TypeStore::dumpNode(Node* n)
 			ss << std::endl;
 		}
 	}
-
+	*/
 	// Result
 	return ss.str();
+}
+
+char const* TypeStore::malloc_cstr(char const* s)
+{
+	if (_strs.find(s) != _strs.end())
+		return s;
+
+	char const* new_s = strdup(s);
+	_strs.insert(new_s);
+	return new_s;
+}
+char const* TypeStore::malloc_cstr(std::string const& s)
+{
+	return malloc_cstr(s.c_str());
 }
 
 /******************************************************************************
@@ -84,15 +102,7 @@ std::string TypeStore::dumpNode(Node* n)
 
 CRAFT_TYPE_DEFINE(craft::types::TypeStore)
 {
-	_.use<PStringer>().singleton<FunctionalStringer>([](instance<Graph::Node> n) -> std::string
-	{
-		if (graph().hasProp<GraphPropertyTypeName>(n.get()))
-			return *graph().getFirstPropValue<GraphPropertyTypeName>(n.get());
-		else
-			return fmt::format("<<{0}>>", graph().getFirstPropValue<GraphPropertyName>(n.get()));
-	});
-
-	_.identify_verbose("craft/types/Graph:Node", "Info", "craft::types::Graph::Node");
+	_.identify_byFullCppName("craft::types::TypeStore");
 	_.defaults();
 }
 
@@ -102,25 +112,11 @@ CRAFT_TYPE_DEFINE(craft::types::TypeStore)
 
 CRAFT_TYPE_DEFINE(craft::types::TypeId)
 {
-	_.use<PStringer>().singleton<FunctionalStringer>([](instance<Graph::Node> n) -> std::string
+	_.use<PStringer>().singleton<FunctionalStringer>([](instance<TypeId> n) -> std::string
 	{
-		if (graph().hasProp<GraphPropertyTypeName>(n.get()))
-			return *graph().getFirstPropValue<GraphPropertyTypeName>(n.get());
-		else
-			return fmt::format("<<{0}>>", graph().getFirstPropValue<GraphPropertyName>(n.get()));
+		return n->toString();
 	});
 
-	_.identify_verbose("craft/types/Graph:Node", "Info", "craft::types::Graph::Node");
+	_.identify_byFullCppName("craft::types::TypeId");
 	_.defaults();
-}
-
-bool Graph::Node::isMeta() const
-{
-	return label == nullptr;
-}
-
-GraphNodeMeta* Graph::Node::getInterface()
-{
-	assert(!isMeta());
-	return (GraphNodeMeta*)label->value;
 }

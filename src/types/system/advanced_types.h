@@ -28,7 +28,45 @@ namespace types
 	*/
 	struct Type_Edge_MethodImplementation final
 	{
-	private:
         ExpressionStore dispatch_type;
+	};
+
+	/******************************************************************************
+	** Type_Node_GenericType
+	******************************************************************************/
+
+	/* This is a generic type.
+	
+	The type described *by* this node is a template type that describes all concrete realizations
+	of this type in general terms. Generally, instantiating this will create a concrete type.
+	
+	A node of this type node may be used by other special generic features to wrap some sort of
+	dispatcher or generic implementation around any nstance of this generic. For example: 
+
+	* A is a concrete type.
+	* G is a generic type with one argument.
+	* S is a generic wrapper type.
+	* G_0A is the concrete instantiation of the generic type G on A.
+	* S_0G is the concrete instantiation of the generic type S on G.
+
+	A user of a type system (e.g. a programming language) might say `G<A>` to get G_0A, but could
+	also say `G<Any>` to get a S_0G, this would be a feature of the language, as the naieve
+	interpretation of this request would be G_0ANY.
+	*/
+	struct Type_Node_GenericType final
+	{
+		uint8_t generic_parameter_count;
+	};
+
+	/******************************************************************************
+	** Type_Edge_GenericInstantiation
+	******************************************************************************/
+
+	/* This describes that a concrete type is an instantiation of a generic type. */
+	struct Type_Edge_GenericInstantiation final
+	{
+	private:
+		// Unused
+		size_t _reserved;
 	};
 }}

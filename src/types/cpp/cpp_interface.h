@@ -117,7 +117,7 @@ namespace types
 			//
 			// Defined in to_string.cpp
 			//
-			inline std::string toString(bool verbose = true) const { return asId().toString(verbose); }
+			inline std::string toString() const { return asId().toString(); }
 		};
 
 		const static TypePtr None = nullptr;
@@ -438,7 +438,7 @@ namespace types
 	private:
 		// These first for inlined functions
 		// Graph for this cpp-system (todo: invert this, graph is also a static)
-		TypeStore* _graph;
+		TypeStore* _store;
 
 		std::recursive_mutex operation;
 
@@ -485,7 +485,7 @@ namespace types
 		void _addEntry(_Entry &&);
 
 	public:
-		inline TypeStore& graph() { return *_graph; }
+		inline TypeStore& types() { return *_store; }
 
 		CRAFT_TYPES_EXPORTED void _register(cpp::static_desc const*);
 
@@ -630,11 +630,11 @@ namespace types
 	}
 	inline TypeStore& global_store()
 	{
-		return CppSystem::global_instance().graph();
+		return CppSystem::global_instance().types();
 	}
 	inline TypeStore& thread_store()
 	{
-		return CppSystem::global_instance().graph();
+		return CppSystem::global_instance().types();
 	}
 
 	inline cpp::static_desc::static_desc(CppStaticDescKindEnum kind_, void* repr_, _fn_register_static_init initer_)
@@ -668,12 +668,14 @@ namespace types
 		{
 		private:
 			static_desc __id;
+			TDispatcher _dispatch;
 
 		public:
 			inline Multimethod(_fn_register_static_init init)
 				: __id(CppStaticDescKindEnum::MultiMethod, this, init)
 			{
-				// TODO throw exception if not static time
+				// TODO? throw exception if not static time
+				// TODO? use a friend to initalize this thing?
 			}
 
 			inline operator types::TypeGraph::Node*() const { return __id.node; }
@@ -683,7 +685,7 @@ namespace types
 			inline typename TDispatcher::InvokeResult operator() (TArgs &&... args) const
 			{
 				// This may return an arbitrary invoke structure that forwards types and arguments
-				return invoke( std::move(typename TDispatcher::cppArgumentsToInvoke(std::forward<TArgs>(args)...)) );
+				return _dispatch.invoke( std::move(typename TDispatcher::cppArgumentsToInvoke(std::forward<TArgs>(args)...)) );
 			}
 
 			template <typename TInvoke>
@@ -693,7 +695,7 @@ namespace types
 
 				TDispatcher::invokeIntoDispatch(invoke, d);
 
-				auto res = this->dispatchWithRecord(d);
+				auto res = _dispatch.dispatchWithRecord(d);
 				auto callable = std::get<0>(res);
 				if (callable == nullptr) throw stdext::exception("bad dispatch");
 				auto dispatchRecord = std::get<1>(res);
@@ -705,9 +707,10 @@ namespace types
 			template<typename T>
 			inline void add(T fn)
 			{
+				// TODO: add to the graph
 				auto res = TDispatcher::cppFunctionToRecordAndFunction(fn);
 
-				this->addRecord(std::get<0>(res), std::get<1>(res));
+				_dispatch.add(std::get<0>(res), std::get<1>(res));
 			}
 		};
 	}

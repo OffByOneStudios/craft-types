@@ -111,12 +111,12 @@ namespace types
 			}
 
 		protected:
-			inline std::string _cpp_name_to_type_name(std::string const& s)
+			inline char const* _cpp_identity_to_type_namespace_identity(std::string const& s)
 			{
 				std::string result;
 
 				if (s.find("::") == std::string::npos)
-					return "." + s;
+					return thread_store().malloc_cstr(std::string("c++.") + s);
 
 				std::vector<std::string> _parts;
 				stdext::split(s, "::", std::back_inserter(_parts));
@@ -124,7 +124,7 @@ namespace types
 					return i.size() == 0;
 				});
 
-				return stdext::join('.', _parts.begin(), end);
+				return thread_store().malloc_cstr(std::string("c++.") + stdext::join('.', _parts.begin(), end));
 			}
 
 			//
@@ -134,6 +134,18 @@ namespace types
 
 			inline operator TypeGraph::Node*() const { return _node; }
 
+			template<typename T>
+			inline void prop(T const& v)
+			{
+				thread_store().addProp(v, _node);
+			}
+
+			template<typename T>
+			inline bool hasAny()
+			{
+				return thread_store().onlyPropOfTypeOnNode<T>(_node) != nullptr;
+			}
+
 			//
 			// Identifiers
 			//
@@ -141,18 +153,27 @@ namespace types
 
 			// Add a namespace identity to this object
 			// The `.` character is the canonical namespace seperator
-			void inline identify(char const* c_name)
+			void inline identify(char const* name)
 			{
-				thread_store().addProp<Type_Property_NamespaceIdentifier>(c, _node);
+				prop<Type_Property_NamespaceIdentifier>({ name });
 				// TODO: find end part
-				thread_store().addProp<Type_Property_LocalIdentifier>(c, _node);
+				prop<Type_Property_LocalIdentifier>({ name });
 			}
 
 			// Provide the C++ name of this object
-			void inline identify_byFullCppName(char const* c)
+			void inline identify_byFullCppName(char const* cpp_name)
 			{
-				thread_store().addProp<Type_Property_CppIdentifier>(c, _node);
-				identify(_cpp_name_to_type_name(c));
+				prop<Type_Property_CppIdentifier>({ cpp_name });
+				identify(_cpp_identity_to_type_namespace_identity(cpp_name));
+			}
+
+			//
+			// Cpp
+			//
+		public:
+			inline void native_size(size_t size)
+			{
+				prop<Type_Property_NativeSize>({ size });
 			}
 
 			//
@@ -205,7 +226,7 @@ namespace types
 				DefineHelper<void> helper(typeDesc, (DefineHelper<void>*)this,
 					+[](void* v) -> void* { return static_cast<TParent*>((TDefine*)v); });
 				typeDesc->initer(helper);
-				graph().add<GraphEdgeIsA>(nullptr, { _node, typeDesc->node });
+				thread_local().addEdge<Type_Edge_IsA>(nullptr, { _node, typeDesc->node });
 			}
 
 			template<typename ...TParents>
@@ -227,10 +248,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				if (!has<GraphPropertyName>()) add<GraphPropertyName>(_T::craft_s_typeName());
-				if (!has<GraphPropertyCppName>()) add<GraphPropertyCppName>(_T::craft_s_typeName());
-				if (!has<GraphPropertyCppSize>()) add<GraphPropertyCppSize>(sizeof(_T));
-				if (!has<GraphPropertyTypeName>()) add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(_T::craft_s_typeName())));
+				if (!hasAny<Type_Property_CppIdentifier>())
+					identify_byFullCppName(_T::craft_s_typeName());
+				if (!hasAny<Type_Property_NativeSize>())
+					native_size(sizeof(_T));
 
 				if (!system().typeHasFeature<PConstructor>(TypeId(_node))) use<PConstructor>().template singleton<DefaultConstructor>();
 			}
@@ -242,10 +263,10 @@ namespace types
 				if (_parent != nullptr) return;
 
 				// Add defaults
-				if (!has<GraphPropertyName>()) add<GraphPropertyName>(cpptype<_T>::typeName());
-				if (!has<GraphPropertyCppName>()) add<GraphPropertyCppName>(cpptype<_T>::typeName());
-				if (!has<GraphPropertyCppSize>()) add<GraphPropertyCppSize>(sizeof(_T));
-				if (!has<GraphPropertyTypeName>()) add<GraphPropertyTypeName>(new std::string(_cpp_name_to_type_name(cpptype<_T>::typeName())));
+				if (!hasAny<Type_Property_CppIdentifier>())
+					identify_byFullCppName(cpptype<_T>::typeName());
+				if (!hasAny<Type_Property_NativeSize>())
+					native_size(sizeof(_T));
 			}
 
 			template<typename _T = TDefine,
@@ -258,9 +279,10 @@ namespace types
 				CppSystem::ensureManager<TDefine>();
 
 				// Add defaults
-				if (!has<GraphPropertyName>()) add<GraphPropertyName>(_T::craft_s_featureName());
-				if (!has<GraphPropertyCppName>()) add<GraphPropertyCppName>(_T::craft_s_typeName());
-				if (!has<GraphPropertyCppSize>()) add<GraphPropertyCppSize>(sizeof(_T));
+				if (!hasAny<Type_Property_CppIdentifier>())
+					identify_byFullCppName(_T::craft_s_typeName());
+				if (!hasAny<Type_Property_NativeSize>())
+					native_size(sizeof(_T));
 			}
 
 			//
@@ -303,8 +325,8 @@ namespace types
 			auto res = new TSingleton();
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 		}
 
 		template<typename TType, typename TFeature>
@@ -316,8 +338,8 @@ namespace types
 			auto res = new TSingleton<TType>();
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 		}
 
 		template<typename TType, typename TFeature>
@@ -329,8 +351,8 @@ namespace types
 			auto res = new TSingleton<TType>(args...);
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 		}
 
 		template<typename TType, typename TFeature>
@@ -342,8 +364,8 @@ namespace types
 			auto res = new TSingleton();
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 
 			return res;
 		}
@@ -357,8 +379,8 @@ namespace types
 			auto res = new TSingleton<TType>();
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 
 			return res;
 		}
@@ -372,8 +394,8 @@ namespace types
 			auto res = new TSingleton<TType>(args...);
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 
 			return res;
 		}
@@ -389,8 +411,8 @@ namespace types
 			auto res = new TConcreate<TType>();
 
 			system().getManager<TFeature>()->addSingleton(_type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { _type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, _type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { _type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, _type->_node });
 
 			return res;
 		}
@@ -412,8 +434,8 @@ namespace types
 			}
 
 			system().getManager<TFeature>()->addFactory(type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, type->_node });
 		}
 
 		template<typename TType, typename TFeature>
@@ -436,8 +458,8 @@ namespace types
 			}
 
 			system().getManager<TFeature>()->addFactory(type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, type->_node });
 		}
 
 		template<typename TType, typename TFeature>
@@ -463,8 +485,8 @@ namespace types
 			}
 
 			system().getManager<TFeature>()->addFactory(type->_sd, res);
-			graph().add<GraphEdgeIsA>(nullptr, { type->_node, _node });
-			graph().add<GraphEdgeImplements>(res, { _node, type->_node });
+			thread_store().addEdge<Type_Edge_IsA>({ }, { type->_node, _node });
+			thread_store().addEdge<Type_Edge_CppLegacyImplements>({ res }, { _node, type->_node });
 
 			return ret;
 		}

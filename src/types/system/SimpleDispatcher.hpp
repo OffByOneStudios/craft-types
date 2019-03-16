@@ -159,14 +159,14 @@ namespace types
 	private:
 		struct _Record
 		{
-			void* value;
+			FunctionPointer value;
 			DispatchRecord dispatch;
 		};
 
 		std::vector<_Record> _records;
 
 	public:
-		void add(DispatchRecord const& d, void* v)
+		void add(DispatchRecord const& d, FunctionPointer v)
 		{
 			auto res = dispatchWithRecord(d.args);
 
@@ -176,7 +176,7 @@ namespace types
 			_records.push_back({ v, d });
 		}
 
-		std::tuple<void*, DispatchRecord const*> dispatchWithRecord(Dispatch const& d) const
+		std::tuple<FunctionPointer, DispatchRecord const*> dispatchWithRecord(Dispatch const& d) const
 		{
 			auto target_size = d.size();
 			for (auto& rec : _records)

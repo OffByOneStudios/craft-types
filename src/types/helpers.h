@@ -2,8 +2,6 @@
 #include "common.h"
 #include "core.h"
 
-#include "util/platform_windows.h"
-
 namespace craft {
 namespace types {
 
@@ -25,10 +23,10 @@ namespace types {
 
 	inline void load_dll(std::string const& path)
 	{
-		auto target = path::normalize(path);
+		auto target = std::filesystem::path(path).lexically_normal();
 #ifdef _WIN32
-		auto handle = LoadLibraryA(target.c_str());
-		if (handle == nullptr) throw stdext::exception(util::platform::windows::GetLastErrorAsString());
+		auto handle = LoadLibraryW(target.c_str());
+		if (handle == nullptr) throw stdext::exception(stdext::platform::windows::GetLastErrorAsString());
 #else
 		if (!dlopen(path.c_str(), RTLD_NOW)) throw stdext::exception(dlerror());
 #endif
