@@ -60,6 +60,7 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 			case _Entry::Kind::StaticDesc:
 			{
 				cpp::static_desc* sd = (cpp::static_desc*)entry.ptr;
+				sd->node = nullptr;
 
 				switch (sd->kind)
 				{
@@ -67,28 +68,24 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 					case CppStaticDescKindEnum::None:
 						break;
 					case CppStaticDescKindEnum::Object:
-					{
-						sd->node = _graph->addNode(_graph->meta<GraphNodeCppObject>(), sd);
-					} break;
-
 					case CppStaticDescKindEnum::RawType:
-					{
-						sd->node = _graph->addNode(_graph->meta<GraphNodeCppClass>(), sd);
-					} break;
 					case CppStaticDescKindEnum::LegacyProvider:
 					case CppStaticDescKindEnum::LegacyAspect:
 					{
-						sd->node = _graph->addNode(_graph->meta<GraphNodeCppFeatureLegacy>(), sd);
+						sd->node = _store->addNode<Type_Node_StructuralType>({ 0 });
 					} break;
 					case CppStaticDescKindEnum::MultiMethod:
 					{
-						sd->node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
+						//sd->node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
 					} break;
 					case CppStaticDescKindEnum::UserInfo:
 					{
-						sd->node = _graph->addNode(_graph->meta<GraphNodeCppUserInfo>(), sd);
+						//sd->node = _graph->addNode(_graph->meta<GraphNodeCppUserInfo>(), sd);
 					} break;
 				}
+
+				if (sd->node != nullptr)
+					_store->addProp<Type_Property_CppStaticDescription>({ sd }, sd->node);
 			} break;
 		}
 	}
@@ -128,7 +125,7 @@ void CppSystem::_init()
 	_lastLoadedDll = "";
 	_current_dll_entries = nullptr;
 
-	_graph = new Graph();
+	_store = new TypeStore();
 
 	// Set up graph and identifiers
 	_init_insertEntries(_static_entries, 0);
@@ -146,7 +143,7 @@ void CppSystem::_init()
 
 bool CppSystem::_hasInited()
 {
-	return _graph != nullptr;
+	return _store != nullptr;
 }
 
 char const* CppSystem::_begin(char const* name)

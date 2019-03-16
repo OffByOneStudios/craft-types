@@ -9,6 +9,12 @@ namespace types
 	struct _TypeId_FwdDec
 	{
 		void* _node;
+
+		inline _TypeId_FwdDec(void* _node)
+			: _node(_node)
+		{ }
+
+		inline bool operator ==(_TypeId_FwdDec const& that) const { return this->_node == that._node; }
 	};
 
 	// This graph will not support import / partial usage. You will have to reimport all of it.
@@ -27,10 +33,7 @@ namespace types
 		inline static Id extract();
 
 		template <typename T>
-		inline static Id convert(T const& v);
-
-		template <typename T>
-		inline static Id convert(instance<T> const& v);
+		inline static void* convert(T const& v);
 	};
 
 	/******************************************************************************
@@ -50,9 +53,11 @@ namespace types
 	******************************************************************************/
 
 	class TypeStore final
+		: public TypeGraph
 	{
 	private:
-		TypeGraph _graph;
+
+		std::set<char const*> _strs;
 
 		// 
 		// Lifecycle
@@ -64,17 +69,11 @@ namespace types
 		CRAFT_TYPES_EXPORTED TypeStore();
 		CRAFT_TYPES_EXPORTED TypeStore(std::vector<TypeStore*>);
 		CRAFT_TYPES_EXPORTED ~TypeStore();
+		
+		CRAFT_TYPES_EXPORTED std::string dumpNode(Node const* n);
 
-	// Internal access
-	public:
-		inline TypeGraph const& graph() { return _graph; }
-
-	// Forward interface
-	public:
-		using Label = TypeGraph::Label;
-		using Node = TypeGraph::Node;
-		using Edge = TypeGraph::Edge;
-		using Prop = TypeGraph::Prop;
+		CRAFT_TYPES_EXPORTED char const* malloc_cstr(char const* s);
+		CRAFT_TYPES_EXPORTED char const* malloc_cstr(std::string const& s);
 	};
 
 	/******************************************************************************
@@ -126,7 +125,7 @@ namespace types
 		//
 		// Defined in to_string.cpp
 		//
-		CRAFT_TYPES_EXPORTED std::string toString(bool verbose = true) const;
+		CRAFT_TYPES_EXPORTED std::string toString() const;
 	};
 
 	const static TypeId None = nullptr;
@@ -140,7 +139,16 @@ namespace types
 	template<typename T>
 	inline TypeGraphTypeExtractor::Id TypeGraphTypeExtractor::extract()
 	{
-		return craft::types::cpptype<T>::typeId();
+		return _TypeId_FwdDec((void*)craft::types::cpptype<T>::typeDesc().desc);
+	}
+	
+	template<typename T>
+	inline void* TypeGraphTypeExtractor::convert(T const& v)
+	{
+		if (sizeof(T) <= sizeof(void*))
+			return (void*)reinterpret_cast<uintptr_t const&>(v);
+		
+		return (void*) new T(v);
 	}
 
 	/******************************************************************************

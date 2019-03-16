@@ -4,6 +4,7 @@
 
 // C++
 #include <string>
+#include <filesystem>
 #include <regex>
 #include <fstream>
 #include <iostream>
@@ -32,6 +33,7 @@
 
 // Deps
 #include "boost/callable_traits.hpp"
-#include "util/all.h"
-#include "util/graph.hpp"
-#include "util/vendor/plf_colony.hpp"
+#include "spdlog/spdlog.h"
+
+// Internal utilities
+#include "utility/all.h"

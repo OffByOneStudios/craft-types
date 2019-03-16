@@ -30,28 +30,29 @@ int main(int argc, char** argv)
 
 		std::cout << std::endl;
 
-		auto curcwd = path::absolute();
+		auto curcwd = std::filesystem::current_path();
+		curcwd = std::filesystem::absolute(curcwd);
 		try
 		{
 			if (input == "dump")
 			{
-				graph().forEachNode(
-					[](Graph& g, Graph::Node* n)
+				global_store().forAllNodes(
+					[](TypeGraph::Node const* n)
 				{
-					std::cout << g.dumpNode(n) << std::endl;
+					std::cout << global_store().dumpNode(n) << std::endl;
 				});
 			}
 			else if (input == "load")
 			{
-				auto abs = path::absolute(args);
-				path::set_cwd(path::dir(abs));
+				auto abs = std::filesystem::absolute(args);
+				std::filesystem::current_path(abs.remove_filename());
 
-				craft::types::load_dll(abs);
+				craft::types::load_dll(abs.string());
 				auto last_dll = system().getLastLibraryName();
 				auto end = system().getLibraryCount(last_dll);
 
 				for (size_t i =0; i < end; ++i)
-					std::cout << graph().dumpNode(system().getLibraryEntry(last_dll, i).asId().node) << std::endl;
+					std::cout << global_store().dumpNode(system().getLibraryEntry(last_dll, i).asId()) << std::endl;
 
 				std::cout << std::endl << "loaded " << (end) << " types." << std::endl;
 			}
@@ -62,7 +63,7 @@ int main(int argc, char** argv)
 		{
 			std::cout << ex.what() << std::endl;
 		}
-		path::set_cwd(curcwd);
+		std::filesystem::current_path(curcwd);
 
 		std::cout << std::endl;
 	}

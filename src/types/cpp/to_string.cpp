@@ -26,7 +26,7 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 {
 	if (inst.isNull())
 	{
-		std::string base = tid.toString(false);
+		std::string base = tid.toString();
 		if (verbose)
 			return fmt::format("<instance|type: {0}|null>"), base;
 		else
@@ -38,14 +38,14 @@ std::string instance<void>::toString(instance<void> const& inst, TypeId tid, boo
 	{
 		from = std::string(PStringer::craft_s_typeName());
 		if (verbose)
-			name = fmt::format("{0} {1}", tid.toString(false), inst.getFeature<PStringer>()->toString(inst));
+			name = fmt::format("{0} {1}", tid.toString(), inst.getFeature<PStringer>()->toString(inst));
 		else
 			name = inst.getFeature<PStringer>()->toString(inst);
 	}
 	else
 	{
 		from = "typeId ptr";
-		name = fmt::format("{0} 0x{1}", tid.toString(false), stdext::to_hex_string(inst._meta->actual));
+		name = fmt::format("{0} 0x{1}", tid.toString(), stdext::to_hex_string(inst._meta->actual));
 	}
 
 
@@ -74,36 +74,32 @@ std::string instance<void>::toString(instance<void> const& inst, FeatureId fid, 
 }
 */
 
-std::string TypeId::toString(bool verbose) const
+std::string TypeId::toString() const
 {
-	if (node == nullptr)
+	if (_node == nullptr)
 	{
-		if (verbose)
-			return "<Type|None>";
-		else
-			return "None";
+		return "None";
 	}
 
 	std::string from, name;
 
-	if (graph().hasProp<GraphPropertyTypeName>(node))
+	auto cpp_name = thread_store().onlyPropOfTypeOnNode<Type_Property_CppIdentifier>(_node);
+	if (cpp_name)
 	{
-		from = "graph:type.name";
-		name = fmt::format("{0}", *graph().getFirstPropValue<GraphPropertyTypeName>(node));
-	}
-	else if (graph().hasProp<GraphPropertyName>(node))
-	{
-		from = "graph:name";
-		name = fmt::format("{0}", graph().getFirstPropValue<GraphPropertyName>(node));
-	}
-	else
-	{
-		from = "#";
-		name = std::to_string((uintptr_t)node);
+		return cpp_name->cpp_identifier;
 	}
 
-	if (verbose)
-		return fmt::format("<Type|{0}|{1}>", from, name);
-	else
-		return name;
+	auto ns_name = thread_store().onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(_node);
+	if (ns_name)
+	{
+		return ns_name->namespace_identifier;
+	}
+
+	auto l_name = thread_store().onlyPropOfTypeOnNode<Type_Property_LocalIdentifier>(_node);
+	if (l_name)
+	{
+		return l_name->local_identifier;
+	}
+
+	return fmt::format("Unknown-{0}", (void*)_node);
 }

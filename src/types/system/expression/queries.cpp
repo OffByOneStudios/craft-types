@@ -8,7 +8,7 @@ using namespace craft::types;
 
 CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 {
-	_.add<GraphPropertyMultiMethodSymbol>("is-subtype");
+	_.identify("syndicate.is-subtype");
 
 	_.add_method([](ExpressionVoid* left, ExpressionVoid* right) -> uintptr_t { return true; });
 
@@ -80,7 +80,7 @@ CRAFT_MULTIMETHOD_DEFINE(craft::types::isSubtypeMethod)
 	_.add_method([](void* left, void* right) -> uintptr_t { return false; });
 }
 
-bool craft::types::isSubtype(Graph::Node* left, Graph::Node* right)
+bool craft::types::isSubtype(TypeGraph::Node* left, TypeGraph::Node* right)
 {
 	if (left == right)
 		return true;
@@ -88,7 +88,8 @@ bool craft::types::isSubtype(Graph::Node* left, Graph::Node* right)
 	if (left == nullptr || right == nullptr)
 		return false;
 
-	return graph().getEdgeDirectionalTo(left, graph().meta<GraphEdgeIsA>(), right) != nullptr;
+	// TODO:
+	//return graph().getEdgeDirectionalTo(left, graph().meta<GraphEdgeIsA>(), right) != nullptr;
 }
 
 bool craft::types::isSubtype(IExpression const* left, IExpression const* right)

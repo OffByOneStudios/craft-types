@@ -36,4 +36,21 @@ namespace types
 	{
 		cpp::static_desc* desc;
 	};
+
+    
+	/******************************************************************************
+	** Type_Edge_CppLegacyImplements
+	******************************************************************************/
+
+    // The static description object that was theorhetically responsible for this node
+	struct Type_Edge_CppLegacyImplements final
+	{
+		void* implementation;
+	};
+
 }}
+
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_CppFunction);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_CppIdentifier);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_CppStaticDescription);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Edge_CppLegacyImplements);

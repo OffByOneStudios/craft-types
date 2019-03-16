@@ -11,7 +11,7 @@ namespace types
 
     std::string TypeId::identifier() const
     {
-        auto prop = thread_store().graph().onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(_node);
+        auto prop = thread_store().onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(_node);
         return prop ? prop->namespace_identifier : "";
     }
 }}

@@ -6,7 +6,7 @@
 // stdlib
 CRAFT_TYPE_DEFINE(std::string)
 {
-	_.identify_verbose("string", "String", "std::string");
+	_.identify_byFullCppName("std::string");
 
 	_.use<PClone>().singleton<DefaultCopyConstructor>();
 	_.use<PParse>().singleton<FunctionalParse>( [](std::string s) { return instance<std::string>::make(s); });
@@ -18,7 +18,7 @@ CRAFT_TYPE_DEFINE(std::string)
 // stdlib
 CRAFT_TYPE_DEFINE(bool)
 {
-	_.identify_verbose("boolean", "Bool", "bool");
+	_.identify("syndicate.native.bool");
 
 	_.use<PParse>().singleton<FunctionalParse>([](std::string s)
 	{

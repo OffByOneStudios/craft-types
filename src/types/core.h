@@ -1,16 +1,24 @@
 #pragma once
 #include "common.h"
 
-//
-// Forward declares
-//
+/******************************************************************************
+** Preludes
+******************************************************************************/
 
-#include "prelude.h"
+#include "prelude.h" /* system prelude:
+    * Forward declares
+    * Exceptions
+*/
+/* cpp-support prelude:
+    * Forward declares
+    * Instance prelude
+    * Type Template Lookups declarations
+*/
 #include "exceptions.hpp"
 
-//
-// Core type system
-//
+/******************************************************************************
+** Core runtime system
+******************************************************************************/
 
 #include "system/store.h" /* TypeStore, TypeId, TypeGraph (and dependents) */
 #include "system/basic_types.h"
@@ -20,9 +28,10 @@
 #include "system/advanced_types.h"
 #include "system/epilogue.h"
 
-//
-// Cpp System
-//
+
+/******************************************************************************
+** C++ Support/Adaptor
+******************************************************************************/
 
 #include "cpp/instance_prelude.hpp"
 
@@ -45,15 +54,12 @@
 #include "cpp/expressions.hpp"
 #include "system/ExpressionDispatcher.hpp"
 
-//
-// Feature helpers
-//
+
+/******************************************************************************
+** Boot Runtime Library
+******************************************************************************/
 
 #include "boot/Context.h"
-
-//
-// Built in features
-//
 
 #include "boot/PConstructor.h"
 #include "boot/PStringer.h"
@@ -69,16 +75,18 @@
 #include "boot/SObjectManipulation.h"
 #include "boot/SObjectFungible.h"
 
-//
-// Helpers
-//
+
+/******************************************************************************
+** Helpers
+******************************************************************************/
 
 #include "helpers.h"
 #include "cpp/DefineHelper.hpp"
 
-//
-// Built in types
-//
+
+/******************************************************************************
+** Built in types
+******************************************************************************/
 
 #include "boot/default_types_c.h"
 #include "boot/default_types_cpp.h"
