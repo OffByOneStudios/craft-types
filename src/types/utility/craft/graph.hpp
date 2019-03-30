@@ -17,6 +17,31 @@
 
 namespace craft
 {
+    namespace _detail
+    {
+        template<typename Func,
+            typename... Args>
+        inline bool invoke_return_bool_or_true(Func func, Args&& ...args)
+        {
+            if constexpr (std::is_void<typename std::invoke_result<Func, Args...>::type>::value)
+            {
+                func(std::forward<Args>(args)...);
+                return true;
+            }
+            else
+                return func(std::forward<Args>(args)...);
+        }
+    }
+
+    enum class GraphKind : uint8_t
+    {
+        Unknown = 0,
+        Label = 1,
+        Node = 2,
+        Edge = 3,
+        Prop = 4,
+    };
+
     // TODO, another graph type that is more effeciently organized but does not support parent overrides
     template <typename TData>
     class GraphCore
@@ -30,10 +55,10 @@ namespace craft
             None = 0,
 
             Mask_Kind = (4 - 1) << 1,
-            Value_Kind_Label = 0 << 1,
-            Value_Kind_Node = 1 << 1,
-            Value_Kind_Edge = 2 << 1,
-            Value_Kind_Prop = 3 << 1,
+            Value_Kind_Label = ((uint8_t)GraphKind::Label - 1) << 1,
+            Value_Kind_Node = ((uint8_t)GraphKind::Node - 1) << 1,
+            Value_Kind_Edge = ((uint8_t)GraphKind::Edge - 1) << 1,
+            Value_Kind_Prop = ((uint8_t)GraphKind::Prop - 1) << 1,
 
             Flag_InverseEdge = 1 << 3,
             //Flag_Override = 1 << 4,
@@ -219,7 +244,8 @@ namespace craft
             {
                 for (auto label_it = _labels.begin(); label_it != _labels.end(); ++label_it)
                 {
-                    func(&label);
+                    if (!_detail::invoke_return_bool_or_true(func, (Label const*)&*label_it))
+                        break;
                 }
             }
 
@@ -228,7 +254,8 @@ namespace craft
             {
                 for (auto node_it = _nodes.begin(); node_it != _nodes.end(); ++node_it)
                 {
-                    func(&*node_it);
+                    if (!_detail::invoke_return_bool_or_true(func, (Node const*)&*node_it))
+                        break;
                 }
             }
 
@@ -237,7 +264,8 @@ namespace craft
             {
                 for (auto edge_it = _edges.begin(); edge_it != _edges.end(); ++edge_it)
                 {
-                    func(&edge);
+                    if (!_detail::invoke_return_bool_or_true(func, (Edge const*)*edge_it))
+                        break;
                 }
             }
 
@@ -246,7 +274,18 @@ namespace craft
             {
                 for (auto node_it = label->nodes.begin(); node_it != label->nodes.end(); ++node_it)
                 {
-                    func((Node const*)*node_it);
+                    if (!_detail::invoke_return_bool_or_true(func, (Node const*)*node_it))
+                        break;
+                }
+            }
+
+            template<typename Func>
+            inline void forAllLabelsOnNode(Node const* node, Func func) const
+            {
+                for (auto label_it = node->labels.begin(); label_it != node->labels.end(); ++label_it)
+                {
+                    if (!_detail::invoke_return_bool_or_true(func, (Label const*)*label_it))
+                        break;
                 }
             }
 
@@ -255,7 +294,8 @@ namespace craft
             {
                 for (auto edge_it = node->edges.begin(); edge_it != node->edges.end(); ++edge_it)
                 {
-                    func((Edge const*)*edge_it);
+                    if (!_detail::invoke_return_bool_or_true(func, (Edge const*)*edge_it))
+                        break;
                 }
             }
 
@@ -264,7 +304,8 @@ namespace craft
             {
                 for (auto prop_it = node->props.begin(); prop_it != node->props.end(); ++prop_it)
                 {
-                    func((Prop const*)*prop_it);
+                    if (!_detail::invoke_return_bool_or_true(func, (Prop const*)*prop_it))
+                        break;
                 }
             }
 
@@ -350,7 +391,7 @@ namespace craft
             template<typename T>
             inline Label* addLabel(T const& data)
             {
-                return addLabel(TTypeExtractor::convert<T>(data), TTypeExtractor::extract<T>());
+                return addLabel(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>());
             }
 
             inline Node* addNode(Data const& data, TypeId type)
@@ -364,7 +405,7 @@ namespace craft
             template<typename T>
             inline Node* addNode(T const& data)
             {
-                return addNode(TTypeExtractor::convert<T>(data), TTypeExtractor::extract<T>());
+                return addNode(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>());
             }
             
             // By default edges point from 0-index to all others
@@ -379,7 +420,7 @@ namespace craft
             template<typename T>
             inline Edge* addEdge(T const& data, std::vector<Node*> const& nodes, bool invert = false)
             {
-                return addEdge(TTypeExtractor::convert<T>(data), TTypeExtractor::extract<T>(), nodes, invert);
+                return addEdge(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>(), nodes, invert);
             }
             
             inline Prop* addProp(Data const& data, TypeId type, Node* on_node)
@@ -393,7 +434,7 @@ namespace craft
             template<typename T>
             inline Prop* addProp(T const& data, Node* on_node)
             {
-                return addProp(TTypeExtractor::convert<T>(data), TTypeExtractor::extract<T>(), on_node);
+                return addProp(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>(), on_node);
             }
 
             inline Prop* addProp(Data const& data, TypeId type, Edge* on_edge)
@@ -407,7 +448,7 @@ namespace craft
             template<typename T>
             inline Prop* addProp(T const& data, Edge* on_edge)
             {
-                return addProp(TTypeExtractor::convert<T>(data), TTypeExtractor::extract<T>(), on_edge);
+                return addProp(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>(), on_edge);
             }
 
         // Getter functions
@@ -427,6 +468,7 @@ namespace craft
             using Base::forAllNodes;
             using Base::forAllEdges;
             using Base::forAllNodesInLabel;
+            using Base::forAllLabelsOnNode;
             using Base::forAllEdgesOnNode;
             using Base::forAllPropsOnNode;
 
@@ -440,21 +482,21 @@ namespace craft
         // TODO: move the only functions there
         public:
             template<typename T>
-            T const* onlyPropOfTypeOnNode(Node* node) const
+            T const* onlyPropOfTypeOnNode(Node const* node) const
             {
-                auto searchType = TTypeExtractor::extract<T>();
+                auto searchType = TTypeExtractor::type_typeToValue<T>();
                 T const* result = nullptr;
-                try
-                {
-                    forAllPropsOnNode(node, [&](auto prop) {
+
+                forAllPropsOnNode(node,
+                    [&](auto prop) -> bool
+                    {
                         if (prop->type == searchType)
                         {
-                            result = (T const*)prop->data;
-                            throw nullptr;
+                            result = TTypeExtractor::type_load<T>(prop->data);
+                            return false;
                         }
+                        return true;
                     });
-                }
-                catch (nullptr_t) { }
 
                 return result;
             }
@@ -506,23 +548,23 @@ namespace craft
     {
     public:
         struct Label
-            : TGraphBase::Core
-            , TGraphBase::Label
+            : public TGraphBase::Core
+            , public TGraphBase::Label
         { };
 
         struct Node
-            : TGraphBase::Core
-            , TGraphBase::Node
+            : public TGraphBase::Core
+            , public TGraphBase::Node
         { };
 
         struct Edge
-            : TGraphBase::Core
-            , TGraphBase::Edge
+            : public TGraphBase::Core
+            , public TGraphBase::Edge
         { };
 
         struct Prop
-            : TGraphBase::Core
-            , TGraphBase::Prop
+            : public TGraphBase::Core
+            , public TGraphBase::Prop
         { };
     };
 

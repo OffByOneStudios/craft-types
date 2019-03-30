@@ -24,6 +24,74 @@ TypeStore::~TypeStore()
 std::string TypeStore::dumpNode(Node const* n)
 {
 	std::ostringstream ss;
+	Node const* nt = (Node const*)n->type._node;
+
+				ss << "__ptr          :  " << std::hex << n << std::endl;
+
+	if (nt)
+		if (auto p = onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(nt))
+				ss << "__type         :  " << p->namespace_identifier << std::endl;
+		else
+				ss << "__type         :  " << "Error[Missing Type_Property_NamespaceIdentifier]" << std::endl;
+	else
+				ss << "__type         :  " << "Error[NULL]" << std::endl;
+
+	ss << std::endl << "--------------------------------- Identifiers ----" << std::endl;
+	if (auto p = onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(n))
+				ss << "   .Namespace  :  " << p->namespace_identifier << std::endl;
+	if (auto p = onlyPropOfTypeOnNode<Type_Property_LocalIdentifier>(n))
+				ss << "   .Local      :  " << p->local_identifier << std::endl;
+	if (auto p = onlyPropOfTypeOnNode<Type_Property_CppIdentifier>(n))
+				ss << "   .C++        :  " << p->cpp_identifier << std::endl;
+
+	int label_count = 0;
+	forAllLabelsOnNode(n, [&](Label const* l)
+	{
+		label_count += 1;
+	});
+				ss << "   #Labels     :  " << label_count << std::endl;
+
+	ss << std::endl << "--------------------------------- Edges ----------" << std::endl;
+	int edge_count = 0;
+	forAllEdgesOnNode(n, [&](Edge const* e)
+	{
+		edge_count += 1;
+		auto type_local_name = onlyPropOfTypeOnNode<Type_Property_LocalIdentifier>((Node const*)e->type._node);
+		
+		ss << "   >";
+		if (type_local_name == nullptr)
+			ss << "Unknown";
+		else
+			ss << type_local_name->local_identifier;
+
+		ss << std::endl;
+	});
+				ss << "   #Edges      :  " << edge_count << std::endl;
+
+	ss << std::endl << "--------------------------------- Properties -----" << std::endl;
+	int prop_count = 0;
+	forAllPropsOnNode(n, [&](Prop const* p)
+	{
+		prop_count += 1;
+		auto type_local_name = onlyPropOfTypeOnNode<Type_Property_LocalIdentifier>((Node const*)p->type._node);
+		void* printer = nullptr;
+
+		ss << "   .";
+		if (type_local_name == nullptr)
+			ss << "Unknown";
+		else
+			ss << type_local_name->local_identifier;
+
+		ss << ":" << std::endl << "        ";
+
+		if (printer == nullptr)
+			ss << "Error[Property Type does not have Edge to printer Implementation]";
+
+		ss << std::endl;
+	});
+				ss << "   #Props      :  " << prop_count << std::endl;
+
+	ss << std::endl;
 
 	/*
 	// Prime node

@@ -23,6 +23,7 @@ CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::TypeId);
 
 #include "types/system/basic_types.h"
 
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_SystemGraphKind);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_NamespaceIdentifier);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_LocalIdentifier);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_AbstractType);
@@ -37,6 +38,17 @@ CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Edge_IsA);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_BitsType);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_StructuralType);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_NativeSize);
+
+/******************************************************************************
+** /types/system/advanced_types.h
+******************************************************************************/
+
+#include "types/system/advanced_types.h"
+
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_Multimethod);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Edge_MethodImplementation);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_GenericType);
+CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Edge_GenericInstantiation);
 
 /******************************************************************************
 ** /types/system/expression/expression.h

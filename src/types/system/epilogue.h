@@ -9,7 +9,7 @@ namespace types
 	** Declared in system/store.h
 	******************************************************************************/
 
-    std::string TypeId::identifier() const
+    inline std::string TypeId::identifier() const
     {
         auto prop = thread_store().onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(_node);
         return prop ? prop->namespace_identifier : "";

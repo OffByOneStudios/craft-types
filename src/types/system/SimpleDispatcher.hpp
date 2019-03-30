@@ -42,7 +42,7 @@ namespace types
 		// Static Helpers
 		//
 	public:
-		CRAFT_TYPES_EXPORTED static void* Any;
+		inline static const void* Any = (void*)(uintptr_t)1;
 
 		static inline void invokeIntoDispatch(Invoke const& i, Dispatch& d)
 		{
@@ -56,7 +56,7 @@ namespace types
 				&& !(std::is_same<T, void>::value || std::is_same<T, void*>::value || std::is_same<T, uintptr_t>::value) >::type* = nullptr>
 		static inline DispatchArgument cppTypeToDispatchArgument()
 		{
-			return (DispatchArgument)(cpptype<TActual>::typeDesc().asId().node);
+			return (DispatchArgument)(cpptype<TActual>::typeDesc().asId());
 		}
 
 		template<typename T,
