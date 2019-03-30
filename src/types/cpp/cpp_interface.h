@@ -466,6 +466,7 @@ namespace types
 
 		void _init_insertEntries(_Entries* entries, size_t start);
 		void _init_runEntries(_Entries* entries, size_t start);
+		void _init_primeInternalEntries();
 
 		static char const* __dll_region;
 

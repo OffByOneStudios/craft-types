@@ -49,6 +49,33 @@ CppSystem& CppSystem::global_instance()
 	return __global_instance;
 }
 
+void CppSystem::_init_primeInternalEntries()
+{
+	// Native structural
+	auto struct_sd = const_cast<cpp::static_desc*>(craft::types::cpptype<Type_Node_StructuralType>::typeDesc().desc);
+	auto struct_n = const_cast<TypeStore::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Node_StructuralType) }));
+	struct_n->type = (_TypeId_FwdDec)struct_n;
+	struct_sd->node = struct_n;
+
+	// Native bits
+	auto bits_sd = const_cast<cpp::static_desc*>(craft::types::cpptype<Type_Node_BitsType>::typeDesc().desc);
+	auto bits_n = const_cast<TypeStore::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Node_BitsType) }));
+	bits_n->type = (_TypeId_FwdDec)struct_n;
+	bits_sd->node = bits_n;
+
+	// Multi-method bits
+	auto mm_sd = const_cast<cpp::static_desc*>(craft::types::cpptype<Type_Node_Multimethod>::typeDesc().desc);
+	auto mm_n = const_cast<TypeStore::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Node_Multimethod) }));
+	mm_n->type = (_TypeId_FwdDec)struct_n;
+	mm_sd->node = mm_n;
+
+	// Static description
+	auto sd_sd = const_cast<cpp::static_desc*>(craft::types::cpptype<Type_Property_CppStaticDescription>::typeDesc().desc);
+	auto sd_n = const_cast<TypeStore::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Property_CppStaticDescription) }));
+	sd_n->type = (_TypeId_FwdDec)struct_n;
+	sd_sd->node = sd_n;
+}
+
 void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 {
 	//std::cerr << "CppSystem::_init_insertEntries:" << entries->_entries.size() << std::endl;
@@ -60,6 +87,10 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 			case _Entry::Kind::StaticDesc:
 			{
 				cpp::static_desc* sd = (cpp::static_desc*)entry.ptr;
+				// Was pre-initalized
+				if (sd->node != nullptr)
+					continue;
+
 				sd->node = nullptr;
 
 				switch (sd->kind)
@@ -76,7 +107,7 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 					} break;
 					case CppStaticDescKindEnum::MultiMethod:
 					{
-						//sd->node = _graph->addNode(_graph->meta<GraphNodeCppMultiMethod>(), sd);
+						sd->node = _store->addNode<Type_Node_Multimethod>({ });
 					} break;
 					case CppStaticDescKindEnum::UserInfo:
 					{
@@ -128,11 +159,11 @@ void CppSystem::_init()
 	_store = new TypeStore();
 
 	// Set up graph and identifiers
+	_init_primeInternalEntries();
 	_init_insertEntries(_static_entries, 0);
 
 	// Build up the Runtime and Graph:
 	cpp::DefineHelper<void>::_build_default_providers();
-
 	_init_runEntries(_static_entries, 0);
 
 	/*std::cerr << "CppSystem::_init:curr" << (_current_dll_entries == nullptr ? "OKOKOK" : "BADBAD") << std::endl;

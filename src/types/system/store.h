@@ -10,6 +10,10 @@ namespace types
 	{
 		void* _node;
 
+		inline _TypeId_FwdDec()
+			: _node(nullptr)
+		{ }
+
 		inline _TypeId_FwdDec(void* _node)
 			: _node(_node)
 		{ }
@@ -21,19 +25,21 @@ namespace types
 	// Because this graph is not meant to support deletion (replacement only) types have an incrementing index
 
 	/******************************************************************************
-	** TypeGraphTypeExtractor
+	** TypeGraphConfig
 	******************************************************************************/
 
-	struct TypeGraphTypeExtractor
+	struct TypeGraphConfig
 	{
 	public:
 		using Id = _TypeId_FwdDec;
 
 		template <typename T>
-		inline static Id extract();
+		inline static Id type_typeToValue();
 
 		template <typename T>
-		inline static void* convert(T const& v);
+		inline static void* type_store(T const& v);
+		template <typename T>
+		inline static T* type_load(void* const&);
 	};
 
 	/******************************************************************************
@@ -44,7 +50,7 @@ namespace types
 		craft::Graph<
 			craft::GraphTyped<
 				craft::GraphCore<void*>,
-				TypeGraphTypeExtractor
+				TypeGraphConfig
 			>
 		>;
 
@@ -114,7 +120,7 @@ namespace types
 			return that_type._node != nullptr && this->_node == that_type._node;
 		}
 
-		std::string identifier() const;
+		inline std::string identifier() const;
 
 		//
 		// Defined in cpp_interface.h
@@ -137,18 +143,45 @@ namespace types
 	******************************************************************************/
 
 	template<typename T>
-	inline TypeGraphTypeExtractor::Id TypeGraphTypeExtractor::extract()
+	inline TypeGraphConfig::Id TypeGraphConfig::type_typeToValue()
 	{
-		return _TypeId_FwdDec((void*)craft::types::cpptype<T>::typeDesc().desc);
+		return (_TypeId_FwdDec)craft::types::cpptype<T>::typeDesc().asId();
 	}
 	
 	template<typename T>
-	inline void* TypeGraphTypeExtractor::convert(T const& v)
+	inline void* TypeGraphConfig::type_store(T const& t)
 	{
-		if (sizeof(T) <= sizeof(void*))
-			return (void*)reinterpret_cast<uintptr_t const&>(v);
-		
-		return (void*) new T(v);
+		// Invokes copy constructor once in either path
+
+		if constexpr (sizeof(T) <= sizeof(void*))
+		{
+			// Pack `t` into a void*
+			void* v = nullptr;
+			void** vp = &v;
+			T* tp = (T*)vp; // This is very bad if not for the sizeof proof above.
+			*tp = t;
+			return v;
+		}
+		else
+		{
+			return (void*) new T(t);
+		}
+	}
+	
+	template<typename T>
+	inline T* TypeGraphConfig::type_load(void* const& v)
+	{
+		if (v == nullptr) return nullptr;
+
+		if constexpr (sizeof(T) <= sizeof(void*))
+		{
+			void** vp = const_cast<void**>(&v);
+			return (T*)vp;
+		}
+		else
+		{
+			return (T*) v;
+		}
 	}
 
 	/******************************************************************************

@@ -39,6 +39,7 @@ int main(int argc, char** argv)
 				global_store().forAllNodes(
 					[](TypeGraph::Node const* n)
 				{
+					std::cout << std::string(80, '=') << std::endl;
 					std::cout << global_store().dumpNode(n) << std::endl;
 				});
 			}
