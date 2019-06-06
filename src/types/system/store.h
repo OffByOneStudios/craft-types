@@ -47,9 +47,9 @@ namespace types
 	******************************************************************************/
 
 	using TypeGraph =
-		craft::Graph<
-			craft::GraphTyped<
-				craft::GraphCore<void*>,
+		graph::Graph<
+			graph::GraphTyped<
+				graph::GraphCore<void*>,
 				TypeGraphConfig
 			>
 		>;

@@ -11,4 +11,4 @@
 
 #include "types/utility/stdext/platform_windows.h"
 
-#include "types/utility/craft/graph.hpp"
+#include "types/utility/graph/graph.hpp"

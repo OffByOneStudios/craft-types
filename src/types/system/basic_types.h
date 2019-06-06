@@ -11,7 +11,7 @@ namespace types
 
 	struct Type_Property_SystemGraphKind final
 	{
-		GraphKind kind;
+		graph::GraphKind kind;
 	};
 
 	/******************************************************************************
