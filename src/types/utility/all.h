@@ -8,6 +8,8 @@
 #include "types/utility/stdext/values.hpp"
 #include "types/utility/stdext/string.hpp"
 #include "types/utility/stdext/to_hex_string.hpp"
+#include "types/utility/stdext/typechange.hpp"
+#include "types/utility/stdext/bindmem.hpp"
 
 #include "types/utility/stdext/platform_windows.h"
 

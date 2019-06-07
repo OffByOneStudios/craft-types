@@ -102,7 +102,7 @@ namespace types
 	{
 		auto arrow = new ExpressionArrow(to_expression_tuple<TArgs...>(), to_expression<TRet>());
 
-		return std::make_tuple(ExpressionStore(arrow), Function{ fn });
+		return std::make_tuple(ExpressionStore(arrow), reinterpret_cast<void (*)()>(fn));
 	}
 
 	template<typename TClass, typename TRet, typename ...TArgs>

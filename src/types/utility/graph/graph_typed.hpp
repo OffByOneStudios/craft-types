@@ -72,7 +72,7 @@ namespace graph
             template<typename T>
             inline Label* addLabel(T const& data)
             {
-                return addLabel(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>());
+                return addLabel(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>());
             }
 
             inline Node* addNode(Data const& data, TypeId type)
@@ -86,7 +86,7 @@ namespace graph
             template<typename T>
             inline Node* addNode(T const& data)
             {
-                return addNode(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>());
+                return addNode(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>());
             }
             
             // By default edges point from 0-index to all others
@@ -101,7 +101,7 @@ namespace graph
             template<typename T>
             inline Edge* addEdge(T const& data, std::vector<Node*> const& nodes, bool invert = false)
             {
-                return addEdge(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>(), nodes, invert);
+                return addEdge(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>(), nodes, invert);
             }
             
             inline Prop* addProp(Data const& data, TypeId type, Node* on_node)
@@ -115,7 +115,7 @@ namespace graph
             template<typename T>
             inline Prop* addProp(T const& data, Node* on_node)
             {
-                return addProp(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>(), on_node);
+                return addProp(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>(), on_node);
             }
 
             inline Prop* addProp(Data const& data, TypeId type, Edge* on_edge)
@@ -129,7 +129,7 @@ namespace graph
             template<typename T>
             inline Prop* addProp(T const& data, Edge* on_edge)
             {
-                return addProp(TTypeExtractor::type_store<T>(data), TTypeExtractor::type_typeToValue<T>(), on_edge);
+                return addProp(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>(), on_edge);
             }
 
         // Getter functions
@@ -175,7 +175,7 @@ namespace graph
             template<typename T>
             T const* onlyPropOfTypeOnNode(Node const* node) const
             {
-                auto searchType = TTypeExtractor::type_typeToValue<T>();
+                auto searchType = TTypeExtractor::template type_typeToValue<T>();
                 T const* result = nullptr;
 
                 forAllPropsOnNode(node,
@@ -183,7 +183,7 @@ namespace graph
                     {
                         if (prop->type == searchType)
                         {
-                            result = TTypeExtractor::type_load<T>(prop->data);
+                            result = TTypeExtractor::template type_load<T>(prop->data);
                             return false;
                         }
                         return true;

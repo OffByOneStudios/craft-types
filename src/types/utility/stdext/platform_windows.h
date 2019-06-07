@@ -1,6 +1,6 @@
 #pragma once
 #ifdef _WIN32
-#include "common.h"
+#include "types/common.h"
 #include <Windows.h>
 
 namespace stdext {

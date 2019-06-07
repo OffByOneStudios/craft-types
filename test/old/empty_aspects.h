@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "types/common.h"
 
 class SEmptyTestFactory abstract
 	: public craft::types::Aspect

@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "types/common.h"
 #include "core.h"
 
 namespace craft {

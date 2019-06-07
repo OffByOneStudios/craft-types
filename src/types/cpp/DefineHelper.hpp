@@ -226,7 +226,7 @@ namespace types
 				DefineHelper<void> helper(typeDesc, (DefineHelper<void>*)this,
 					+[](void* v) -> void* { return static_cast<TParent*>((TDefine*)v); });
 				typeDesc->initer(helper);
-				thread_local().addEdge<Type_Edge_IsA>(nullptr, { _node, typeDesc->node });
+				thread_store().addEdge<Type_Edge_IsA>(nullptr, { _node, typeDesc->node });
 			}
 
 			template<typename ...TParents>

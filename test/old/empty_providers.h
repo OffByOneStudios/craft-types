@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "types/common.h"
 
 class PEmptyTestSingleton abstract
 	: public craft::types::Provider

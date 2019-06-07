@@ -1,4 +1,4 @@
-#include "common.h"
+#include "types/common.h"
 #include "basic_object.h"
 
 using namespace bandit;

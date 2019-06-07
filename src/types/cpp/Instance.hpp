@@ -311,7 +311,7 @@ namespace types
 		inline void decref() { InstanceHeader::safe_dec(_meta); }
 
 		// DO NOT RELY ON THIS, for diagnostic information ONLY
-		inline uintptr_t refCount() const { _meta->memInfo; }
+		inline uintptr_t refCount() const { return _meta->memInfo; }
 
 	//
 	// Stringing
