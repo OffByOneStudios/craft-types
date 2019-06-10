@@ -142,8 +142,10 @@ namespace graph
 
         inline std::vector<typename TGraph::Node const*> run()
         {
+            // Create state if there is none (or it is stale)
             if (_state.size() != _pipes.size())
             {
+                reset();
                 _state.reserve(_pipes.size());
                 for (auto const& pipe : _pipes)
                 {
@@ -151,6 +153,7 @@ namespace graph
                 }
             }
 
+            // The results of the query
             std::vector<std::shared_ptr<Gremlin>> results;
 
             // We operate "one to the right" because we need sentinals on both sides.
@@ -405,10 +408,25 @@ namespace graph
         {
             return addPipe(std::make_unique<GraphQueryPipeVertex<TGraph>>(std::forward<TArgs>(args)...));
         }
+
         template<typename TFuncEdges, typename TFuncEdgeNodes>
         RetType e(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
         {
             return addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
+        }
+
+        template<typename TFuncEdges>
+        RetType in(TFuncEdges func_edges)
+        {
+            auto inEdgeNodeFunc = &edgeIsOutgoing<TGraph>;
+            return addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(inEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), inEdgeNodeFunc));
+        }
+
+        template<typename TFuncEdges>
+        RetType out(TFuncEdges func_edges)
+        {
+            auto outEdgeNodeFunc = &edgeIsIncoming<TGraph>;
+            return addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
         }
     };
 

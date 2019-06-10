@@ -63,7 +63,7 @@ namespace graph
         typename std::vector<typename TGraph::Node const*> res;
         g.forAllNodesInEdge(e, [&](auto n)
         {
-            if (func(e, n))
+            if (func(n, e))
                 res.push_back(n);
         });
         return res;

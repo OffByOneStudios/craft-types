@@ -54,13 +54,66 @@ TEST_CASE( "graph::query() basics", "[graph::GraphQuery]" )
 
         CHECK(r.size() == 1);
     }
+}
 
-    SECTION( "graph::query.e() can add GraphQueryStepEdges with syntax" )
+
+TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
+{
+    Graph< GraphCore<std::string> > g;
+
+    test_help::fillStrGraphWithNorse(g);
+
+    SECTION( "graph::query.e() can add GraphQueryStepEdges by hand" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            // same as "out"
+            .e( [](auto n, auto e) { return e->data == "parents"; },
+                &edgeIsIncoming<decltype(g)>);
+            
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 2);
+    }
+
+    SECTION( "graph::query.in() can add GraphQueryStepEdges with helper" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            .in( [](auto n, auto e) { return e->data == "parents"; } );
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 1);
+    }
+
+    SECTION( "graph::query.out() can add GraphQueryStepEdges with helper" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            .out( [](auto n, auto e) { return e->data == "parents"; } );
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 2);
+    }
+
+    SECTION( "graph::query.e() can retrieve specific node" )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
             .e( [](auto n, auto e) { return e->data == "parents"; },
-                [](auto e, auto n) { return edgeIsIncoming<decltype(g)>(n, e); });
+                [](auto n, auto e) { return e->nodes.size() > 1 && e->nodes[1] == n; });
 
         CHECK(q->getGraph() == &g);
         CHECK(q->countPipes() == 2);
