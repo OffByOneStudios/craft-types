@@ -9,17 +9,22 @@
 /*
  * This file contains the query system and is laid out as follows:
  * 
- * - GraphQuery
- * - GraphQueryPipeEmpty
- * - GraphQueryPipeVertex
- * - query namespace
- *   > Contains helpers to use the query system.
+ * - GraphQueryEngine
+ * - [pipes]
+ *   - GraphQueryPipeEmpty
+ *   - GraphQueryPipeVertex
+ *   - GraphQueryPipeEdges
+ * - [syntax]
+ *   - GraphQueryLibraryBase
+ *   - GraphQueryLibraryCore
+ *   - GraphQuery
+ *   - query()
  */
 
 namespace graph
 {
     template<typename TGraph>
-    class GraphQueryBase
+    class GraphQueryEngine final
     {
     public:
         using Graph = TGraph;
@@ -41,7 +46,7 @@ namespace graph
         class Pipe
         {
         protected:
-            friend class GraphQueryBase<TGraph>;
+            friend class GraphQueryEngine<TGraph>;
 
         public:
             virtual ~Pipe() = default;
@@ -88,18 +93,18 @@ namespace graph
         TGraph const* _graph;
 
     public:
-        GraphQueryBase()
+        GraphQueryEngine()
             : _pipes()
             , _state()
             , _graph(nullptr)
         { }
-        GraphQueryBase(TGraph const* g)
+        GraphQueryEngine(TGraph const* g)
             : _pipes()
             , _state()
             , _graph(g)
         { }
 
-        ~GraphQueryBase()
+        ~GraphQueryEngine()
         {
             reset();
         }
@@ -227,10 +232,10 @@ namespace graph
 
     template<typename TGraph>
     class GraphQueryPipeEmpty
-        : public GraphQueryBase<TGraph>::Pipe
+        : public GraphQueryEngine<TGraph>::Pipe
     {
     private:
-        using Query = GraphQueryBase<TGraph>;
+        using Query = GraphQueryEngine<TGraph>;
 
     public:
         inline GraphQueryPipeEmpty() = default;
@@ -256,10 +261,10 @@ namespace graph
 
     template<typename TGraph>
     class GraphQueryPipeVertex
-        : public GraphQueryBase<TGraph>::Pipe
+        : public GraphQueryEngine<TGraph>::Pipe
     {
     private:
-        using Query = GraphQueryBase<TGraph>;
+        using Query = GraphQueryEngine<TGraph>;
 
     // config
     protected:
@@ -301,17 +306,17 @@ namespace graph
             if (_it == _nodes.end())
                 return Query::PipeResultEnum::Done;
             else
-                return GraphQueryBase<TGraph>::makeGremlin(*(_it ++), gremlin);
+                return GraphQueryEngine<TGraph>::makeGremlin(*(_it ++), gremlin);
         }
     };
 
 
     template<typename TGraph, typename TFuncEdges, typename TFuncEdgeNodes>
     class GraphQueryPipeEdges
-        : public GraphQueryBase<TGraph>::Pipe
+        : public GraphQueryEngine<TGraph>::Pipe
     {
     private:
-        using Query = GraphQueryBase<TGraph>;
+        using Query = GraphQueryEngine<TGraph>;
 
     // config
     protected:
@@ -379,7 +384,7 @@ namespace graph
                 _nodes_it = _nodes.begin();
             }
 
-            return GraphQueryBase<TGraph>::gotoVertex(_gremlin, (typename TGraph::Node const*) *(_nodes_it ++));
+            return GraphQueryEngine<TGraph>::gotoVertex(_gremlin, (typename TGraph::Node const*) *(_nodes_it ++));
         }
     };
 
@@ -387,7 +392,7 @@ namespace graph
     class GraphQueryLibraryBase
     {
     protected:
-        virtual RetType addPipe(std::unique_ptr<typename GraphQueryBase<TGraph>::Pipe> && Pipe) = 0;
+        virtual RetType addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) = 0;
     };
 
     template<typename TGraph, typename RetType>
@@ -413,10 +418,10 @@ namespace graph
         , public TGraphQueryLibrary<TGraph, GraphQuery<TGraph, TGraphQueryLibrary>>
     {
     private:
-        std::unique_ptr<GraphQueryBase<TGraph>> _engine;
+        std::unique_ptr<GraphQueryEngine<TGraph>> _engine;
 
     protected:
-        inline virtual GraphQuery addPipe(std::unique_ptr<typename GraphQueryBase<TGraph>::Pipe> && Pipe) override
+        inline virtual GraphQuery addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) override
         {
             _engine->addPipe(std::move(Pipe));
 
@@ -426,7 +431,7 @@ namespace graph
     public:
         GraphQuery(TGraph const* g)
         {
-            _engine = std::make_unique<GraphQueryBase<TGraph>>(g);
+            _engine = std::make_unique<GraphQueryEngine<TGraph>>(g);
         }
 
         ~GraphQuery() = default;
@@ -437,7 +442,7 @@ namespace graph
         GraphQuery(GraphQuery const& that) = delete;
         GraphQuery& operator=(const GraphQuery& other) = delete;
 
-        inline GraphQueryBase<TGraph>* operator->()
+        inline GraphQueryEngine<TGraph>* operator->()
         {
             return _engine.operator->();
         }
