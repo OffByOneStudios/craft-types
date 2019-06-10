@@ -7,35 +7,66 @@
 #include <string>
 
 using namespace graph;
-using namespace graph::query;
 using namespace Catch::Matchers;
 
 
-TEST_CASE( "graph::query basics", "[graph::GraphQuery]" )
+TEST_CASE( "graph::query() basics", "[graph::GraphQuery]" )
 {
     Graph< GraphCore<std::string> > g;
 
     test_help::fillStrGraphWithNorse(g);
 
-    SECTION( "graph::query::q returns empty" )
+    SECTION( "graph::query() returns working query object" )
     {
-        q(g);
+        auto q = query(&g);
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 0);
+
+        auto r = q.run();
+
+        CHECK(r.size() == 0);
     }
 
-    SECTION( "graph::query::q can add GraphQueryStepEmpty manually" )
+    SECTION( "graph::query() ->addPipe() can add GraphQueryPipeEmpty manually" )
     {
-        auto query = q(g);
+        auto q = query(&g);
 
-        query->addStep(std::make_unique<GraphQueryStepEmpty<decltype(g)>>());
+        q->addPipe(std::make_unique<GraphQueryPipeEmpty<decltype(g)>>());
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 1);
+
+        auto r = q.run();
+
+        CHECK(r.size() == 0);
     }
 
-    SECTION( "graph::query::q can add GraphQueryStepVertex (AKA `v`) with syntax" )
+    SECTION( "graph:query().v() can add GraphQueryStepVertex (AKA `v`) with syntax" )
     {
-        auto query = q(g) | v(std::vector { findNode(g, "thor") });
+        auto q = query(&g)
+            .v(findNode(g, "thor"));
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 1);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 1);
     }
 
-    SECTION( "graph::query::q can add GraphQueryStepEdges (AKA `in`, `out`) with syntax" )
+    SECTION( "graph::query.e() can add GraphQueryStepEdges with syntax" )
     {
-        //auto query = q(g) | in(edgeIsIncoming<decltype(g)>);
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            .e( [](auto n, auto e) { return e->data == "parents"; },
+                [](auto e, auto n) { return edgeIsIncoming<decltype(g)>(n, e); });
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 2);
     }
 }

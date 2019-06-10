@@ -282,6 +282,15 @@ namespace graph
                         break;
                 }
             }
+            template<typename Func>
+            inline void forAllNodesInEdge(Edge const* edge, Func func) const
+            {
+                for (auto node_it = edge->nodes.begin(); node_it != edge->nodes.end(); ++node_it)
+                {
+                    if (!_detail::invoke_return_bool_or_true(func, (Node const*)*node_it))
+                        break;
+                }
+            }
 
         // Update functions
         public:
