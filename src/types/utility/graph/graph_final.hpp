@@ -11,6 +11,13 @@ namespace graph
         : public TGraphBase
     {
     public:
+        /*
+         * All types listed here are expected to be forwarded by all 'Actual' types
+         */
+        
+        using MetaFlags = typename TGraphBase::MetaFlags;
+        using Data = typename TGraphBase::Data;
+
         struct Label
             : public TGraphBase::Core
             , public TGraphBase::Label

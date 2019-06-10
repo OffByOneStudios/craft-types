@@ -139,4 +139,9 @@ TEST_CASE( "::graph::GraphCore updates", "[graph::GraphCore]" )
     {
         REQUIRE_THROWS_AS( g.attachEdge(n3, e, 5), graph_error );
     }
+
+    REQUIRE(g.labelCount() == 1);
+    REQUIRE(g.nodeCount() == 4);
+    REQUIRE(g.edgeCount() == 1);
+    REQUIRE(g.propCount() == 0);
 }

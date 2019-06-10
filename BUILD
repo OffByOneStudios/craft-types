@@ -13,7 +13,10 @@ entrypoint_generator(name = "runtime_explorer")
 
 cc_test(
     name = "tests",
-    srcs = glob(["test/unit/**/*.cpp"]),
+    srcs = glob([
+        "test/unit/**/*.cpp",
+        "test/unit/**/*.h*"
+    ]),
     deps = [
         "types",
         "@catch//:catch",

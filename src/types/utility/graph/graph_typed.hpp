@@ -51,9 +51,10 @@ namespace graph
         {
             using Base = typename TGraphBase::template Actual<TFinal>;
 
+        public:
+            using MetaFlags = typename TFinal::MetaFlags;
             using Data = typename TFinal::Data;
 
-        public:
             using Label = typename TFinal::Label;
             using Node = typename TFinal::Node;
             using Edge = typename TFinal::Edge;

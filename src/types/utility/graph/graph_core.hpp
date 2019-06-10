@@ -84,12 +84,16 @@ namespace graph
         template<typename TFinal>
         class Actual
         {
-        protected:
+        public:
+            using MetaFlags = typename TFinal::MetaFlags;
+            using Data = typename TFinal::Data;
+
             using Label = typename TFinal::Label;
             using Node = typename TFinal::Node;
             using Edge = typename TFinal::Edge;
             using Prop = typename TFinal::Prop;
 
+        protected:
             using LabelStorage = typename TFinal::template Storage<Label>;
             using NodeStorage = typename TFinal::template Storage<Node>;
             using EdgeStorage = typename TFinal::template Storage<Edge>;
@@ -123,11 +127,16 @@ namespace graph
             // By default edges point from 0-index to all others
             inline Edge* addEdge(TData const& data, std::vector<Node*> const& nodes, bool invert = false)
             {
+                auto nodes_size = nodes.size();
+                if (nodes_size < 2)
+                    throw graph_error("Edges must connect at least two nodes.");
+
                 Edge& ref = _edges.emplace_back();
                 ref.data = data;
                 ref.flags = MetaFlags::Value_Kind_Edge;
                 if (invert) ref.flags = (MetaFlags)((uint64_t)ref.flags | (uint64_t)MetaFlags::Flag_InverseEdge);
 
+                ref.nodes.reserve(nodes_size);
                 for (auto node : nodes)
                 {
                     ref.nodes.push_back(node);
