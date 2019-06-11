@@ -1,4 +1,7 @@
+
 # Build stuff
+.vscode
+bazel-*
 common.cpp
 cmake/*
 CMakeLists.txt

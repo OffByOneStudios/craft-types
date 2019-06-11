@@ -1,15 +1,34 @@
 # Bazel Build File For Type system
 
-load("//build_tools:macros.bzl", "header_generator", "dll_generator", "entrypoint_generator")
 
-header_generator(  
-  extra_headers = ["src/types/dll_entry.inc",],
-  deps = ["@spdlog//:spdlog", "@boost//:callable_traits"]
+cc_library(
+    name="types",
+    visibility = ["//visibility:public"],
+    hdrs=glob([
+        "src/**/*.h*",
+    ]),
+    srcs=glob([
+        "src/**/*.c*"
+    ]),
+    defines=[
+        "CULTLANG_TYPES_DLL",
+        "CULT_CURRENT_PACKAGE=\\\"org_cultlang_" + "types" + "\\\""
+    ],
+    includes=[
+        "src"
+    ],
+    copts = select({
+        "@bazel_tools//src/conditions:windows": ["/std:c++17"],
+        "@bazel_tools//src/conditions:darwin": ["-std=c++17"],
+        "//conditions:default": ["-std=c++17"],
+    }),
+    deps=[
+        "@spdlog//:headers",
+        "@boost//:callable_traits",
+    ]
 )
 
-dll_generator()
 
-entrypoint_generator(name = "runtime_explorer")
 
 cc_test(
     name = "tests",
@@ -19,7 +38,7 @@ cc_test(
     ]),
     deps = [
         "types",
-        "@catch//:catch",
+        "@catch//:single_include",
     ],
     copts = select({
         "@bazel_tools//src/conditions:windows": ["/std:c++17"],
@@ -33,6 +52,6 @@ cc_test(
     srcs = glob(["test/literate/*.cpp"]),
     deps = [
         "types",
-        "@catch//:catch",
+       "@catch//:single_include",
     ],
 )
