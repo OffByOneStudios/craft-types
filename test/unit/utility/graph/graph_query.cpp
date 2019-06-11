@@ -42,7 +42,7 @@ TEST_CASE( "graph::query() basics", "[graph::GraphQuery]" )
         CHECK(r.size() == 0);
     }
 
-    SECTION( "graph:query().v() can add GraphQueryStepVertex (AKA `v`) with syntax" )
+    SECTION( "graph:query().v() can add GraphQueryStepVertex (AKA `v`) with syntax (single node)" )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"));
@@ -54,6 +54,33 @@ TEST_CASE( "graph::query() basics", "[graph::GraphQuery]" )
 
         CHECK(r.size() == 1);
     }
+
+    SECTION( "graph:query().v() can add GraphQueryStepVertex (AKA `v`) with syntax (multiple nodes)" )
+    {
+        auto q = query(&g)
+            .v(std::vector { findNode(g, "thor"), findNode(g, "odin"), findNode(g, "jord") });
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 1);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 3);
+    }
+
+    SECTION( "graph:query().v() can add GraphQueryStepVertex (AKA `v`) with syntax (repeat nodes)" )
+    {
+        auto thor = findNode(g, "thor");
+        auto q = query(&g)
+            .v(std::vector { thor, thor, thor, thor, thor });
+
+        CHECK(q->getGraph() == &g);
+        CHECK(q->countPipes() == 1);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 5);
+    }
 }
 
 
@@ -63,46 +90,13 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
 
     test_help::fillStrGraphWithNorse(g);
 
-    SECTION( "graph::query.e() can add GraphQueryStepEdges by hand" )
+    SECTION( "graph::query.e() can query for specific edges." )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
-            // same as "out"
-            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; },
-                &edgeIsIncoming<decltype(g)>);
-            
+            // same as "out" (mostly)
+            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; } );
 
-        CHECK(q->getGraph() == &g);
-        CHECK(q->countPipes() == 2);
-        
-        auto r = q.run();
-
-        CHECK(r.size() == 2);
-    }
-
-    SECTION( "graph::query.in() can add GraphQueryStepEdges with helper" )
-    {
-        auto q = query(&g)
-            .v(findNode(g, "thor"))
-            // TODO fix this to remove edgeIsIncoming
-            .in( [](auto n, auto e) { return edgeIsIncoming<decltype(g)>(n, e) && e->data == "parents"; } );
-
-        CHECK(q->getGraph() == &g);
-        CHECK(q->countPipes() == 2);
-        
-        auto r = q.run();
-
-        CHECK(r.size() == 3); // Thor has 3 children
-    }
-
-    SECTION( "graph::query.out() can add GraphQueryStepEdges with helper" )
-    {
-        auto q = query(&g)
-            .v(findNode(g, "thor"))
-            // TODO fix this to remove edgeIsOutgoing
-            .out( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; } );
-
-        CHECK(q->getGraph() == &g);
         CHECK(q->countPipes() == 2);
         
         auto r = q.run();
@@ -110,34 +104,89 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         CHECK(r.size() == 2); // Thor has 2 parents
     }
 
-    SECTION( "graph::query.e() can retrieve specific node" )
+    SECTION( "graph::query.e() can follow edges in a specific way." )
+    {
+        auto q_mom = query(&g)
+            .v(findNode(g, "thor"))
+            // same as "out" (mostly)
+            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; },
+                // mother is in slot 1 (size guard not needed: 2 size edges are guarnteed)
+                [](auto n, auto e, auto ne) { return e->nodes[1] == ne; });
+
+        auto q_dad = query(&g)
+            .v(findNode(g, "thor"))
+            // same as "out" (mostly)
+            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; },
+                // father is in slot 2 (size guard requried)
+                [](auto n, auto e, auto ne) { return e->nodes.size() > 2 && e->nodes[2] == ne; });
+
+        CHECK(q_mom->countPipes() == 2);
+        CHECK(q_dad->countPipes() == 2);
+        
+        auto r_mom = q_mom.run();
+        auto r_dad = q_dad.run();
+
+        REQUIRE(r_mom.size() == 1);
+        REQUIRE(r_mom[0]->data == "jord"); // Thor's mom
+
+        REQUIRE(r_dad.size() == 1);
+        REQUIRE(r_dad[0]->data == "odin"); // Thor's dad
+    }
+
+    SECTION( "graph::query.in() can get nodes of incoming edges." )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
-            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; },
-                [](auto n, auto e) { return e->nodes.size() > 1 && e->nodes[1] == n; });
+            .in( [](auto n, auto e) { return e->data == "parents"; } );
 
-        CHECK(q->getGraph() == &g);
         CHECK(q->countPipes() == 2);
         
         auto r = q.run();
 
-        REQUIRE(r.size() == 1);
-        REQUIRE(r[0]->data == "jord"); // Thor's mom
+        CHECK(r.size() == 3); // Thor has 3 children
     }
 
-    SECTION( "graph::query.unique() ensures unique results" )
+    SECTION( "graph::query.out() can get nodes of outgoing edges." )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
-            // TODO fix this to remove edgeIsOutgoing
-            .out( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; } )
-            // TODO fix this to remove edgeIsIncoming
-            .in( [](auto n, auto e) { return edgeIsIncoming<decltype(g)>(n, e) && e->data == "parents"; } );
+            .out( [](auto n, auto e) { return e->data == "parents"; } );
+
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        CHECK(r.size() == 2); // Thor has 2 parents
+    }
+
+    SECTION( "graph::query.unique() ensures unique results (contrived)" )
+    {
+        auto thor = findNode(g, "thor");
+        auto q = query(&g)
+            .v(std::vector { thor, thor, thor, thor, thor })
+            .unique();
+
+        CHECK(q->countPipes() == 2);
+
+        auto r = q.run();
+
+        REQUIRE(r.size() == 1); // Thor is unique
+    }
+
+    SECTION( "graph::query.unique() ensures unique results (large query)" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            .out( [](auto n, auto e) { return e->data == "parents"; } )
+            .in( [](auto n, auto e) { return e->data == "parents"; } );
+
+        CHECK(q->countPipes() == 3);
 
         auto r0 = q.run();
 
         q = q.unique();
+
+        CHECK(q->countPipes() == 4);
 
         auto r1 = q.run();
 

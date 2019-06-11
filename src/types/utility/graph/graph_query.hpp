@@ -314,8 +314,14 @@ namespace graph
         }
     };
 
+    enum class GraphQueryPipeEdgesEnum
+    {
+        All,
+        Incoming,
+        Outgoing
+    };
 
-    template<typename TGraph, typename TFuncEdges, typename TFuncEdgeNodes>
+    template<typename TGraph, GraphQueryPipeEdgesEnum EMode, typename TFuncEdges, typename TFuncEdgeNodes>
     class GraphQueryPipeEdges
         : public GraphQueryEngine<TGraph>::Pipe
     {
@@ -359,6 +365,48 @@ namespace graph
             return res;
         };
 
+        static inline bool _modeFilterEdges(typename TGraph::Node const* n, typename TGraph::Edge const* e)
+        {
+            if constexpr (EMode == GraphQueryPipeEdgesEnum::All)
+            {
+                return true;
+            }
+            else if constexpr (EMode == GraphQueryPipeEdgesEnum::Incoming)
+            {
+                return edgeIsIncoming<TGraph>(n, e);
+            }
+            else if constexpr (EMode == GraphQueryPipeEdgesEnum::Outgoing)
+            {
+                return edgeIsOutgoing<TGraph>(n, e);
+            }
+            else
+            {
+                static_assert("Bad EMode");
+            }
+            
+        }
+
+        static inline bool _modeFilterEdgeNodes(typename TGraph::Node const* n, typename TGraph::Edge const* e, typename TGraph::Node const* en)
+        {
+            if constexpr (EMode == GraphQueryPipeEdgesEnum::All)
+            {
+                return n != en;
+            }
+            else if constexpr (EMode == GraphQueryPipeEdgesEnum::Incoming)
+            {
+                return !edgeIsIncoming<TGraph>(en, e);
+            }
+            else if constexpr (EMode == GraphQueryPipeEdgesEnum::Outgoing)
+            {
+                return !edgeIsOutgoing<TGraph>(en, e);
+            }
+            else
+            {
+                static_assert("Bad EMode");
+            }
+            
+        }
+
         inline virtual typename Query::PipeResult pipeFunc(
             TGraph const* graph,
             std::shared_ptr<typename Query::Gremlin> const& gremlin
@@ -373,7 +421,9 @@ namespace graph
             {
                 _gremlin = gremlin;
 
-                _edges = collectEdges(*graph, _gremlin->node, _func_edges);
+                auto n = _gremlin->node;
+                _edges = collectEdges(*graph, n,
+                    [&](auto e) { return _modeFilterEdges(n, e) && _func_edges(n, e); });
                 _edges_it = _edges.begin();
                 _nodes_it = _nodes.end();
             }
@@ -384,7 +434,12 @@ namespace graph
                 if (_edges_it == _edges.end())
                     return Query::PipeResultEnum::Pull;
 
-                _nodes = collectNodes(*graph, (typename TGraph::Edge const*) *(_edges_it ++), _func_edgeNodes);
+                // TODO: simplyfy this, we know which nodes on the edge are the ones we want to
+                //   traverse, we may want to revert our iterator paradigm too.
+                auto n = _gremlin->node;
+                auto e = (typename TGraph::Edge const*) *(_edges_it ++);
+                _nodes = collectNodes(*graph, e, 
+                    [&](auto en) { return _modeFilterEdgeNodes(n, e, en) && _func_edgeNodes(n, e, en); });
                 _nodes_it = _nodes.begin();
             }
 
@@ -458,24 +513,40 @@ namespace graph
             return this->addPipe(std::make_unique<GraphQueryPipeVertex<TGraph>>(std::forward<TArgs>(args)...));
         }
 
+        template<typename TFuncEdges>
+        RetType e(TFuncEdges func_edges)
+        {
+            auto edgeNodeFunc = [](auto n, auto e, auto ne){ return true; };
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::All, TFuncEdges, decltype(edgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), edgeNodeFunc));
+        }
         template<typename TFuncEdges, typename TFuncEdgeNodes>
         RetType e(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
         {
-            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::All, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
 
         template<typename TFuncEdges>
         RetType in(TFuncEdges func_edges)
         {
-            auto inEdgeNodeFunc = &edgeIsOutgoing<TGraph>;
-            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(inEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), inEdgeNodeFunc));
+            auto inEdgeNodeFunc = [](auto n, auto e, auto ne){ return true; };
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Incoming, TFuncEdges, decltype(inEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), inEdgeNodeFunc));
+        }
+        template<typename TFuncEdges, typename TFuncEdgeNodes>
+        RetType in(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
+        {
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Incoming, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
 
         template<typename TFuncEdges>
         RetType out(TFuncEdges func_edges)
         {
-            auto outEdgeNodeFunc = &edgeIsIncoming<TGraph>;
-            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
+            auto outEdgeNodeFunc = [](auto n, auto e, auto ne){ return true; };
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Outgoing, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
+        }
+        template<typename TFuncEdges, typename TFuncEdgeNodes>
+        RetType out(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
+        {
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Outgoing, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
         
         RetType unique()
