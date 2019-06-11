@@ -15,7 +15,7 @@ namespace graph
     public:
         // TODO move value kind out of this
         // TODO a way for this to be used by wrapping templates
-        enum class MetaFlags : uint64_t
+        enum class MetaFlags : uint32_t
         {
             None = 0,
 
@@ -48,7 +48,7 @@ namespace graph
         struct Edge;
         struct Prop;
 
-        // A graph "lebel" metadata
+        // A graph "label" metadata
         struct Label
         {
         public:
@@ -170,6 +170,29 @@ namespace graph
                 return &ref;
             }
 
+        // Update functions
+        public:
+            inline void attachLabel(Node* node, Label* label)
+            {
+                label->nodes.push_back(node);
+                node->labels.push_back(label);
+            }
+
+            inline void attachEdge(Node* node, Edge* edge)
+            {
+                edge->nodes.push_back(node);
+                node->edges.push_back(edge);
+            }
+
+            inline void attachEdge(Node* node, Edge* edge, size_t index)
+            {
+                if (index > edge->nodes.size())
+                    throw graph_error("Argument `index` out of range.");
+
+                edge->nodes.insert(edge->nodes.begin() + index, node);
+                node->edges.push_back(edge);
+            }
+
         // Printer functions
         public:
             inline std::string print(Core*) const
@@ -177,7 +200,7 @@ namespace graph
 
             }
 
-        // Getter functions
+        // Stat functions
         public:
             inline size_t labelCount() const
             {
@@ -196,19 +219,58 @@ namespace graph
                 return _props.size();
             }
 
+        // Introspection functions
+        public:
+            
+            inline bool isLabel(Core const* core) const
+            {
+                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Label;
+            }
+            inline bool isNode(Core const* core) const
+            {
+                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Node;
+            }
+            inline bool isEdge(Core const* core) const
+            {
+                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Edge;
+            }
+            inline bool isProp(Core const* core) const
+            {
+                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Prop;
+            }
+
+            inline bool isEdgeInverted(Edge const* edge) const
+            {
+                return ((uint64_t)edge->flags & (uint64_t)MetaFlags::Flag_InverseEdge) != 0;
+            }
+
+        // Getter functions
+        public:
+            inline std::vector<Node*> getLabelNodes(Label const* label) const
+            {
+                return label->nodes;
+            }
+
             inline std::vector<Label*> getNodeLabels(Node const* node) const
             {
                 return node->labels;
+            }
+            inline std::vector<Edge*> getNodeEdges(Node const* node) const
+            {
+                return node->edges;
+            }
+            inline std::vector<Prop*> getNodeProps(Node const* node) const
+            {
+                return node->props;
             }
 
             inline std::vector<Node*> getEdgeNodes(Edge const* edge) const
             {
                 return edge->nodes;
             }
-            
-            inline bool isEdgeInverted(Edge const* edge) const
+            inline std::vector<Prop*> getEdgeProps(Edge const* edge) const
             {
-                return ((uint64_t)edge->flags & (uint64_t)MetaFlags::Flag_InverseEdge) != 0;
+                return edge->props;
             }
 
         // Iteration functions
@@ -282,6 +344,7 @@ namespace graph
                         break;
                 }
             }
+
             template<typename Func>
             inline void forAllNodesInEdge(Edge const* edge, Func func) const
             {
@@ -291,28 +354,15 @@ namespace graph
                         break;
                 }
             }
-
-        // Update functions
-        public:
-            inline void attachLabel(Node* node, Label* label)
+            
+            template<typename Func>
+            inline void forAllPropsOnEdge(Edge const* edge, Func func) const
             {
-                label->nodes.push_back(node);
-                node->labels.push_back(label);
-            }
-
-            inline void attachEdge(Node* node, Edge* edge)
-            {
-                edge->nodes.push_back(node);
-                node->edges.push_back(edge);
-            }
-
-            inline void attachEdge(Node* node, Edge* edge, size_t index)
-            {
-                if (index > edge->nodes.size())
-                    throw graph_error("Argument `index` out of range.");
-
-                edge->nodes.insert(edge->nodes.begin() + index, node);
-                node->edges.push_back(edge);
+                for (auto prop_it = edge->props.begin(); prop_it != edge->props.end(); ++prop_it)
+                {
+                    if (!_detail::invoke_return_bool_or_true(func, (Prop const*)*prop_it))
+                        break;
+                }
             }
         };
     };
