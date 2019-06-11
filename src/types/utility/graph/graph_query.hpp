@@ -3,6 +3,7 @@
 #include <memory>
 #include <variant>
 #include <vector>
+#include <set>
 
 #include "graph_util.hpp"
 
@@ -391,6 +392,54 @@ namespace graph
         }
     };
 
+
+    template<typename TGraph>
+    class GraphQueryPipeUnique
+        : public GraphQueryEngine<TGraph>::Pipe
+    {
+    private:
+        using Query = GraphQueryEngine<TGraph>;
+
+    // config
+    protected:
+
+    // state
+    protected:
+        std::set<typename TGraph::Node const*> _seen;
+
+    public:
+        inline GraphQueryPipeUnique()
+            : _seen()
+        { }
+
+        inline GraphQueryPipeUnique(GraphQueryPipeUnique const&) = default;
+        inline GraphQueryPipeUnique(GraphQueryPipeUnique &&) = default;
+
+        inline ~GraphQueryPipeUnique() = default;
+
+    protected:
+        virtual typename Query::Pipe* init() const override
+        {
+            auto res = new GraphQueryPipeUnique();
+
+            return res;
+        };
+
+        inline virtual typename Query::PipeResult pipeFunc(
+            TGraph const* graph,
+            std::shared_ptr<typename Query::Gremlin> const& gremlin
+        ) override
+        {
+            if (!gremlin)
+                return Query::PipeResultEnum::Pull;
+            if (_seen.count(gremlin->node))
+                return Query::PipeResultEnum::Pull;
+            _seen.insert(gremlin->node);
+            return gremlin;
+        }
+    };
+
+
     template<typename TGraph, typename RetType>
     class GraphQueryLibraryBase
     {
@@ -400,7 +449,7 @@ namespace graph
 
     template<typename TGraph, typename RetType>
     class GraphQueryLibraryCore
-        : protected virtual GraphQueryLibraryBase<TGraph, RetType>
+        : protected GraphQueryLibraryBase<TGraph, RetType>
     {
     public:
         template<typename ...TArgs>
@@ -428,12 +477,16 @@ namespace graph
             auto outEdgeNodeFunc = &edgeIsIncoming<TGraph>;
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
         }
+        
+        RetType unique()
+        {
+            return this->addPipe(std::make_unique<GraphQueryPipeUnique<TGraph>>());
+        }
     };
 
     template<typename TGraph, template <typename, typename> typename TGraphQueryLibrary> 
     class GraphQuery final
-        : protected virtual GraphQueryLibraryBase<TGraph, GraphQuery<TGraph, TGraphQueryLibrary>>
-        , public TGraphQueryLibrary<TGraph, GraphQuery<TGraph, TGraphQueryLibrary>>
+        : public TGraphQueryLibrary<TGraph, GraphQuery<TGraph, TGraphQueryLibrary>>
     {
     private:
         std::unique_ptr<GraphQueryEngine<TGraph>> _engine;

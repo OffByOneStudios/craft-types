@@ -125,4 +125,23 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         REQUIRE(r.size() == 1);
         REQUIRE(r[0]->data == "jord"); // Thor's mom
     }
+
+    SECTION( "graph::query.unique() ensures unique results" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            // TODO fix this to remove edgeIsOutgoing
+            .out( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; } )
+            // TODO fix this to remove edgeIsIncoming
+            .in( [](auto n, auto e) { return edgeIsIncoming<decltype(g)>(n, e) && e->data == "parents"; } );
+
+        auto r0 = q.run();
+
+        q = q.unique();
+
+        auto r1 = q.run();
+
+        REQUIRE(r0.size() > r1.size());
+        REQUIRE(r1.size() == 4); // Thor has 4 siblings (including himself)
+    }
 }
