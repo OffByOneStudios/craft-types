@@ -68,7 +68,7 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         auto q = query(&g)
             .v(findNode(g, "thor"))
             // same as "out"
-            .e( [](auto n, auto e) { return e->data == "parents"; },
+            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; },
                 &edgeIsIncoming<decltype(g)>);
             
 
@@ -84,35 +84,37 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
-            .in( [](auto n, auto e) { return e->data == "parents"; } );
+            // TODO fix this to remove edgeIsIncoming
+            .in( [](auto n, auto e) { return edgeIsIncoming<decltype(g)>(n, e) && e->data == "parents"; } );
 
         CHECK(q->getGraph() == &g);
         CHECK(q->countPipes() == 2);
         
         auto r = q.run();
 
-        CHECK(r.size() == 1);
+        CHECK(r.size() == 3); // Thor has 3 children
     }
 
     SECTION( "graph::query.out() can add GraphQueryStepEdges with helper" )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
-            .out( [](auto n, auto e) { return e->data == "parents"; } );
+            // TODO fix this to remove edgeIsOutgoing
+            .out( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; } );
 
         CHECK(q->getGraph() == &g);
         CHECK(q->countPipes() == 2);
         
         auto r = q.run();
 
-        CHECK(r.size() == 2);
+        CHECK(r.size() == 2); // Thor has 2 parents
     }
 
     SECTION( "graph::query.e() can retrieve specific node" )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
-            .e( [](auto n, auto e) { return e->data == "parents"; },
+            .e( [](auto n, auto e) { return edgeIsOutgoing<decltype(g)>(n, e) && e->data == "parents"; },
                 [](auto n, auto e) { return e->nodes.size() > 1 && e->nodes[1] == n; });
 
         CHECK(q->getGraph() == &g);
@@ -120,6 +122,7 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         
         auto r = q.run();
 
-        CHECK(r.size() == 2);
+        REQUIRE(r.size() == 1);
+        REQUIRE(r[0]->data == "jord"); // Thor's mom
     }
 }
