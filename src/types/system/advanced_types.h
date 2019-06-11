@@ -2,8 +2,10 @@
 #include "../common.h"
 #include "../core.h"
 
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-private-field"
+#endif
 namespace craft {
 namespace types
 {
@@ -72,4 +74,6 @@ namespace types
 		size_t _reserved;
 	};
 }}
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
