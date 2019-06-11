@@ -1,44 +1,8 @@
 
-# Build stuff
+# dot files
 .vscode
-bazel-*
-common.cpp
-cmake/*
-CMakeLists.txt
-build
-dist
 .DS_Store
-gen.txt
 
-# Prerequisites
-*.d
+# bazel
+bazel-*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
