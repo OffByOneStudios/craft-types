@@ -18,14 +18,14 @@
 namespace graph
 {
     template<typename TGraph>
-    typename bool edgeIsIncoming(typename TGraph::Node const* n, typename TGraph::Edge const* e)
+    bool edgeIsIncoming(typename TGraph::Node const* n, typename TGraph::Edge const* e)
     {
         const auto inverseFlagValue = TGraph::MetaFlags::Flag_InverseEdge;
 
         return  (e->nodes[0] != n) != (((uint64_t)e->flags & (uint64_t)inverseFlagValue) == (uint64_t)inverseFlagValue);
     }
     template<typename TGraph>
-    typename bool edgeIsOutgoing(typename TGraph::Node const* n, typename TGraph::Edge const* e)
+    bool edgeIsOutgoing(typename TGraph::Node const* n, typename TGraph::Edge const* e)
     {
         const auto inverseFlagValue = TGraph::MetaFlags::Flag_InverseEdge;
 

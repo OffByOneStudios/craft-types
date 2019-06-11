@@ -2,6 +2,9 @@
 #include "../common.h"
 #include "../core.h"
 
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-private-field"
 namespace craft {
 namespace types
 {
@@ -61,3 +64,4 @@ namespace types
 		uintptr_t _reserved;
 	};
 }}
+#pragma clang diagnostic pop

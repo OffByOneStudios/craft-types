@@ -256,8 +256,8 @@ namespace graph
         ) override
         {
             return gremlin
-                ? Query::PipeResult(gremlin)
-                : Query::PipeResult(Query::PipeResultEnum::Pull);
+                ? typename Query::PipeResult(gremlin)
+                : typename Query::PipeResult(Query::PipeResultEnum::Pull);
         }
     };
 
@@ -406,27 +406,27 @@ namespace graph
         template<typename ...TArgs>
         RetType v(TArgs... args)
         {
-            return addPipe(std::make_unique<GraphQueryPipeVertex<TGraph>>(std::forward<TArgs>(args)...));
+            return this->addPipe(std::make_unique<GraphQueryPipeVertex<TGraph>>(std::forward<TArgs>(args)...));
         }
 
         template<typename TFuncEdges, typename TFuncEdgeNodes>
         RetType e(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
         {
-            return addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
 
         template<typename TFuncEdges>
         RetType in(TFuncEdges func_edges)
         {
             auto inEdgeNodeFunc = &edgeIsOutgoing<TGraph>;
-            return addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(inEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), inEdgeNodeFunc));
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(inEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), inEdgeNodeFunc));
         }
 
         template<typename TFuncEdges>
         RetType out(TFuncEdges func_edges)
         {
             auto outEdgeNodeFunc = &edgeIsIncoming<TGraph>;
-            return addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
+            return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
         }
     };
 

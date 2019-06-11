@@ -2,6 +2,8 @@
 #include "../common.h"
 #include "../core.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-private-field"
 namespace craft {
 namespace types
 {
@@ -49,6 +51,7 @@ namespace types
 	};
 
 }}
+#pragma clang diagnostic pop
 
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Node_CppFunction);
 CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, craft::types::Type_Property_CppIdentifier);
