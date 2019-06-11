@@ -159,6 +159,34 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         CHECK(r.size() == 2); // Thor has 2 parents
     }
 
+    SECTION( "graph::query.filter() can filter nodes (1 arg, contrived)." )
+    {
+        auto q = query(&g)
+            .v(std::vector { findNode(g, "thor"), findNode(g, "odin"), findNode(g, "odr") })
+            .filter( [](auto n) { return n->data[0] != 'o'; } );
+
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        REQUIRE(r.size() == 1);
+        CHECK(r[0]->data == "thor");
+    }
+
+    SECTION( "graph::query.filter() can filter gremlins (2 arg, contrived)." )
+    {
+        auto q = query(&g)
+            .v(std::vector { findNode(g, "thor"), findNode(g, "odin"), findNode(g, "odr") })
+            .filter( [](auto n, auto g) { return g->node->data[0] != 'o'; } );
+
+        CHECK(q->countPipes() == 2);
+        
+        auto r = q.run();
+
+        REQUIRE(r.size() == 1);
+        CHECK(r[0]->data == "thor");
+    }
+
     SECTION( "graph::query.unique() ensures unique results (contrived)" )
     {
         auto thor = findNode(g, "thor");
