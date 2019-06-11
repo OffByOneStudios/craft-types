@@ -2,6 +2,8 @@
 
 #include "types/utility/graph/graph.hpp"
 
+#include "shared.h"
+
 using namespace graph;
 using namespace Catch::Matchers;
 

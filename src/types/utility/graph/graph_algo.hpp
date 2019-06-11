@@ -20,12 +20,12 @@ namespace graph
     template<typename TGraph>
     bool edgeIsIncoming(typename TGraph::Node const* n, typename TGraph::Edge const* e)
     {
-        return  (e->nodes[0] != n) != g.isEdgeInverted(e);
+        return (e->nodes[0] != n) != TGraph::isEdgeInverted(e);
     }
     template<typename TGraph>
     bool edgeIsOutgoing(typename TGraph::Node const* n, typename TGraph::Edge const* e)
     {
-        return  (e->nodes[0] == n) != g.isEdgeInverted(e);
+        return (e->nodes[0] == n) != TGraph::isEdgeInverted(e);
     }
 
     template<typename TGraph>

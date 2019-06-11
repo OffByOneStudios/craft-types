@@ -222,26 +222,26 @@ namespace graph
         // Introspection functions
         public:
             
-            inline bool isLabel(Core const* core) const
+            static inline bool isLabel(Core const* core)
             {
-                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Label;
+                return ((uint32_t)core->flags & (uint32_t)MetaFlags::Mask_Kind) == (uint32_t)MetaFlags::Value_Kind_Label;
             }
-            inline bool isNode(Core const* core) const
+            static inline bool isNode(Core const* core)
             {
-                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Node;
+                return ((uint32_t)core->flags & (uint32_t)MetaFlags::Mask_Kind) == (uint32_t)MetaFlags::Value_Kind_Node;
             }
-            inline bool isEdge(Core const* core) const
+            static inline bool isEdge(Core const* core)
             {
-                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Edge;
+                return ((uint32_t)core->flags & (uint32_t)MetaFlags::Mask_Kind) == (uint32_t)MetaFlags::Value_Kind_Edge;
             }
-            inline bool isProp(Core const* core) const
+            static inline bool isProp(Core const* core)
             {
-                return ((uint64_t)core->flags & (uint64_t)MetaFlags::Mask_Kind) == Value_Kind_Prop;
+                return ((uint32_t)core->flags & (uint32_t)MetaFlags::Mask_Kind) == (uint32_t)MetaFlags::Value_Kind_Prop;
             }
 
-            inline bool isEdgeInverted(Edge const* edge) const
+            static inline bool isEdgeInverted(Edge const* edge)
             {
-                return ((uint64_t)edge->flags & (uint64_t)MetaFlags::Flag_InverseEdge) != 0;
+                return ((uint32_t)edge->flags & (uint32_t)MetaFlags::Flag_InverseEdge) != 0;
             }
 
         // Getter functions

@@ -10,7 +10,7 @@ The graph library included in this repository is a header only implementation of
 
 ### Theory
 
-The graph model we chose is robust, it works off of some general axioms, with a couple of assumptions about edge cases.
+The graph model chosen is robust, it works off of some general axioms, with a couple of assumptions about edge cases.
 
 1. All core graph kinds can have associated data (aka `Core`).
   * In the case of a typed graph this would include types.
@@ -18,25 +18,25 @@ The graph model we chose is robust, it works off of some general axioms, with a 
 3. Edges (a core graph kind) join togeather an arbitrary number of nodes.
 4. Edges are directional, pointing **from** (outwards) a primary node **to** (inwards) all the other nodes. The primary node is always at the 0 index. Because edges can involve an arbitrary number of nodes a single node can *point at* many other nodes.
 5. Edges can be inverted, because nodes can involve an arbitrary number of nodes an inverted edge allows a single node to be *pointed at* by many other nodes.
-6. Labels (a core graph kind) can include an arbitrary number of nodes (and a node can have an arbitrary number of labels), this allows the graph to be grouped into categories. One view of labels is that they are a pathological case of an edge that involves many edges.
+6. Labels (a core graph kind) can include an arbitrary number of nodes (and a node can have an arbitrary number of labels), this allows the graph to be grouped into categories. One view of labels is that they are a pathological case of an edge that involves many nodes.
 7. Properties (a core graph kind; often shortened to Props) can be placed on a node or an edge as an additional piece of information about that object. Properties may only have a single owner. One view of properties is that they are a pathological pattern of an edge that maps to a node that has no other relationships.
-8. Edges must involve more 2 or more nodes (as properties and labels prevent the pathological need for other cases).
+8. Edges must involve 2 or more nodes (as properties and labels prevent the pathological need for other cases).
 
 Some notable things fall out of this that are worth discussing:
-* Nodes are the focus, we can confirm this by seeing that every core type involves nodes.
+* Nodes are the focus, we can confirm this by seeing that every core kind involves nodes (and no other kind involves every kind).
 * Edges can't be placed in labels. The authors didn't find this use case to be especially compelling (see patterns for alterntives; can also be corrected with a mixin), it also steps on the toes of adding types to the system.
   * Props can't be placed in labels for similar reasons.
   * It is also a step towards homoginizing the model to an interesting extreme that eliminates edges.
 * Labels can't have props. The authors didn't find this use case compelling (see patterns for alterntives; can also be corrected with a mixin).
   * It is also a step towards homoginizing the model to an extreme that eliminates labels (in favor of simply being edges again).
-* Edges can't join Edges. The authors didn't find this compelling after the multiple node edges were added (see patterns for alterntives; could theorhetically be fixed wiht a mixin).
+* Edges can't join Edges. The authors didn't find this compelling after the arbitrarily sized edges were added (see patterns for alterntives; could theorhetically be fixed wiht a mixin).
   * It is also a step towards homoginizing the model to an extreme that eliminates nodes.
 
 ### Designing Data Models
 
 Designing a data model for a graph is the hardest part of using a graph library. We have attempted to provide a variety of tools for whatever data model one might be facing, as we describe below.
 
-Designing graph models is complicated because of the variety of options at one's disposal. We describe some thoughts here to solve these conundrums when using our library.
+Designing graph models is complicated in large part because of the variety of options at one's disposal. We describe some thoughts here to solve these conundrums when using our library.
 
 #### Concern: Source of Truth vs. Fast to Query
 
@@ -52,10 +52,10 @@ There are two primary options in front of us (besides redesigning the data model
 
 #### Pattern: Marker Property
 
-In an untyped graph a common pattern is to use a "marker" property which marks a specific node or edge as being special in some way. A Ahelper `hasProp` will find it.
-A
-A better to use types to represent this A). In keyed graphs it is easier to use Aempty value) to represent this (which A
-A
+In an untyped graph a common pattern is to use a "marker" property which marks a specific node or edge as being special in some way. A simple call to the algorithmic helper `hasProp` will find it.
+
+In typed graphs it is generally better to use types to represent this (which then have faster lookups). In keyed graphs it is easier to use a keyed property (with even an empty value) to represent this (which then have faster lookups).
+
 #### Anti-Pattern: Label Properties
 
 Wanting to put properties on labels is usually an anti-pattern. Here are some motivations and their solutions:
