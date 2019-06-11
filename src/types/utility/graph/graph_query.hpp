@@ -15,6 +15,7 @@
  *   - GraphQueryPipeEmpty
  *   - GraphQueryPipeVertex
  *   - GraphQueryPipeEdges
+ *   - GraphQueryPipeUnique
  * - [syntax]
  *   - GraphQueryLibraryBase
  *   - GraphQueryLibraryCore
@@ -34,6 +35,8 @@ namespace graph
         {
         public:
             typename TGraph::Node const* node;
+
+            std::map<size_t, typename TGraph::Node const*> labels;
         };
 
         enum class PipeResultEnum
@@ -87,20 +90,30 @@ namespace graph
             return std::shared_ptr<Gremlin>();
         }
 
+    // configure
     private:
-
         std::vector<std::unique_ptr<Pipe>> _pipes;
+
+        size_t _labelCounter;
+        std::map<std::string, size_t> _labels;
+
+    // state
+    private:
         std::vector<Pipe*> _state;
         TGraph const* _graph;
 
     public:
         GraphQueryEngine()
             : _pipes()
+            , _labelCounter(0)
+            , _labels()
             , _state()
             , _graph(nullptr)
         { }
         GraphQueryEngine(TGraph const* g)
             : _pipes()
+            , _labelCounter(0)
+            , _labels()
             , _state()
             , _graph(g)
         { }
@@ -129,6 +142,22 @@ namespace graph
         inline TGraph const* getGraph() const
         {
             return _graph;
+        }
+
+        inline size_t requireLabel(std::string const& label)
+        {
+            auto lb = _labels.lower_bound(label);
+
+            if(lb != _labels.end() && !(_labels.key_comp()(label, lb->first)))
+            {
+                return lb->second;
+            }
+            else
+            {
+                auto id = ++_labelCounter;
+                _labels.insert(lb, decltype(_labels)::value_type(label, id));
+                return id;
+            }
         }
 
         inline void addPipe(std::unique_ptr<Pipe> && pipe)
@@ -495,10 +524,53 @@ namespace graph
     };
 
 
+    template<typename TGraph>
+    class GraphQueryPipeLabel
+        : public GraphQueryEngine<TGraph>::Pipe
+    {
+    private:
+        using Query = GraphQueryEngine<TGraph>;
+
+    // config
+    protected:
+        size_t _label;
+
+    // state
+    protected:
+
+    public:
+        inline GraphQueryPipeLabel(size_t label)
+            : _label(label)
+        { }
+
+        inline GraphQueryPipeLabel(GraphQueryPipeLabel const&) = default;
+        inline GraphQueryPipeLabel(GraphQueryPipeLabel &&) = default;
+
+        inline ~GraphQueryPipeLabel() = default;
+
+    protected:
+        inline virtual void cleanup() override { };
+
+        inline virtual typename Query::PipeResult pipeFunc(
+            TGraph const* graph,
+            std::shared_ptr<typename Query::Gremlin> const& gremlin
+        ) override
+        {
+            if (!gremlin)
+                return Query::PipeResultEnum::Pull;
+            
+            gremlin->labels[_label] = gremlin->node;
+
+            return gremlin;
+        }
+    };
+
+
     template<typename TGraph, typename RetType>
     class GraphQueryLibraryBase
     {
     protected:
+        virtual std::unique_ptr<GraphQueryEngine<TGraph>> & engine() = 0;
         virtual RetType addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) = 0;
     };
 
@@ -553,6 +625,11 @@ namespace graph
         {
             return this->addPipe(std::make_unique<GraphQueryPipeUnique<TGraph>>());
         }
+
+        RetType as(std::string const& label)
+        {
+            return this->addPipe(std::make_unique<GraphQueryPipeLabel<TGraph>>(engine()->requireLabel(label)));
+        }
     };
 
     template<typename TGraph, template <typename, typename> typename TGraphQueryLibrary> 
@@ -563,6 +640,10 @@ namespace graph
         std::unique_ptr<GraphQueryEngine<TGraph>> _engine;
 
     protected:
+        virtual std::unique_ptr<GraphQueryEngine<TGraph>> & engine() override
+        {
+            return _engine;
+        }
         inline virtual GraphQuery addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) override
         {
             _engine->addPipe(std::move(Pipe));

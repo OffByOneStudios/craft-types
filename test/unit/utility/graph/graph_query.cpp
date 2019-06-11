@@ -193,4 +193,17 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         REQUIRE(r0.size() > r1.size());
         REQUIRE(r1.size() == 4); // Thor has 4 siblings (including himself)
     }
+
+    SECTION( "graph::query.as() can label nodes (contrived)" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            .as("me");
+
+        CHECK(q->countPipes() == 2);
+
+        auto r = q.run();
+
+        REQUIRE(r.size() == 1); // Thor is returned
+    }
 }
