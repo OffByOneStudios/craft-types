@@ -206,4 +206,21 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
 
         REQUIRE(r.size() == 1); // Thor is returned
     }
+
+    SECTION( "graph::query.except() can filter (large query)" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "thor"))
+            .as("me")
+            .out( [](auto n, auto e) { return e->data == "parents"; } )
+            .in( [](auto n, auto e) { return e->data == "parents"; } )
+            .unique()
+            .except("me");
+
+        CHECK(q->countPipes() == 6);
+
+        auto r = q.run();
+
+        REQUIRE(r.size() == 3); // Thor has 3 siblings
+    }
 }
