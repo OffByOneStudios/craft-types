@@ -14,12 +14,43 @@ void test_help::fillStrGraphWithNorse(Graph< GraphCore<std::string> > & g)
     // Helper temporaries
     typename Graph< GraphCore<std::string> >::Edge* e;
 
-    // Asgardians
+
+    auto tyr = g.addNode("tyr");
+
+    auto mimir = g.addNode("mimir");
+
+    auto bestla = g.addNode("bestla");
+
+    auto burr = g.addNode("burr");
+
+    auto buri = g.addNode("buri");
+
+    e = g.addEdge("married", { burr, bestla });
+
+
+
+    // now it stops beign weird
+    auto fjorgynn = g.addNode("fjorgynn");
+    auto fjorgynn_wife = g.addNode("fjorgynn_wife");
+
+    auto vili = g.addNode("vili");
+    e = g.addEdge("parents", { vili, bestla, burr });
+
+    auto ve = g.addNode("ve");
+    e = g.addEdge("parents", { ve, bestla, burr });
+
+    auto hoenir = g.addNode("hoenir");
+    e = g.addEdge("parents", { hoenir, bestla, burr });
+
+
+
     auto odin = g.addNode("odin");
+    e = g.addEdge("parents", { odin, bestla, burr });
 
     auto jord = g.addNode("jord");
 
     auto frigg = g.addNode("frigg");
+    e = g.addEdge("parents", { frigg, fjorgynn_wife, fjorgynn });
 
     e = g.addEdge("married", { odin, frigg });
 

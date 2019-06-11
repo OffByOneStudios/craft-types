@@ -671,6 +671,47 @@ namespace graph
     };
 
 
+    template<typename TGraph>
+    class GraphQueryPipeBack
+        : public GraphQueryEngine<TGraph>::Pipe
+    {
+    private:
+        using Query = GraphQueryEngine<TGraph>;
+
+    // config
+    protected:
+        size_t _label;
+
+    // state
+    protected:
+
+    public:
+        inline GraphQueryPipeBack(size_t label)
+            : _label(label)
+        { }
+
+        inline GraphQueryPipeBack(GraphQueryPipeBack const&) = default;
+        inline GraphQueryPipeBack(GraphQueryPipeBack &&) = default;
+
+        inline ~GraphQueryPipeBack() = default;
+
+    protected:
+        inline virtual void cleanup() override { };
+
+        inline virtual typename Query::PipeResult pipeFunc(
+            TGraph const* graph,
+            std::shared_ptr<typename Query::Gremlin> const& gremlin
+        ) override
+        {
+            if (!gremlin)
+                return Query::PipeResultEnum::Pull;
+            
+            return GraphQueryEngine<TGraph>::gotoVertex(gremlin, gremlin->getLabel(_label));
+        }
+    };
+
+
+
     template<typename TGraph, typename RetType>
     class GraphQueryLibraryBase
     {
@@ -745,6 +786,11 @@ namespace graph
         RetType except(std::string const& label)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeExcept<TGraph>>(engine()->requireLabel(label)));
+        }
+
+        RetType back(std::string const& label)
+        {
+            return this->addPipe(std::make_unique<GraphQueryPipeBack<TGraph>>(engine()->requireLabel(label)));
         }
     };
 

@@ -235,7 +235,7 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         REQUIRE(r.size() == 1); // Thor is returned
     }
 
-    SECTION( "graph::query.except() can filter (large query)" )
+    SECTION( "graph::query.except() can filter based on labels (large query)" )
     {
         auto q = query(&g)
             .v(findNode(g, "thor"))
@@ -250,5 +250,24 @@ TEST_CASE( "graph::query() syntax queries", "[graph::GraphQuery]" )
         auto r = q.run();
 
         REQUIRE(r.size() == 3); // Thor has 3 siblings
+    }
+
+    SECTION( "graph::query.back() can allow backtracking (large query)" )
+    {
+        auto q = query(&g)
+            .v(findNode(g, "fjorgynn"))
+            .in( [](auto n, auto e) { return e->data == "parents"; } )
+                .as("me")
+                    .in( [](auto n, auto e) { return e->data == "parents"; } )
+                    .out( [](auto n, auto e) { return e->data == "parents"; } )
+                    .out( [](auto n, auto e) { return e->data == "parents"; } )
+                    .filter( [](auto n) { return n->data == "bestla"; } )
+            .back("me").unique()
+            ;
+
+        auto r = q.run();
+
+        REQUIRE(r.size() == 1);
+        CHECK(r[0]->data == "frigg"); // frigg is the daughter of fjorgynn who had children with one of bestla's sons
     }
 }
