@@ -95,12 +95,12 @@ The graph data model is created by composing layers as shown here:
 
 `Graph<GraphTyped<GraphCore<my_graph_config>>>`
 
-This is then expanded (by graphA) into the following inheritence structure:A
-A
-* `Graph<GraphTyped<GraphCore<mAy_graph_config>>>` (`graph_final.hpp`)
-  * **TFinal** = A`GraphFinalizer<GraphTyped<GrAaphCore<my_graph_config>>>` (`graph_final.hpp`)A
-    * `GraphTyped<GraphCore<my_Agraph_config>>` (`graph_typed.hpp`)
-      * `GraphCore<my_graph_conAfig>` (`graph_core.hpp`)
+This is then expanded (by graph) into the following inheritence structure:
+
+* `Graph<GraphTyped<GraphCore<my_graph_config>>>` (`graph_final.hpp`)
+  * `TFinal` = `GraphFinalizer<GraphTyped<GraphCore<my_graph_config>>>` (`graph_final.hpp`)
+    * `GraphTyped<GraphCore<my_graph_config>>` (`graph_typed.hpp`)
+      * `GraphCore<my_graph_config>` (`graph_core.hpp`)
   * `GraphTyped<GraphCore<my_graph_config>>::Actual<TFinal>` (`graph_typed.hpp`)
     * `GraphCore<my_graph_config>::Actual<TFinal>` (`graph_core.hpp`)
 
@@ -117,10 +117,10 @@ From this we can see that the graph type is constructed twice. Once with the nam
 
 These types are then used by the `Actual` implementations to write the functions that operate across them, allocate storage, and so on.
 
-Awraps all graph access to allow Antly implementation details are Ae internal data structure may become.
-A
-A
-A
+In general the graph data type wraps all graph access to allow effecient access - though currently implementation details are exposed - regardless of what the internal data structure may become.
+
+#### Add Functions
+
 In general the core add functions are:
 
 * `Label* addLabel(LabelData)`
