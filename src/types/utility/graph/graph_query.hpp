@@ -70,7 +70,137 @@ namespace graph
             inline virtual Pipe* init() const { return const_cast<Pipe*>(this); };
             inline virtual void cleanup() { delete this; };
 
+            inline virtual std::vector<std::shared_ptr<class PipeLine>> getSubPipelines() { return { }; };
+
             virtual PipeResult pipeFunc(TGraph const* graph, std::shared_ptr<Gremlin> const& gremlin) = 0;
+        };
+
+        class PipeLine final
+        {
+            bool _isActive;
+            std::vector<std::unique_ptr<Pipe>> _pipes;
+            std::vector<Pipe*> _state;
+
+        public:
+            PipeLine()
+                : _isActive(false)
+                , _pipes()
+                , _state()
+            {
+            }
+
+            ~PipeLine()
+            {
+                reset();
+            }
+
+        public:
+            inline void addPipe(std::unique_ptr<Pipe> && pipe)
+            {
+                if (_isActive)
+                    throw graph_error("Pipeline is active.");
+                _pipes.push_back(std::move(pipe));
+            }
+
+            inline void ensureActive()
+            {
+                if (!_isActive)
+                {
+                    _state.reserve(_pipes.size());
+                    for (auto const& pipe : _pipes)
+                    {
+                        _state.push_back(pipe->init());
+                    }
+                    _isActive = true;
+                }
+            }
+
+            inline size_t countPipes() const
+            {
+                return _pipes.size();
+            }
+
+            inline void reset()
+            {
+                for (auto pipe : _state)
+                {
+                    pipe->cleanup();
+                }
+                _state.clear();
+                _isActive = false;
+            }
+
+            inline std::vector<std::shared_ptr<Gremlin>> run(TGraph* graph)
+            {
+                ensureActive();
+
+                // The results of the query
+                std::vector<std::shared_ptr<Gremlin>> results;
+
+                // We operate "one to the right" because we need sentinals on both sides.
+                const size_t max = _state.size();
+                size_t done = 0;
+                size_t pc = max;
+
+                PipeResult maybe_gremlin = nullGremlin();
+
+                while (done < max)
+                {
+                    auto gremlin = std::holds_alternative<std::shared_ptr<Gremlin>>(maybe_gremlin)
+                        ? std::get<std::shared_ptr<Gremlin>>(maybe_gremlin)
+                        : nullGremlin();
+
+                    maybe_gremlin = _state[pc - 1]->pipeFunc(graph, gremlin);
+
+                    auto maybe_gremlin_is_enum = std::holds_alternative<PipeResultEnum>(maybe_gremlin);
+                    if (maybe_gremlin_is_enum)
+                    {
+                        auto result_enum = std::get<PipeResultEnum>(maybe_gremlin);
+                        maybe_gremlin = nullGremlin();
+                        
+                        // Pipe needs more input
+                        if (result_enum == PipeResultEnum::Pull)
+                        {
+                            // Try the previous pipe
+                            if (pc - 1 > done)
+                            {
+                                pc --;
+                                continue;
+                            }
+                            // , the previous pipe is done then so is this one
+                            else
+                                done = pc;
+                        }
+                        // Pipe is finished
+                        else if (result_enum == PipeResultEnum::Done)
+                        {
+                            done = pc;
+                        }
+                    }
+
+                    // Move to next pipe
+                    pc ++; 
+
+                    if (pc > max)
+                    {
+                        // check for a gremlin that popped out
+                        if (!maybe_gremlin_is_enum)
+                        {
+                            auto gremlin = std::get<std::shared_ptr<Gremlin>>(maybe_gremlin);
+                            if (gremlin)
+                            {
+                                results.push_back(gremlin);
+                            }
+                        }
+
+                        // step back
+                        maybe_gremlin = nullGremlin();
+                        pc --;
+                    }
+                }
+
+                return results;
+            }
         };
 
     public:
@@ -103,56 +233,57 @@ namespace graph
 
     // configure
     private:
-        std::vector<std::unique_ptr<Pipe>> _pipes;
+        std::shared_ptr<PipeLine> _pipeline;
 
         size_t _labelCounter;
         std::map<std::string, size_t> _labels;
 
     // state
     private:
-        std::vector<Pipe*> _state;
-        TGraph const* _graph;
+        TGraph* _graph;
 
     public:
         GraphQueryEngine()
-            : _pipes()
+            : _pipeline()
             , _labelCounter(0)
             , _labels()
-            , _state()
             , _graph(nullptr)
         { }
-        GraphQueryEngine(TGraph const* g)
-            : _pipes()
+        GraphQueryEngine(TGraph* g)
+            : _pipeline()
             , _labelCounter(0)
             , _labels()
-            , _state()
             , _graph(g)
         { }
-
-        ~GraphQueryEngine()
-        {
-            reset();
-        }
 
     public:
         inline void reset()
         {
-            for (auto pipe : _state)
-            {
-                pipe->cleanup();
-            }
-            _state.clear();
+            if (_pipeline)
+                _pipeline->reset();
         }
 
-        inline void setGraph(TGraph const* g)
+        inline void setGraph(TGraph* g)
         {
             reset();
             _graph = g;
         }
 
-        inline TGraph const* getGraph() const
+        inline TGraph* getGraph() const
         {
             return _graph;
+        }
+
+        inline void setPipeline(std::shared_ptr<PipeLine> pipeline)
+        {
+            reset();
+            _pipeline = pipeline;
+            reset();
+        }
+
+        inline std::shared_ptr<PipeLine> getPipeline() const
+        {
+            return _pipeline;
         }
 
         inline size_t requireLabel(std::string const& label)
@@ -171,93 +302,9 @@ namespace graph
             }
         }
 
-        inline void addPipe(std::unique_ptr<Pipe> && pipe)
-        {
-            _pipes.push_back(std::move(pipe));
-        }
-
-        inline size_t countPipes() const
-        {
-            return _pipes.size();
-        }
-
         inline std::vector<typename TGraph::Node const*> run()
         {
-            // Create state if there is none (or it is stale)
-            if (_state.size() != _pipes.size())
-            {
-                reset();
-                _state.reserve(_pipes.size());
-                for (auto const& pipe : _pipes)
-                {
-                    _state.push_back(pipe->init());
-                }
-            }
-
-            // The results of the query
-            std::vector<std::shared_ptr<Gremlin>> results;
-
-            // We operate "one to the right" because we need sentinals on both sides.
-            const size_t max = _state.size();
-            size_t done = 0;
-            size_t pc = max;
-
-            PipeResult maybe_gremlin = nullGremlin();
-
-            while (done < max)
-            {
-                auto gremlin = std::holds_alternative<std::shared_ptr<Gremlin>>(maybe_gremlin)
-                    ? std::get<std::shared_ptr<Gremlin>>(maybe_gremlin)
-                    : nullGremlin();
-
-                maybe_gremlin = _state[pc - 1]->pipeFunc(_graph, gremlin);
-
-                auto maybe_gremlin_is_enum = std::holds_alternative<PipeResultEnum>(maybe_gremlin);
-                if (maybe_gremlin_is_enum)
-                {
-                    auto result_enum = std::get<PipeResultEnum>(maybe_gremlin);
-                    maybe_gremlin = nullGremlin();
-                    
-                    // Pipe needs more input
-                    if (result_enum == PipeResultEnum::Pull)
-                    {
-                        // Try the previous pipe
-                        if (pc - 1 > done)
-                        {
-                            pc --;
-                            continue;
-                        }
-                        // , the previous pipe is done then so is this one
-                        else
-                            done = pc;
-                    }
-                    // Pipe is finished
-                    else if (result_enum == PipeResultEnum::Done)
-                    {
-                        done = pc;
-                    }
-                }
-
-                // Move to next pipe
-                pc ++; 
-
-                if (pc > max)
-                {
-                    // check for a gremlin that popped out
-                    if (!maybe_gremlin_is_enum)
-                    {
-                        auto gremlin = std::get<std::shared_ptr<Gremlin>>(maybe_gremlin);
-                        if (gremlin)
-                        {
-                            results.push_back(gremlin);
-                        }
-                    }
-
-                    // step back
-                    maybe_gremlin = nullGremlin();
-                    pc --;
-                }
-            }
+            auto results = _pipeline->run(_graph);
 
             // TODO build a better way to map projected reuslts
             // (perhaps by mutating query template and templating this function?)
@@ -712,83 +759,87 @@ namespace graph
 
 
 
-    template<typename TGraph, typename RetType>
+    template<typename TGraph, typename TQueryFinal>
     class GraphQueryLibraryBase
     {
     protected:
-        virtual std::unique_ptr<GraphQueryEngine<TGraph>> & engine() = 0;
-        virtual RetType addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) = 0;
+        virtual std::shared_ptr<GraphQueryEngine<TGraph>> & engine() = 0;
+        
+        virtual TQueryFinal addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) = 0;
+
+        virtual TQueryFinal newQueryPipeline() = 0;
+        virtual std::shared_ptr<typename GraphQueryEngine<TGraph>::PipeLine> extractPipeline(TQueryFinal const& other) = 0;
     };
 
-    template<typename TGraph, typename RetType>
+    template<typename TGraph, typename TQueryFinal>
     class GraphQueryLibraryCore
-        : protected GraphQueryLibraryBase<TGraph, RetType>
+        : protected GraphQueryLibraryBase<TGraph, TQueryFinal>
     {
     public:
         template<typename ...TArgs>
-        RetType v(TArgs... args)
+        TQueryFinal v(TArgs... args)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeVertex<TGraph>>(std::forward<TArgs>(args)...));
         }
 
         template<typename TFuncEdges>
-        RetType e(TFuncEdges func_edges)
+        TQueryFinal e(TFuncEdges func_edges)
         {
             auto edgeNodeFunc = [](auto n, auto e, auto ne){ return true; };
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::All, TFuncEdges, decltype(edgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), edgeNodeFunc));
         }
         template<typename TFuncEdges, typename TFuncEdgeNodes>
-        RetType e(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
+        TQueryFinal e(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::All, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
 
         template<typename TFuncEdges>
-        RetType in(TFuncEdges func_edges)
+        TQueryFinal in(TFuncEdges func_edges)
         {
             auto inEdgeNodeFunc = [](auto n, auto e, auto ne){ return true; };
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Incoming, TFuncEdges, decltype(inEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), inEdgeNodeFunc));
         }
         template<typename TFuncEdges, typename TFuncEdgeNodes>
-        RetType in(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
+        TQueryFinal in(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Incoming, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
 
         template<typename TFuncEdges>
-        RetType out(TFuncEdges func_edges)
+        TQueryFinal out(TFuncEdges func_edges)
         {
             auto outEdgeNodeFunc = [](auto n, auto e, auto ne){ return true; };
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Outgoing, TFuncEdges, decltype(outEdgeNodeFunc)>>(std::forward<TFuncEdges>(func_edges), outEdgeNodeFunc));
         }
         template<typename TFuncEdges, typename TFuncEdgeNodes>
-        RetType out(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
+        TQueryFinal out(TFuncEdges func_edges, TFuncEdgeNodes func_edgeNodes)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeEdges<TGraph, GraphQueryPipeEdgesEnum::Outgoing, TFuncEdges, TFuncEdgeNodes>>(std::forward<TFuncEdges>(func_edges), std::forward<TFuncEdgeNodes>(func_edgeNodes)));
         }
 
         template<typename TFuncNodes>
-        RetType filter(TFuncNodes func_nodes)
+        TQueryFinal filter(TFuncNodes func_nodes)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeFilter<TGraph, TFuncNodes>>(std::forward<TFuncNodes>(func_nodes)));
         }
         
-        RetType unique()
+        TQueryFinal unique()
         {
             return this->addPipe(std::make_unique<GraphQueryPipeUnique<TGraph>>());
         }
 
-        RetType as(std::string const& label)
+        TQueryFinal as(std::string const& label)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeLabel<TGraph>>(this->engine()->requireLabel(label)));
         }
 
-        RetType except(std::string const& label)
+        TQueryFinal except(std::string const& label)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeExcept<TGraph>>(this->engine()->requireLabel(label)));
         }
 
-        RetType back(std::string const& label)
+        TQueryFinal back(std::string const& label)
         {
             return this->addPipe(std::make_unique<GraphQueryPipeBack<TGraph>>(this->engine()->requireLabel(label)));
         }
@@ -799,24 +850,44 @@ namespace graph
         : public TGraphQueryLibrary<TGraph, GraphQuery<TGraph, TGraphQueryLibrary>>
     {
     private:
-        std::unique_ptr<GraphQueryEngine<TGraph>> _engine;
+        std::shared_ptr<GraphQueryEngine<TGraph>> _engine;
+        std::shared_ptr<typename GraphQueryEngine<TGraph>::PipeLine> _pipeline;
+
+        // subquery
+        GraphQuery(std::shared_ptr<GraphQueryEngine<TGraph>> & engine)
+        {
+            _engine = engine;
+            _pipeline = std::make_shared<typename GraphQueryEngine<TGraph>::PipeLine>();
+        }
 
     protected:
-        virtual std::unique_ptr<GraphQueryEngine<TGraph>> & engine() override
+        inline virtual std::shared_ptr<GraphQueryEngine<TGraph>> & engine() override
         {
             return _engine;
         }
         inline virtual GraphQuery addPipe(std::unique_ptr<typename GraphQueryEngine<TGraph>::Pipe> && Pipe) override
         {
-            _engine->addPipe(std::move(Pipe));
+            _pipeline->addPipe(std::move(Pipe));
 
             return std::move(*this);
         }
+        
+        inline virtual GraphQuery newQueryPipeline() override
+        {
+            return GraphQuery(_engine);
+        }
+        inline virtual std::shared_ptr<typename GraphQueryEngine<TGraph>::PipeLine> extractPipeline(GraphQuery const& query)
+        {
+            return query._pipeline;
+        }
+
 
     public:
-        GraphQuery(TGraph const* g)
+        GraphQuery(TGraph* g)
         {
-            _engine = std::make_unique<GraphQueryEngine<TGraph>>(g);
+            _engine = std::make_shared<GraphQueryEngine<TGraph>>(g);
+            _pipeline = std::make_shared<typename GraphQueryEngine<TGraph>::PipeLine>();
+            _engine->setPipeline(_pipeline);
         }
 
         ~GraphQuery() = default;
@@ -840,7 +911,7 @@ namespace graph
     };
 
     template<typename TGraph, template <typename, typename> typename TGraphQueryLibrary = GraphQueryLibraryCore>
-    GraphQuery<TGraph, TGraphQueryLibrary> query(TGraph const* g)
+    GraphQuery<TGraph, TGraphQueryLibrary> query(TGraph* g)
     {
         return GraphQuery<TGraph, TGraphQueryLibrary>(g);
     }
