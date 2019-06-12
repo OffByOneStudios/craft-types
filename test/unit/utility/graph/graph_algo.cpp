@@ -12,7 +12,7 @@ using namespace Catch::Matchers;
 
 TEST_CASE( "graph::findNode", "[graph::findNode]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     g.addNode("test");
 

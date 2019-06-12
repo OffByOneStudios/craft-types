@@ -2,7 +2,7 @@
 
 using namespace graph;
 
-void test_help::fillStrGraphWithNorse(Graph< GraphCore<std::string> > & g)
+void test_help::fillStrGraphWithNorse(test_help::str_graph & g)
 {
     // from http://www.veritablehokum.com/comic/the-norse-god-family-tree/
 
@@ -12,7 +12,7 @@ void test_help::fillStrGraphWithNorse(Graph< GraphCore<std::string> > & g)
      */ 
 
     // Helper temporaries
-    typename Graph< GraphCore<std::string> >::Edge* e;
+    typename test_help::str_graph::Edge* e;
 
 
     auto tyr = g.addNode("tyr");
@@ -127,7 +127,7 @@ using namespace Catch::Matchers;
 
 TEST_CASE( "test_help works correctly", "[test_help]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     test_help::fillStrGraphWithNorse(g);
 }

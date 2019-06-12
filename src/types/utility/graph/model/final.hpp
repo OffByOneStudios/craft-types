@@ -16,7 +16,7 @@ namespace graph
          */
         
         using MetaFlags = typename TGraphBase::MetaFlags;
-        using Data = typename TGraphBase::Data;
+        using CoreData = typename TGraphBase::CoreData;
 
         struct Label
             : public TGraphBase::Core

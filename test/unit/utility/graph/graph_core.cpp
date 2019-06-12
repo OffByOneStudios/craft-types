@@ -9,7 +9,7 @@ using namespace Catch::Matchers;
 
 TEST_CASE( "::graph::GraphCore basic initialization, adding, and counts", "[graph::GraphCore]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     REQUIRE(g.labelCount() == 0);
     REQUIRE(g.nodeCount() == 0);
@@ -54,6 +54,30 @@ TEST_CASE( "::graph::GraphCore basic initialization, adding, and counts", "[grap
         CHECK(g.propCount() == 0);
     }
 
+    SECTION( "adding an edge with too few nodes excepts" )
+    {
+        auto a = g.addNode("a-node");
+
+        CHECK(g.labelCount() == 0);
+        CHECK(g.nodeCount() == 1);
+        CHECK(g.edgeCount() == 0);
+        CHECK(g.propCount() == 0);
+
+        SECTION( "0 nodes" )
+        {
+            REQUIRE_THROWS_AS( g.addEdge("a-edge", { }), graph_error );
+        }
+        SECTION( "1 node" )
+        {
+            REQUIRE_THROWS_AS( g.addEdge("a-edge", { a }), graph_error );
+        }
+
+        CHECK(g.labelCount() == 0);
+        CHECK(g.nodeCount() == 1);
+        CHECK(g.edgeCount() == 0);
+        CHECK(g.propCount() == 0);
+    }
+
     SECTION( "adding a property (on node), only adds a property" )
     {
         auto n = g.addNode("a-node");
@@ -71,7 +95,7 @@ TEST_CASE( "::graph::GraphCore basic initialization, adding, and counts", "[grap
         CHECK(g.propCount() == 1);
     }
 
-    SECTION( "adding a property (on node), only adds a property" )
+    SECTION( "adding a property (on edge), only adds a property" )
     {
         auto a = g.addNode("a-node");
         auto b = g.addNode("b-node");
@@ -95,7 +119,7 @@ TEST_CASE( "::graph::GraphCore basic initialization, adding, and counts", "[grap
 
 TEST_CASE( "::graph::GraphCore updates", "[graph::GraphCore]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     auto l = g.addLabel("label");
 
@@ -137,7 +161,7 @@ TEST_CASE( "::graph::GraphCore updates", "[graph::GraphCore]" )
         g.attachEdge(n3, e, 2);
     }
 
-    SECTION( "attaching an edge to a node, inserted error" )
+    SECTION( "attaching an edge to a node, inserted out of range, error" )
     {
         REQUIRE_THROWS_AS( g.attachEdge(n3, e, 5), graph_error );
     }

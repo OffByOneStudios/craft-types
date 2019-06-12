@@ -6,18 +6,28 @@
 
 namespace graph
 {
-    // The type extractor is a templated interface which dispatches (at compile time) to a type extraction method
-    // Along with effecient access patterns
-    template<typename TGraphBase, typename TTypeExtractor>
+    template<typename TType, typename TData>
+    struct basic_typed_config
+        : basic_core_config<std::tuple<TData, TType>>
+    {
+        
+    };
+
+    /*
+     * This graph mixin adds typing to the graph. Each Core object has a type parameter.
+     * We pull from the config a set of functionality:
+     * - TypeId is the storage type for the type identifier
+     * - typed_typeToValue<T>()
+     */
+    template<typename TGraphBase>
     class GraphTyped
         : public TGraphBase
     {
-    // This type types:
-    public:
-        using TypeId = typename TTypeExtractor::Id;
-
     // Graph types:
     public:
+        using Config = typename TGraphBase::Config;
+        using TypeId = typename Config::TypeId;
+
         struct Core
             : public TGraphBase::Core
         {
@@ -53,7 +63,7 @@ namespace graph
 
         public:
             using MetaFlags = typename TFinal::MetaFlags;
-            using Data = typename TFinal::Data;
+            using CoreData = typename TFinal::CoreData;
 
             using Label = typename TFinal::Label;
             using Node = typename TFinal::Node;
@@ -62,7 +72,7 @@ namespace graph
 
         // Add functions
         public:
-            inline Label* addLabel(Data const& data, TypeId type)
+            inline Label* addLabel(CoreData const& data, TypeId type)
             {
                 auto ret = Base::addLabel(data);
                 ret->type = type;
@@ -73,10 +83,10 @@ namespace graph
             template<typename T>
             inline Label* addLabel(T const& data)
             {
-                return addLabel(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>());
+                return addLabel(Config::template typed_store<T>(data), Config::template typed_typeToValue<T>());
             }
 
-            inline Node* addNode(Data const& data, TypeId type)
+            inline Node* addNode(CoreData const& data, TypeId type)
             {
                 auto ret = Base::addNode(data);
                 ret->type = type;
@@ -87,11 +97,11 @@ namespace graph
             template<typename T>
             inline Node* addNode(T const& data)
             {
-                return addNode(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>());
+                return addNode(Config::template typed_store<T>(data), Config::template typed_typeToValue<T>());
             }
             
             // By default edges point from 0-index to all others
-            inline Edge* addEdge(Data const& data, TypeId type, std::vector<Node*> const& nodes, bool invert = false)
+            inline Edge* addEdge(CoreData const& data, TypeId type, std::vector<Node*> const& nodes, bool invert = false)
             {
                 auto ret = Base::addEdge(data, nodes, invert);
                 ret->type = type;
@@ -102,10 +112,10 @@ namespace graph
             template<typename T>
             inline Edge* addEdge(T const& data, std::vector<Node*> const& nodes, bool invert = false)
             {
-                return addEdge(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>(), nodes, invert);
+                return addEdge(Config::template typed_store<T>(data), Config::template typed_typeToValue<T>(), nodes, invert);
             }
             
-            inline Prop* addProp(Data const& data, TypeId type, Node* on_node)
+            inline Prop* addProp(CoreData const& data, TypeId type, Node* on_node)
             {
                 auto ret = Base::addProp(data, on_node);
                 ret->type = type;
@@ -116,10 +126,10 @@ namespace graph
             template<typename T>
             inline Prop* addProp(T const& data, Node* on_node)
             {
-                return addProp(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>(), on_node);
+                return addProp(Config::template typed_store<T>(data), Config::template typed_typeToValue<T>(), on_node);
             }
 
-            inline Prop* addProp(Data const& data, TypeId type, Edge* on_edge)
+            inline Prop* addProp(CoreData const& data, TypeId type, Edge* on_edge)
             {
                 auto ret = Base::addProp(data, on_edge);
                 ret->type = type;
@@ -130,7 +140,7 @@ namespace graph
             template<typename T>
             inline Prop* addProp(T const& data, Edge* on_edge)
             {
-                return addProp(TTypeExtractor::template type_store<T>(data), TTypeExtractor::template type_typeToValue<T>(), on_edge);
+                return addProp(Config::template typed_store<T>(data), Config::template typed_typeToValue<T>(), on_edge);
             }
 
         // Getter functions
@@ -176,7 +186,7 @@ namespace graph
             template<typename T>
             T const* onlyPropOfTypeOnNode(Node const* node) const
             {
-                auto searchType = TTypeExtractor::template type_typeToValue<T>();
+                auto searchType = Config::template typed_typeToValue<T>();
                 T const* result = nullptr;
 
                 forAllPropsOnNode(node,
@@ -184,7 +194,7 @@ namespace graph
                     {
                         if (prop->type == searchType)
                         {
-                            result = TTypeExtractor::template type_load<T>(prop->data);
+                            result = Config::template typed_load<T>(prop->data);
                             return false;
                         }
                         return true;

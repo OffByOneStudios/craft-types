@@ -7,8 +7,28 @@
 
 namespace graph
 {
-    // TODO, another graph type that is more effeciently organized but does not support parent overrides
-    template <typename TData>
+    struct void_t
+    {
+    };
+
+    template<typename TCoreData, typename TBase = void_t>
+    struct basic_core_config : public TBase
+    {
+        using CoreData = TCoreData;
+
+        using LabelData = void_t;
+        using NodeData = void_t;
+        using EdgeData = void_t;
+        using PropData = void_t;
+
+        // support plf colony?
+        template<typename T>
+        using Storage = std::deque<T>;
+    };
+
+    // TODO, another graph type that is more effeciently organized
+    //   maybe by not supporting parent overrides
+    template <typename TConfig>
     class GraphCore
     {
     // This type types:
@@ -31,15 +51,22 @@ namespace graph
 
     // Graph types:
     public:
-        using Data = TData;
+        using Config = TConfig;
+        
+        using CoreData = typename Config::CoreData;
+
+        using LabelData = typename Config::LabelData;
+        using NodeData = typename Config::NodeData;
+        using EdgeData = typename Config::EdgeData;
+        using PropData = typename Config::PropData;
 
         template<typename T>
-        using Storage = std::deque<T>; // support plf colony?
+        using Storage = typename Config::template Storage<T>;
 
         struct Core
         {
         public:
-            TData data;
+            CoreData data;
             MetaFlags flags;
         };
 
@@ -52,6 +79,8 @@ namespace graph
         struct Label
         {
         public:
+            LabelData label_data;
+
             std::vector<Node*> nodes;
         };
 
@@ -59,6 +88,8 @@ namespace graph
         struct Node
         {
         public:
+            NodeData node_data;
+
             std::vector<Label*> labels;
             std::vector<Edge*> edges;
             std::vector<Prop*> props;
@@ -68,6 +99,8 @@ namespace graph
         struct Edge
         {
         public:
+            EdgeData edge_data;
+
             std::vector<Node*> nodes;
             std::vector<Prop*> props;
         };
@@ -76,6 +109,8 @@ namespace graph
         struct Prop
         {
         public:
+            PropData prop_data;
+
             Core* owner;
         };
 
@@ -86,7 +121,7 @@ namespace graph
         {
         public:
             using MetaFlags = typename TFinal::MetaFlags;
-            using Data = typename TFinal::Data;
+            using CoreData = typename TFinal::CoreData;
 
             using Label = typename TFinal::Label;
             using Node = typename TFinal::Node;
@@ -106,7 +141,7 @@ namespace graph
 
         // Add functions
         public:
-            inline Label* addLabel(TData const& data)
+            inline Label* addLabel(CoreData const& data)
             {
                 Label& ref = _labels.emplace_back();
                 ref.data = data;
@@ -115,7 +150,7 @@ namespace graph
                 return &ref;
             }
 
-            inline Node* addNode(TData const& data)
+            inline Node* addNode(CoreData const& data)
             {
                 Node& ref = _nodes.emplace_back();
                 ref.data = data;
@@ -125,7 +160,7 @@ namespace graph
             }
             
             // By default edges point from 0-index to all others
-            inline Edge* addEdge(TData const& data, std::vector<Node*> const& nodes, bool invert = false)
+            inline Edge* addEdge(CoreData const& data, std::vector<Node*> const& nodes, bool invert = false)
             {
                 auto nodes_size = nodes.size();
                 if (nodes_size < 2)
@@ -146,7 +181,7 @@ namespace graph
                 return &ref;
             }
             
-            inline Prop* addProp(TData const& data, Node* on_node)
+            inline Prop* addProp(CoreData const& data, Node* on_node)
             {
                 Prop& ref = _props.emplace_back();
                 ref.data = data;
@@ -158,7 +193,7 @@ namespace graph
                 return &ref;
             }
 
-            inline Prop* addProp(TData const& data, Edge* on_edge)
+            inline Prop* addProp(CoreData const& data, Edge* on_edge)
             {
                 Prop& ref = _props.emplace_back();
                 ref.data = data;

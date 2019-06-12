@@ -29,7 +29,7 @@ namespace graph
     }
 
     template<typename TGraph>
-    typename TGraph::Node const* findNode(TGraph const& g, typename TGraph::Data const& v)
+    typename TGraph::Node const* findNode(TGraph const& g, typename TGraph::CoreData const& v)
     {
         typename TGraph::Node const* res = nullptr;
         g.forAllNodes([&](auto n)

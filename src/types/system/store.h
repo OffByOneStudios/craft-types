@@ -29,17 +29,18 @@ namespace types
 	******************************************************************************/
 
 	struct TypeGraphConfig
+		: graph::basic_core_config<void*>
 	{
 	public:
-		using Id = _TypeId_FwdDec;
+		using TypeId = _TypeId_FwdDec;
 
 		template <typename T>
-		inline static Id type_typeToValue();
+		inline static TypeId typed_typeToValue();
 
 		template <typename T>
-		inline static void* type_store(T const& v);
+		inline static void* typed_store(T const& v);
 		template <typename T>
-		inline static T* type_load(void* const&);
+		inline static T* typed_load(void* const&);
 	};
 
 	/******************************************************************************
@@ -49,8 +50,7 @@ namespace types
 	using TypeGraph =
 		graph::Graph<
 			graph::GraphTyped<
-				graph::GraphCore<void*>,
-				TypeGraphConfig
+				graph::GraphCore<TypeGraphConfig>
 			>
 		>;
 
@@ -143,13 +143,13 @@ namespace types
 	******************************************************************************/
 
 	template<typename T>
-	inline TypeGraphConfig::Id TypeGraphConfig::type_typeToValue()
+	inline TypeGraphConfig::TypeId TypeGraphConfig::typed_typeToValue()
 	{
 		return (_TypeId_FwdDec)craft::types::cpptype<T>::typeDesc().asId();
 	}
 	
 	template<typename T>
-	inline void* TypeGraphConfig::type_store(T const& t)
+	inline void* TypeGraphConfig::typed_store(T const& t)
 	{
 		// Invokes copy constructor once in either path
 
@@ -169,7 +169,7 @@ namespace types
 	}
 	
 	template<typename T>
-	inline T* TypeGraphConfig::type_load(void* const& v)
+	inline T* TypeGraphConfig::typed_load(void* const& v)
 	{
 		if (v == nullptr) return nullptr;
 

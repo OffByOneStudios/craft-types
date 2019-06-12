@@ -11,5 +11,7 @@
 
 namespace test_help
 {
-    void fillStrGraphWithNorse(graph::Graph< graph::GraphCore<std::string> > & g);
+    using str_graph = graph::Graph< graph::GraphCore< graph::basic_core_config<std::string> > >;
+
+    void fillStrGraphWithNorse(str_graph & g);
 }

@@ -12,7 +12,7 @@ using namespace Catch::Matchers;
 
 TEST_CASE( "graph::query() basics", "[graph::GraphQuery]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     test_help::fillStrGraphWithNorse(g);
 
@@ -108,7 +108,7 @@ TEST_CASE( "graph::query() basics", "[graph::GraphQuery]" )
 
 TEST_CASE( "graph::query() syntax traversal queries", "[graph::GraphQuery]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     test_help::fillStrGraphWithNorse(g);
 
@@ -248,7 +248,7 @@ TEST_CASE( "graph::query() syntax traversal queries", "[graph::GraphQuery]" )
 
 TEST_CASE( "graph::query() syntax label queries", "[graph::GraphQuery]" )
 {
-    Graph< GraphCore<std::string> > g;
+    test_help::str_graph g;
 
     test_help::fillStrGraphWithNorse(g);
 
