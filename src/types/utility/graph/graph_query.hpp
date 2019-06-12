@@ -166,7 +166,7 @@ namespace graph
             else
             {
                 auto id = ++_labelCounter;
-                _labels.insert(lb, decltype(_labels)::value_type(label, id));
+                _labels.insert(lb, typename decltype(_labels)::value_type(label, id));
                 return id;
             }
         }
@@ -780,17 +780,17 @@ namespace graph
 
         RetType as(std::string const& label)
         {
-            return this->addPipe(std::make_unique<GraphQueryPipeLabel<TGraph>>(engine()->requireLabel(label)));
+            return this->addPipe(std::make_unique<GraphQueryPipeLabel<TGraph>>(this->engine()->requireLabel(label)));
         }
 
         RetType except(std::string const& label)
         {
-            return this->addPipe(std::make_unique<GraphQueryPipeExcept<TGraph>>(engine()->requireLabel(label)));
+            return this->addPipe(std::make_unique<GraphQueryPipeExcept<TGraph>>(this->engine()->requireLabel(label)));
         }
 
         RetType back(std::string const& label)
         {
-            return this->addPipe(std::make_unique<GraphQueryPipeBack<TGraph>>(engine()->requireLabel(label)));
+            return this->addPipe(std::make_unique<GraphQueryPipeBack<TGraph>>(this->engine()->requireLabel(label)));
         }
     };
 

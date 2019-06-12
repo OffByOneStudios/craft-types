@@ -6,6 +6,7 @@ cc_library(
     visibility = ["//visibility:public"],
     hdrs=glob([
         "src/**/*.h*",
+        "src/types/dll_entry.inc"
     ]),
     srcs=glob([
         "src/**/*.c*"
