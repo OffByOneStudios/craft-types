@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "graph_util.hpp"
+#include "../util.hpp"
 
 namespace graph
 {

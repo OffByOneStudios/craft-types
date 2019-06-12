@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include "graph_util.hpp"
+#include "util.hpp"
 
 /*
  * This file contains the various minor algorithms and is laid out as follows:

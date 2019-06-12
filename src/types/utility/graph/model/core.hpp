@@ -3,7 +3,7 @@
 #include <vector>
 #include <deque>
 
-#include "graph_util.hpp"
+#include "../util.hpp"
 
 namespace graph
 {

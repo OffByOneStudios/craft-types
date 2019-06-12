@@ -15,13 +15,24 @@
     * Supports type based helper lookups.
 */
 
-#include "graph_util.hpp"
+#include "util.hpp"
 
-#include "graph_core.hpp"
-#include "graph_typed.hpp"
-#include "graph_todo.hpp"
+#include "model/core.hpp"
+#include "model/typed.hpp"
+#include "model/todo.hpp"
+#include "model/final.hpp"
 
-#include "graph_algo.hpp"
-#include "graph_query.hpp"
+#include "algo.hpp"
 
-#include "graph_final.hpp"
+#include "query/engine.hpp"
+#include "query/query.hpp"
+#include "query/query_library_core.hpp"
+
+namespace graph
+{
+    template<typename TGraph, template <typename, typename> typename TGraphQueryLibrary = GraphQueryLibraryCore>
+    GraphQuery<TGraph, TGraphQueryLibrary> query(TGraph* g)
+    {
+        return GraphQuery<TGraph, TGraphQueryLibrary>(g);
+    }
+}
