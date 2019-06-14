@@ -65,3 +65,12 @@ http_archive(
     strip_prefix = "fmt-f16f77297e6bb4df38d4c858edb3295f55716cb4",
     sha256 = "edcacda20bf46be208fbc49cedee2a8a321005dd833752ccc6aa7a1a9d75dc23",
 )
+
+########################
+# stdext
+http_archive(
+    name = "graph",
+    urls = ["https://github.com/cultlang/graph/archive/v0.1.0.zip"],
+    strip_prefix = "graph-0.1.0",
+    sha256 = "cf30e79fbaf0aa2c82a802239927b43a6e963fac970d8273f77823c3e998f582",
+)
