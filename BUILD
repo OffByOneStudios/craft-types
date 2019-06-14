@@ -24,6 +24,7 @@ cc_library(
         "//conditions:default": ["-std=c++17"],
     }),
     deps=[
+        "@stdext//:stdext",
         "@spdlog//:headers",
         "@boost//:callable_traits",
     ]
