@@ -30,3 +30,30 @@ cc_library(
         "@boost//:callable_traits",
     ]
 )
+
+
+cc_test(
+    name = "test",
+    srcs = glob([
+        "test/unit/**/*.cpp",
+        "test/unit/**/*.h*"
+    ]),
+    deps = [
+        "types",
+        "@catch//:single_include",
+    ],
+    copts = select({
+        "@bazel_tools//src/conditions:windows": ["/std:c++17"],
+        "@bazel_tools//src/conditions:darwin": ["-std=c++17"],
+        "//conditions:default": ["-std=c++17"],
+    }),
+)
+
+cc_test(
+    name = "literate",
+    srcs = glob(["test/literate/*.cpp"]),
+    deps = [
+        "types",
+       "@catch//:single_include",
+    ],
+)
