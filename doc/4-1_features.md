@@ -1,17 +1,27 @@
-Here we the features provided within the type system.
+Here we show off some of the "killer" features provided within the type system.
 
-## Names
+Get all types constructuble using a `FooType` (graph syntax is still a work in progress by another library, and this is without any convience helpers we plan on adding):
 
-Graph nodes have a `name` property which is a non-unique name. C++ graph nodes have a `cpp.name` property which is canonical C++ names for the nodes. Type nodes have an indexed `type.name` property that describes the unique, index-able, and canonical name of the type (which we still need to determine).
+```c++
+using namespace syn;
+using namespace syn::core;
+```
 
-## Copying
-
-Currently implemented by the legacy provider `PClonable` with implementation `DefaultCopyConstructor`. This provides an instance copy.
-
-Thoughts on feature interfaces:
-
-* kinds of memory copy: "instance copy", "place yourself there", "give me a void* and size".
-* kinds of semantic copy: "clone just me", "clone my whole tree"
+```c++
+  auto convertable_types = syn::system().query()
+    .v(type<FooType>())
+    .in([](auto n, auto e) { return is_type<ESigntureArgumentTypes>(e->type)
+      // We are the 0th and only argument; e[0] is the signature itself
+      && e->nodes.size() == 2 && e[1] == n; })
+    // this as-back block would be better organized as a `check()` once implemented
+    // infact this could probably even be a transformer!
+    .as("signature")
+        .in([](auto n, auto e) { return is_type<EHasSigntureType>(e->type); })
+        .hasProp([](auto p) { return is_type<PConstructor>(e->type); })
+    .back("signature").unique()
+    .out([](auto n, auto e) { return is_type<ESigntureReturnTypes>(e->type) })
+    .run();
+```
 
 
 # TODO

@@ -43,13 +43,19 @@ We also generate some system abstracts and add them to the graph:
 
 Now we can support C style structs. This involves a node that represents the structure, this node is mostly empty besides the size of the structure. And then a property for the in memory size of a structure.
 
-* `syn::core::graph::NStruct` (`/Syndicate/Core/Struct`) a node for a struct type (that is any type that takes up a chunk of memory)
+* `syn::core::NStruct` (`/Syndicate/Core/Struct`) a node for a struct type (that is any type that takes up a chunk of memory)
 
-### Features
+#### Function
 
-Here we add generic features for any system to take advantage of.
+### Objects
 
-#### Lifecycle
+Here we add generic object features.
+
+### Lifecycle
+
+Here we add generic lifecycle features.
+
+#### Meta Rules
 
 The first set of generic features are those that manage the lifecycle of objects. For this we create some types in the runtime:
 
@@ -68,3 +74,6 @@ This leads to a computed property:
 * `PlainOldData`: A type is "plain old data"
 
 #### Constructor
+
+#### Destructor
+

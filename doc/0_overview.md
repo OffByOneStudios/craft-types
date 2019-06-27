@@ -39,6 +39,7 @@ In no particular order:
 * Universal data structure
 * Instance helpers
 * Data structure specialization utilities (for providing semi-optimized data structures that "share" an instanced header across their internal instances)
+* Concurrency and execution helpers
 
 
 
