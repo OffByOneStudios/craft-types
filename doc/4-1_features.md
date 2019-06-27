@@ -1,6 +1,6 @@
 Here we show off some of the "killer" features provided within the type system.
 
-Get all types constructuble using a `FooType` (graph syntax is still a work in progress by another library, and this is without any convience helpers we plan on adding):
+Get all types constructable using a `FooType` (graph syntax is still a work in progress by another library, and this is without any convince helpers we plan on adding):
 
 ```c++
 using namespace syn;
@@ -11,8 +11,8 @@ using namespace syn::core;
   auto convertable_types = syn::system().query()
     .v(type<FooType>())
     .in([](auto n, auto e) { return is_type<ESigntureArgumentTypes>(e->type)
-      // We are the 0th and only argument; e[0] is the signature itself
-      && e->nodes.size() == 2 && e[1] == n; })
+      // We are the 0th and only argument; e->nodes[0] is the signature itself
+      && e->nodes.size() == 2 && e->nodes[1] == n; })
     // this as-back block would be better organized as a `check()` once implemented
     // infact this could probably even be a transformer!
     .as("signature")

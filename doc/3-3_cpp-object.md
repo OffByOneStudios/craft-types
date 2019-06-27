@@ -1,6 +1,6 @@
 There are two ways of representing C++ objects in the runtime system.
 
- **Objects are any *type* that *directly* exhibits polymorphism**. Hence the zero case is that if your object has no virtual methods (nor virtual inheritance) it is a structure (and hence not an object) and the following discussion does not apply. Finally if your type only exhibits polymorphism through external runtime system features (like multimethods, or concepts) then this discussion also does not apply.
+**Objects are any *type* that *directly* exhibits polymorphism**. Hence the zero case is that if your object has no virtual methods (nor virtual inheritance) it is a structure (and hence not an object) and the following discussion does not apply. Finally if your type only exhibits polymorphism through external runtime system features (like multimethods, or concepts) then this discussion also does not apply.
 
 C++ objects support only object methods (AKA single dispatch methods), but we must represent their dispatch to the runtime system in some way. The main difficulty we are working around here is that we cannot (without importing the compiler's internals) generate virtual function tables at runtime. In general either of the following ways support creating dispatch hierarchies for both object-methods and multi-methods. They primarily have tradeoffs in how the objects can be interacted with by programmers.
 
