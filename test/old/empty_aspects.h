@@ -1,16 +1,16 @@
 #pragma once
-#include "types/common.h"
+#include "syn/common.h"
 
 class SEmptyTestFactory abstract
-	: public craft::types::Aspect
+	: public syn::Aspect
 {
-	CRAFT_LEGACY_FEATURE_DECLARE(SEmptyTestFactory, "types.test.empty.factory", craft::types::FactoryAspectManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(SEmptyTestFactory, "types.test.empty.factory", syn::FactoryAspectManager);
 };
 
 class SEmptyTestInstance abstract
-	: public craft::types::Aspect
+	: public syn::Aspect
 {
-	CRAFT_LEGACY_FEATURE_DECLARE(SEmptyTestInstance, "types.test.empty.instance", craft::types::InstanceAspectManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(SEmptyTestInstance, "types.test.empty.instance", syn::InstanceAspectManager);
 };
 
 template<template<typename> class T>

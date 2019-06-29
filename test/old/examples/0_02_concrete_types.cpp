@@ -79,7 +79,7 @@ char const* AdvancedMulti::virtualFunction() { return "AdvacedMulti"; }
 	Next we write our header file. First we include the type system for the first time.
 */
 
-#include "types/core.h"
+#include "syn/syn.h"
 	
 /*
 	And now we will attach the type system data to the "external" types we defined earlier.

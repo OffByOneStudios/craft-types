@@ -1,11 +1,11 @@
 #pragma once
-#include "types/common.h"
+#include "syn/common.h"
 #include "empty_aspects.h"
 #include "empty_providers.h"
 #include "basic_object.h"
 
 class TestAdvancedObject
-	: public virtual craft::types::Object
+	: public virtual syn::Object
 {
 	CRAFT_OBJECT_DECLARE(TestAdvancedObject);
 public: // normally private

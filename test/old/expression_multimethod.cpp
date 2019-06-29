@@ -6,7 +6,7 @@ using namespace bandit;
 using namespace snowhouse;
 
 using namespace craft;
-using namespace craft::types;
+using namespace syn;
 
 instance<bool> test_method_expression(instance<TestBasicObject> this_, instance<TestBasicObject> that)
 {

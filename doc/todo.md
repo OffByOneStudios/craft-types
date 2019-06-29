@@ -1,12 +1,3 @@
-Rename namespaces
-
-* `syn` namespace is the system (craft and craft::types currently).
-* `syn::def` namespace is the define helper.
-* `syn::cpp` namespace is the C++ specific helpers.
-* `syn::sys` namespace is an implementation of the syndicate system.
-
----
-
 New definition syntax. Based off of literate programming being turned into ASTs (more or less...).
 
 Contained within `syn::def` see `defines_v2.md`.
@@ -64,3 +55,9 @@ Memory Management
 
 See this: http://cone.jondgoodwin.com/memory.html
 
+---
+
+Fast runtime checks:
+
+- [ ] Subtype: 
+  - https://www.researchgate.net/publication/221552851_Fast_subtype_checking_in_the_HotSpot_JVM

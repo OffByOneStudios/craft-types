@@ -8,9 +8,15 @@ cc_library(
         "src/**/*.h*",
         "src/types/dll_entry.inc"
     ]),
-    srcs=glob([
-        "src/**/*.c*"
-    ]),
+    #srcs=glob([
+    #    "src/**/*.c*"
+    #]),
+    srcs=[
+        "src/syn/system/SymbolTable.cpp",
+        "src/syn/system/TypeStore.cpp",
+
+        #"src/syn/cpp/cpp_interface.cpp",
+    ],
     defines=[
         "CULTLANG_TYPES_DLL",
         "CULT_CURRENT_PACKAGE=\\\"org_cultlang_" + "types" + "\\\""
@@ -20,9 +26,9 @@ cc_library(
     ],
     copts = select({
         "@bazel_tools//src/conditions:windows": ["/std:c++17"],
-        "@bazel_tools//src/conditions:darwin": ["-std=c++17"],
         "//conditions:default": ["-std=c++17"],
     }),
+    
     deps=[
         "@graph//:graph",
         "@stdext//:stdext",
@@ -31,9 +37,42 @@ cc_library(
     ]
 )
 
+cc_binary(
+    name = "Syndicate.dll",
+    deps = ["types"],
+    linkopts = ["/ENTRY:syn_DLLMAIN"],
+    linkshared = 1,
+)
+
+cc_binary(
+    name = "libSyndicate.dylib",
+    deps = ["types"],
+    linkshared = 1,
+)
+
+cc_binary(
+    name = "libSyndicate.so",
+    deps = ["types"],
+    linkshared = 1,
+)
+
+cc_binary(
+    name = "syndicate_explorer",
+    deps = select({
+        "@bazel_tools//src/conditions:windows": ["Syndicate.dll"],
+        "@bazel_tools//src/conditions:darwin": ["libSyndicate.dylib"],
+        "//conditions:default": ["libSyndicate.so"],
+    }),
+    srcs = glob([
+        "entry/*.c*",
+        "entry/*.h*",
+    ]),
+)
+
 
 cc_test(
     name = "test",
+    includes = ["test"],
     srcs = glob([
         "test/unit/**/*.cpp",
         "test/unit/**/*.h*"
@@ -44,13 +83,13 @@ cc_test(
     ],
     copts = select({
         "@bazel_tools//src/conditions:windows": ["/std:c++17"],
-        "@bazel_tools//src/conditions:darwin": ["-std=c++17"],
         "//conditions:default": ["-std=c++17"],
     }),
 )
 
 cc_test(
     name = "literate",
+    includes = ["test"],
     srcs = glob(["test/literate/*.cpp"]),
     deps = [
         "types",

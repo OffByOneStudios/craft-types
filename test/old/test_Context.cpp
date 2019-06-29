@@ -1,4 +1,4 @@
-#include "types/common.h"
+#include "syn/common.h"
 
 #include "empty_aspects.h"
 #include "empty_providers.h"
@@ -8,25 +8,25 @@
 */
 
 class MockObjectContextual
-	: public virtual craft::types::Object
+	: public virtual syn::Object
 {
 	CRAFT_OBJECT_DECLARE(MockObjectContextual);
 
-	void contextualize(std::shared_ptr<craft::types::Context> c);
+	void contextualize(std::shared_ptr<syn::Context> c);
 
 public:
-	std::function<void (std::shared_ptr<craft::types::Context>)> contextualizer;
+	std::function<void (std::shared_ptr<syn::Context>)> contextualizer;
 };
 
 CRAFT_DEFINE(MockObjectContextual)
 {
-	_.use<craft::types::PObjectContextual>().byConfiguring<craft::types::ObjectContextualWrapper>()
+	_.use<syn::PObjectContextual>().byConfiguring<syn::ObjectContextualWrapper>()
 		->withContextualizer(&MockObjectContextual::contextualize);
 
 	_.defaults();
 }
 
-void MockObjectContextual::contextualize(std::shared_ptr<craft::types::Context> c)
+void MockObjectContextual::contextualize(std::shared_ptr<syn::Context> c)
 {
 	contextualizer(c);
 }
@@ -36,8 +36,8 @@ void MockObjectContextual::contextualize(std::shared_ptr<craft::types::Context> 
 */
 
 class StupidObjectContextual
-	: public virtual craft::types::Object
-	, public craft::types::Implements<SEmptyTestInstance>
+	: public virtual syn::Object
+	, public syn::Implements<SEmptyTestInstance>
 {
 	CRAFT_OBJECT_DECLARE(StupidObjectContextual);
 
@@ -111,7 +111,7 @@ go_bandit([]()
 	/*
 	Testing the properties of the Context object
 	*/
-	describe("`craft::types::Context`", []()
+	describe("`syn::Context`", []()
 	{
 		describe("test Context", [&]() {
 			std::shared_ptr<types::Context> ctx;
@@ -175,7 +175,7 @@ go_bandit([]()
 	/*
 	Testing the properties of the Context object
 	*/
-	describe("`craft::types::PObjectContextual`", []()
+	describe("`syn::PObjectContextual`", []()
 	{
 
 	});

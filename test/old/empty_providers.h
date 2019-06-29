@@ -1,24 +1,24 @@
 #pragma once
-#include "types/common.h"
+#include "syn/common.h"
 
 class PEmptyTestSingleton abstract
-	: public craft::types::Provider
+	: public syn::Provider
 {
-	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingleton, "types.test.empty.singleton", craft::types::SingletonProviderManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingleton, "types.test.empty.singleton", syn::SingletonProviderManager);
 };
 
 class PEmptyTestSingletonNamed abstract
-	: public craft::types::Provider
+	: public syn::Provider
 {
-	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingletonNamed, "types.test.empty.singleton-named", craft::types::NamedSingletonProviderManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingletonNamed, "types.test.empty.singleton-named", syn::NamedSingletonProviderManager);
 
 	virtual std::string provider_index() = 0;
 };
 
 class PEmptyTestSingletonTagged abstract
-	: public craft::types::Provider
+	: public syn::Provider
 {
-	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingletonTagged, "types.test.empty.singleton-tagged", craft::types::TaggedSingletonProviderManager);
+	CRAFT_LEGACY_FEATURE_DECLARE(PEmptyTestSingletonTagged, "types.test.empty.singleton-tagged", syn::TaggedSingletonProviderManager);
 
 	virtual std::vector<std::string> provider_tags() = 0;
 };

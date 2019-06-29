@@ -1,12 +1,12 @@
-#include "types/common.h"
-#include "types/core.h"
+#include "syn/common.h"
+#include "syn/syn.h"
 
 using namespace craft;
-using namespace craft::types;
+using namespace syn;
 
 int main(int argc, char** argv)
 {
-	craft::types::boot();
+	syn::boot();
 
 	for (;;)
 	{
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 			if (input == "dump")
 			{
 				global_store().forAllNodes(
-					[](TypeGraph::Node const* n)
+					[](Graph::Node const* n)
 				{
 					std::cout << std::string(80, '=') << std::endl;
 					std::cout << global_store().dumpNode(n) << std::endl;
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 				auto abs = std::filesystem::absolute(args);
 				std::filesystem::current_path(abs.remove_filename());
 
-				craft::types::load_dll(abs.string());
+				syn::load_dll(abs.string());
 				auto last_dll = system().getLastLibraryName();
 				auto end = system().getLibraryCount(last_dll);
 
@@ -173,7 +173,7 @@ CRAFT_DEFINE(entry::ContextHost)
 
 int main(int argc, char** argv)
 {
-	craft::types::boot();
+	syn::boot();
 
 	_impl::console = spdlog::stdout_color_mt("console");
 	// Init ur config

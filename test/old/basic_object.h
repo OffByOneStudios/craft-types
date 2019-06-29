@@ -1,8 +1,8 @@
 #pragma once
-#include "types/common.h"
+#include "syn/common.h"
 
 class TestBasicObject
-	: public virtual craft::types::Object
+	: public virtual syn::Object
 {
 	CRAFT_OBJECT_DECLARE(TestBasicObject);
 public: // normally private

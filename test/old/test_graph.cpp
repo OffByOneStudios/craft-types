@@ -1,11 +1,11 @@
-#include "types/common.h"
+#include "syn/common.h"
 #include "basic_object.h"
 
 using namespace bandit;
 using namespace snowhouse;
 
 using namespace craft;
-using namespace craft::types;
+using namespace syn;
 
 
 go_bandit([]()
@@ -13,7 +13,7 @@ go_bandit([]()
 	/*
 	Testing the properties of the graph system
 	*/
-	describe("craft::types::graph()", []()
+	describe("syn::graph()", []()
 	{
 		it("graph().get(cpptype<_>::typeDesc()).ptr() == cpptype<_>::typeDesc().asNode()", [&]()
 		{

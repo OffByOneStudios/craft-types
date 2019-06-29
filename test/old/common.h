@@ -3,8 +3,8 @@
 #include <stack>
 #include <queue>
 
-#include "types/common.h"
-#include "types/core.h"
+#include "syn/common.h"
+#include "syn/syn.h"
 
 #include <spdlog/spdlog.h>
 #include <bandit/bandit.h>

@@ -1,4 +1,4 @@
-#include "types/common.h"
+#include "syn/common.h"
 
 #include "empty_aspects.h"
 #include "empty_providers.h"

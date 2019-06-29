@@ -1,5 +1,5 @@
 #pragma once
-#include "types/common.h"
+#include "syn/common.h"
 
 struct external_struct
 {
