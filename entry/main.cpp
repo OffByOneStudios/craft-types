@@ -36,11 +36,11 @@ int main(int argc, char** argv)
 		{
 			if (input == "dump")
 			{
-				global_store().forAllNodes(
+				global_store().g().forAllNodes(
 					[](Graph::Node const* n)
 				{
 					std::cout << std::string(80, '=') << std::endl;
-					std::cout << global_store().dumpNode(n) << std::endl;
+					std::cout << global_store().describeNode(n) << std::endl;
 				});
 			}
 			else if (input == "load")
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 				auto end = system().getLibraryCount(last_dll);
 
 				for (size_t i =0; i < end; ++i)
-					std::cout << global_store().dumpNode(system().getLibraryEntry(last_dll, i).asId()) << std::endl;
+					std::cout << global_store().describeNode(system().getLibraryEntry(last_dll, i).asId()) << std::endl;
 
 				std::cout << std::endl << "loaded " << (end) << " types." << std::endl;
 			}
