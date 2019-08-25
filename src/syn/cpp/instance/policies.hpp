@@ -136,7 +136,7 @@ namespace syn
 					return false;
 				} 
 
-				// In theory this code path should rarely be run, the last surviving instance will rarely be an any
+				// In theory this code path should rarely be run, the last surviving instance should never be an any
 				inline void _destroy()
 				{
 					if (!_destroy_with_manager()

@@ -71,7 +71,7 @@ cc_binary(
 
 
 cc_test(
-    name = "test",
+    name = "unit",
     includes = ["test"],
     srcs = glob([
         "test/unit/**/*.cpp",
