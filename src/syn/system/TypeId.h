@@ -20,6 +20,7 @@ namespace syn
 
 		inline operator Graph::Node*() const { return reinterpret_cast<Graph::Node*>(_node); }
 		inline operator details::TypeIdForwardDeclare() const { return { _node }; }
+		inline operator uintptr_t() const { return (uintptr_t)_node; }
 
 		inline bool operator <(TypeId const& that) const { return this->_node < that._node; }
 		inline bool operator >(TypeId const& that) const { return this->_node > that._node; }

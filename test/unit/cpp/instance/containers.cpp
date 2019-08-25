@@ -27,15 +27,34 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
 
         CHECK(inst.get() == nullptr);
         CHECK(inst.isNull() == true);
-        CHECK(inst == false);
+        CHECK((bool)inst == false);
     }
 
-    SECTION( "can be made" )
+    SECTION( "is a smart pointer" )
     {
-        instance<std::string> inst;
+        instance<std::string> inst = instance<std::string>::make("hello");
 
-        CHECK(inst.get() == nullptr);
-        CHECK(inst.isNull() == true);
-        CHECK(inst == false);
+        CHECK(inst.isNull() == false);
+        CHECK((bool)inst == true);
+        REQUIRE(inst.get() != nullptr);
+        CHECK(inst.typeId() == syn::type<std::string>::id());
+
+        CHECK(*inst.get() == "hello");
+        CHECK(*inst.get() == std::string("hello"));
+
+        CHECK(*inst == "hello");
+        CHECK(*inst == std::string("hello"));
+
+        CHECK(inst->size() == std::string("hello").size());
+    }
+
+    SECTION( "smart pointer with type erase" )
+    {
+        instance<> inst = instance<std::string>::make("hello");
+
+        CHECK(inst.isNull() == false);
+        CHECK((bool)inst == true);
+        REQUIRE(inst.get() != nullptr);
+        CHECK(inst.typeId() == syn::type<std::string>::id());
     }
 }

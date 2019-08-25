@@ -1,5 +1,9 @@
 #pragma once
 #include "syn/syn.h"
 
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, std::string);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, bool);
+namespace syn
+{
+    template<> struct type_define<bool> { static syn::Define<bool> Definition; };
+
+    template<> struct type_define<::std::string> { static syn::Define<::std::string> Definition; };
+}

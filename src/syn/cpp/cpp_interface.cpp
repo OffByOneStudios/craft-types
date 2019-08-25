@@ -31,29 +31,31 @@ CppSystem& CppSystem::global_instance()
 
 void CppSystem::_init_primeInternalEntries()
 {
+	/*
 	// Native structural
-	auto struct_sd = const_cast<CppStaticDefine*>(type<Type_Node_StructuralType>::desc().desc);
+	auto struct_sd = const_cast<CppDefine*>(type<Type_Node_StructuralType>::desc().desc);
 	auto struct_n = const_cast<Graph::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Node_StructuralType) }));
 	struct_n->type = (details::TypeIdForwardDeclare)struct_n;
 	struct_sd->node = struct_n;
 
 	// Native bits
-	auto bits_sd = const_cast<CppStaticDefine*>(type<Type_Node_BitsType>::desc().desc);
+	auto bits_sd = const_cast<CppDefine*>(type<Type_Node_BitsType>::desc().desc);
 	auto bits_n = const_cast<Graph::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Node_BitsType) }));
 	bits_n->type = (details::TypeIdForwardDeclare)struct_n;
 	bits_sd->node = bits_n;
 
 	// Multi-method bits
-	auto mm_sd = const_cast<CppStaticDefine*>(type<Type_Node_Multimethod>::desc().desc);
+	auto mm_sd = const_cast<CppDefine*>(type<Type_Node_Multimethod>::desc().desc);
 	auto mm_n = const_cast<Graph::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Node_Multimethod) }));
 	mm_n->type = (details::TypeIdForwardDeclare)struct_n;
 	mm_sd->node = mm_n;
 
 	// Static description
-	auto sd_sd = const_cast<CppStaticDefine*>(type<Type_Property_CppStaticDescription>::desc().desc);
+	auto sd_sd = const_cast<CppDefine*>(type<Type_Property_CppStaticDescription>::desc().desc);
 	auto sd_n = const_cast<Graph::Node*>(_store->addNode<Type_Node_StructuralType>({ sizeof(Type_Property_CppStaticDescription) }));
 	sd_n->type = (details::TypeIdForwardDeclare)struct_n;
 	sd_sd->node = sd_n;
+	*/
 }
 
 void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
@@ -66,7 +68,7 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 		{
 			case _Entry::Kind::StaticDefine:
 			{
-				cpp::static_desc* sd = (cpp::static_desc*)entry.ptr;
+				auto* sd = (CppDefine*)entry.ptr;
 				// Was pre-initalized
 				if (sd->node != nullptr)
 					continue;
@@ -76,24 +78,28 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 				switch (sd->kind)
 				{
 					default:
-					case CppStaticDefineKind::Unknown:
+					case CppDefineKind::Unknown:
 						break;
-					case CppStaticDefineKind::Type:
+					case CppDefineKind::Abstract:
 					{
-						sd->node = _store->addNode<Type_Node_StructuralType>({ 0 });
+						sd->node = _store->g().addNode<core::NAbstract>({ });
 					} break;
-					case CppStaticDefineKind::Function:
+					case CppDefineKind::Struct:
 					{
-						sd->node = _store->addNode<Type_Node_Multimethod>({ });
+						sd->node = _store->g().addNode<core::NStruct>({ });
 					} break;
-					case CppStaticDefineKind::Concept:
+					case CppDefineKind::Dispatcher:
+					{
+						//sd->node = _store->g().addNode<Type_Node_Multimethod>({ });
+					} break;
+					case CppDefineKind::Module:
 					{
 						//sd->node = _graph->addNode(_graph->meta<GraphNodeCppUserInfo>(), sd);
 					} break;
 				}
 
 				if (sd->node != nullptr)
-					_store->addProp<Type_Property_CppStaticDescription>({ sd }, sd->node);
+					_store->g().addProp<core::PCppDefine>({ sd }, sd->node);
 			} break;
 		}
 	}
@@ -107,13 +113,13 @@ void CppSystem::_init_runEntries(_Entries* entries, size_t start)
 		auto& entry = entries->_entries[i];
 		switch (entry.kind)
 		{
-			case _Entry::Kind::StaticDesc:
+			case _Entry::Kind::StaticDefine:
 			{
-				auto td = static_cast<cpp::static_desc*>(entry.ptr);
+				auto td = static_cast<CppDefine*>(entry.ptr);
 
 				if (td->initer == nullptr) continue;
 
-				cpp::DefineHelper<void> helper(td);
+				details::DefineHelper<void> helper(td);
 				td->initer(helper);
 			} break;
 		}
@@ -140,7 +146,7 @@ void CppSystem::_init()
 	_init_insertEntries(_static_entries, 0);
 
 	// Build up the Runtime and Graph:
-	cpp::DefineHelper<void>::_build_default_providers();
+	//-cpp::DefineHelper<void>::_build_default_providers();
 	_init_runEntries(_static_entries, 0);
 
 	/*std::cerr << "CppSystem::_init:curr" << (_current_dll_entries == nullptr ? "OKOKOK" : "BADBAD") << std::endl;
@@ -234,9 +240,9 @@ void CppSystem::_addEntry(_Entry && e)
 	_current_dll_entries->_entries.push_back(e);
 }
 
-void CppSystem::_register(cpp::static_desc const* info)
+void CppSystem::_register(CppDefine const* info)
 {
-	_addEntry({ const_cast<cpp::static_desc*>(info), _Entry::Kind::StaticDesc });
+	_addEntry({ const_cast<CppDefine*>(info), _Entry::Kind::StaticDefine });
 }
 
 std::string CppSystem::getLastLibraryName()
@@ -249,5 +255,5 @@ size_t CppSystem::getLibraryCount(std::string const& dll)
 }
 TypePtr CppSystem::getLibraryEntry(std::string const& dll, size_t index)
 {
-	return reinterpret_cast<cpp::static_desc*>(_dll_entries[dll]->_entries[index].ptr);
+	return reinterpret_cast<CppDefine*>(_dll_entries[dll]->_entries[index].ptr);
 }

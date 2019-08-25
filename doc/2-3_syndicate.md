@@ -1,3 +1,15 @@
+Here we describe the advanced features that syndicate builds ontop the core, that we consider core implementation features (but are not strictly speaking required).
+
+### Instance
+
+instance
+
+### Dispatcher
+
+method, dispatcher
+
+#### Methods (OLD)
+
 We have descending levels of representation for subroutines.
 
 A simple function node with a signature is a standalone function. If bound to a name it would only be called if types matched exactly.

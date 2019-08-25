@@ -7,40 +7,41 @@ namespace syn
 	** prelude
 	******************************************************************************/
 
-	struct CppStaticDefine;
+	struct CppDefine;
 
 	// TODO make this a dynamic mapping, to allow user extensions
-	enum class CppStaticDefineKind
+	enum class CppDefineKind
 	{
-		Unknown,
-		Abstract,
-		Struct,
-		Function,
-		Dispatcher,
+		Unknown,    // unknown / void, treat like information element
+		Abstract,   // presents as a C++ abstract, could be interface or abstract base
+		Struct,     // presents as a concrete C++ object, treat like structure type
+		Dispatcher, // is an explicit Multimethod define
+		Module,     // is an explicit Module define
 	};
 
 	namespace details
 	{
 		template<typename T> class DefineHelper;
 
-		typedef void(*CppStaticDefineRunner)(DefineHelper<void> _);
+		typedef void(*CppDefineRunner)(DefineHelper<void> _);
 	}
 
-	struct CppStaticDefine final
+	// should always be static...
+	struct CppDefine
 	{
 	public:
 		Graph::Node* node;
 
-		details::CppStaticDefineRunner initer;
-		CppStaticDefineKind kind;
+		details::CppDefineRunner initer;
+		CppDefineKind kind;
 
 		void* repr;
 
 		// TODO: ifdef debug (or trace?) add line numbers and file names
 
-		inline CppStaticDefine(CppStaticDefineKind kind_, void* repr_ = nullptr, details::CppStaticDefineRunner initer_ = nullptr);
+		inline CppDefine(CppDefineKind kind_, void* repr_ = nullptr, details::CppDefineRunner initer_ = nullptr);
 
-		inline CppStaticDefine& operator<< (details::CppStaticDefineRunner initer_);
+		inline CppDefine& operator<< (details::CppDefineRunner initer_);
 	};
 
 
@@ -53,14 +54,14 @@ namespace syn
 
 	struct TypePtr final
 	{
-		CppStaticDefine const* desc;
+		CppDefine const* desc;
 
 		inline TypePtr() : desc(nullptr) { }
-		inline TypePtr(CppStaticDefine const* const& v)
+		inline TypePtr(CppDefine const* const& v)
 			: desc(v) { }
 		inline TypePtr(TypeId const& tid)
 			// TODO this is a prop
-			: desc(static_cast<CppStaticDefine const*>(static_cast<Graph::Node*>(tid)->data))
+			: desc(static_cast<CppDefine const*>(static_cast<Graph::Node*>(tid)->data))
 		{
 			// TODO assert cpp type
 			//assert(identifiers().get(tid).ptr_type);
@@ -79,7 +80,7 @@ namespace syn
 			return that_type.desc != nullptr && *this == that_type;
 		}
 
-		inline explicit operator CppStaticDefine const*() const { return desc; }
+		inline explicit operator CppDefine const*() const { return desc; }
 		inline operator TypeId() const { return asId(); }
 
 		inline bool operator <(TypePtr const& that) const { return this->desc < that.desc; }
@@ -107,15 +108,19 @@ namespace syn
 	{
 		// This must be zero width
 	public:
-		static constexpr CppStaticDefineKind kind = CppStaticDefineKind::Unknown;
+		static constexpr CppDefineKind kind = CppDefineKind::Unknown;
 		inline static TypePtr desc() { return nullptr; }
+		inline static TypeId id() { return nullptr; }
+		inline static Graph::Node* graphNode() { return nullptr; }
 	};
 
 	template <typename TType>
-	struct type<TType, type_define<TType>>
+	struct type<TType, std::void_t<type_define<TType>>>
 	{
-		static constexpr CppStaticDefineKind kind = decltype(type_define<TType>::Definition)::kind;
-		inline static TypePtr desc() { return type_define<TType>::Definition; }
+		static constexpr CppDefineKind kind = decltype(type_define<TType>::Definition)::kind;
+		inline static TypePtr desc() { return &type_define<TType>::Definition; }
+		inline static TypeId id() { return desc().asId(); }
+		inline static Graph::Node* graphNode() { return id(); }
 	};
 
 	/******************************************************************************
@@ -197,7 +202,7 @@ namespace syn
 	public:
 		inline TypeStore& types() { return *_store; }
 
-		CRAFT_TYPES_EXPORTED void _register(CppStaticDefine const*);
+		CRAFT_TYPES_EXPORTED void _register(CppDefine const*);
 
 		CRAFT_TYPES_EXPORTED std::string getLastLibraryName();
 		CRAFT_TYPES_EXPORTED size_t getLibraryCount(std::string const& dll);
@@ -217,14 +222,14 @@ namespace syn
 		return CppSystem::global_instance().types();
 	}
 
-	inline CppStaticDefine::CppStaticDefine(CppStaticDefineKind kind_, void* repr_, details::CppStaticDefineRunner initer_)
+	inline CppDefine::CppDefine(CppDefineKind kind_, void* repr_, details::CppDefineRunner initer_)
 	{
 		initer = initer_;
 		kind = kind_;
 		repr = repr_;
 		system()._register(this);
 	}
-	inline CppStaticDefine& CppStaticDefine::operator<< (details::CppStaticDefineRunner initer_) { initer = initer_; return *this; }
+	inline CppDefine& CppDefine::operator<< (details::CppDefineRunner initer_) { initer = initer_; return *this; }
 
 	/******************************************************************************
 	** Define
@@ -233,32 +238,49 @@ namespace syn
 	template <typename TType = void>
 	class Define;
 
+	// should always be static...
 	template <>
-	class Define<void>
+	class Define<void> final
+		: public CppDefine
 	{
+	public:
+		static const CppDefineKind kind = CppDefineKind::Unknown;
 
+		Define(details::CppDefineRunner init)
+			: CppDefine(kind, this, init)
+			{ }
 	};
 
+	// should always be static...
 	template <typename TType>
-	class Define
+	class Define final
+		: public CppDefine
 	{
+	public:
+		static const CppDefineKind kind = CppDefineKind::Struct;
 
+		Define(details::CppDefineRunner init)
+			: CppDefine(kind, this, init)
+			{ }
 	};
 
 	/******************************************************************************
 	** Multimethod
 	******************************************************************************/
 
+	// should always be static...
 	template <typename TDispatcher>
 	class Multimethod final
+		: CppDefine
 	{
 	private:
-		CppStaticDefine __id;
 		TDispatcher _dispatch;
 
 	public:
-		inline Multimethod(details::CppStaticDefineRunner init)
-			: __id(CppStaticDefineKind::Dispatcher, this, init)
+		static const CppDefineKind kind = CppDefineKind::Dispatcher;
+
+		inline Multimethod(details::CppDefineRunner init)
+			: CppDefine(kind, this, init)
 		{
 			// TODO? throw exception if not static time
 			// TODO? use a friend to initalize this thing?

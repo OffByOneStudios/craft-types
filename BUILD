@@ -14,8 +14,14 @@ cc_library(
     srcs=[
         "src/syn/system/SymbolTable.cpp",
         "src/syn/system/TypeStore.cpp",
+        "src/syn/system/TypeId.cpp",
 
-        #"src/syn/cpp/cpp_interface.cpp",
+        "src/syn/core/system_graph.cpp",
+        "src/syn/core/cpp_graph.cpp",
+
+        "src/syn/cpp/cpp_interface.cpp",
+
+        "src/syn/boot/default_types_cpp.cpp",
     ],
     defines=[
         "CULTLANG_TYPES_DLL",

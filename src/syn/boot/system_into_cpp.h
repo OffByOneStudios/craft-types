@@ -3,76 +3,32 @@
 
 /* This file fixes up the system by declaring the system types as external cpp types.
 
-	See the relevant .cpp files for the DEFINEs
-
+	See the relevant .cpp files for the defines
 */
 
 /******************************************************************************
-** /types/system/store.h
+** /syn/core/system_graph.h
 ******************************************************************************/
-
-#include "syn/system/TypeStore.h"
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::TypeStore);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::TypeId);
-
-/******************************************************************************
-** /types/system/basic_types.h
-******************************************************************************/
-
-#include "syn/system/basic_types.h"
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Property_SystemGraphKind);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Property_NamespaceIdentifier);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Property_LocalIdentifier);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Node_AbstractType);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Edge_IsA);
-
-/******************************************************************************
-** /types/system/native_types.h
-******************************************************************************/
-
-#include "syn/system/native_types.h"
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Node_BitsType);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Node_StructuralType);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Property_NativeSize);
-
-/******************************************************************************
-** /types/system/advanced_types.h
-******************************************************************************/
-
-#include "syn/system/advanced_types.h"
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Node_Multimethod);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Edge_MethodImplementation);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Node_GenericType);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Edge_GenericInstantiation);
-
-/******************************************************************************
-** /types/system/expression/expression.h
-******************************************************************************/
-
-#include "syn/system/expression/expression.h"
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionAny);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionVoid);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionBottom);
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionConcrete);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionArrow);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionTuple);
-
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::ExpressionStore);
-
-/******************************************************************************
-** /types/system/expression/queries.h
-******************************************************************************/
-
-#include "syn/system/expression/queries.h"
-
-namespace craft {
-namespace types
+namespace syn
 {
-	CRAFT_MULTIMETHOD_DECLARE(isSubtypeMethod, SimpleDispatcher);
-}}
+    template<> struct type_define<::syn::core::NEmpty> { static syn::Define<::syn::core::NEmpty> Definition; };
+    template<> struct type_define<::syn::core::NAbstract> { static syn::Define<::syn::core::NAbstract> Definition; };
+    template<> struct type_define<::syn::core::EIsA> { static syn::Define<::syn::core::EIsA> Definition; };
+	namespace core { extern syn::Define<> MetaDefinitions; }
+
+    template<> struct type_define<::syn::core::NBits> { static syn::Define<::syn::core::NBits> Definition; };
+    template<> struct type_define<::syn::core::NStruct> { static syn::Define<::syn::core::NStruct> Definition; };
+    template<> struct type_define<::syn::core::NReference> { static syn::Define<::syn::core::NReference> Definition; };
+	namespace core { extern syn::Define<> VoidAndPointerDefinitions; }
+
+    template<> struct type_define<::syn::core::NSignature> { static syn::Define<::syn::core::NSignature> Definition; };
+    template<> struct type_define<::syn::core::NFunction> { static syn::Define<::syn::core::NFunction> Definition; };
+}
+
+/******************************************************************************
+** /syn/core/cpp_graph.h
+******************************************************************************/
+namespace syn
+{
+    template<> struct type_define<::syn::core::PCppDefine> { static syn::Define<::syn::core::PCppDefine> Definition; };
+}

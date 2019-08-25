@@ -29,6 +29,7 @@ std::string TypeId::toString() const
 
 	std::string from, name;
 
+	/*
 	auto cpp_name = thread_store().onlyPropOfTypeOnNode<Type_Property_CppIdentifier>(_node);
 	if (cpp_name)
 	{
@@ -46,6 +47,7 @@ std::string TypeId::toString() const
 	{
 		return l_name->local_identifier;
 	}
+	*/
 
 	return fmt::format("Unknown-{0}", (void*)_node);
 }

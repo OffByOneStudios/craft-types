@@ -56,19 +56,28 @@
 ** C++ Support/Adaptor
 ******************************************************************************/
 
+// prelude ////////////////////////////////////////////////////////////////////
+
 #include "cpp/prelude.h" 
+
+// instance ///////////////////////////////////////////////////////////////////
 
 #include "cpp/instance/prelude.hpp"
 #include "cpp/instance/policies.hpp"
 #include "cpp/instance/containers.hpp"
 
+// system /////////////////////////////////////////////////////////////////////
+
 #include "cpp/cpp_interface.h"
 
-/*#include "system/GenericInvoke.hpp"
+// graph //////////////////////////////////////////////////////////////////////
+
+#include "core/cpp_graph.h"
+
+/*#include "system/runtime/GenericInvoke.hpp"
 
 #include "system/SimpleDispatcher.hpp"
 
-#include "boot/system_into_cpp.h"
 
 //#include "cpp/graph.hpp"
 #include "cpp/cpp_types.h"
@@ -80,11 +89,15 @@
 ** Boot Runtime Library
 ******************************************************************************/
 
-/*#include "cpp/DefineHelper.hpp"
-
+// TODO move to file below
+namespace syn { namespace details { template<typename T> class DefineHelper { public: DefineHelper(CppDefine*) { } }; }}
+/*
+#include "cpp/DefineHelper.hpp"
 #include "boot/default_types_c.h"
-#include "boot/default_types_cpp.h"
 */
+#include "boot/default_types_cpp.h"
+
+#include "boot/system_into_cpp.h"
 
 // TODO:
 // * Rework objects to manage their own instance meta stuff (rather than from_raw) via SLifecycle

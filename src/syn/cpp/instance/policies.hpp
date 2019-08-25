@@ -7,16 +7,6 @@ namespace syn
 {
 	namespace instance_policy
 	{
-		template<typename TInstanceForm>
-		class FinalizeInstanceForm
-			: public TInstanceForm
-		{
-		public:
-			using InstanceForm = TInstanceForm;
-		};
-
-
-
 		class ReferenceCounted
 		{
 		public:
@@ -47,6 +37,17 @@ namespace syn
 					
 					if (this->_header != nullptr)
 						incref();
+				}
+
+				inline TypeId typeId() const
+				{
+					return (TypeId) this->_header->concrete;
+				}
+
+				// TODO... assignment rules
+				inline operator InstanceHeader*() const
+				{
+					return this->_header;
 				}
 
 				uint32_t incref()
@@ -244,6 +245,34 @@ namespace syn
 						return nullptr;
 					return reinterpret_cast<TType*>(this->_header->memory);
 				}
+
+				inline TType const& operator*() const
+				{
+					return *get();
+				}
+
+				inline TType& operator*()
+				{
+					return *get();
+				}
+
+				inline TType const* operator->() const
+				{
+					return get();
+				}
+
+				inline TType* operator->()
+				{
+					return get();
+				}
+
+				template<typename... TArgs>
+				inline static instance<TType> make(TArgs &&... args)
+				{
+					auto ptr = new TType(std::forward<TArgs>(args)...);
+					auto id = (uintptr_t)syn::type<TType>::desc().asId();
+					return { new InstanceHeader(ptr, id, InstanceLifecycle::ReferenceCounted(1)) };
+				}
 			};
 		};
 
@@ -305,22 +334,22 @@ namespace syn
 		template <typename TType>
 		class CppReferenceCounted<TType,
 			typename std::enable_if_t<std::is_object_v<TType>>>
-			: CppBase
+			: CppTypedObject<TType>
 			, ReferenceCounted
 		{
 		public:
-			struct Instance
-				: public InstanceChunkHeader
+			template <typename TBase>
+			using InstanceFormBase
+				= typename ReferenceCounted::template InstanceForm
+				< typename CppTypedObject<TType>::template InstanceForm
+				< TBase >>;
+
+			template<typename TBaseForm>
+			struct InstanceForm
+				: public InstanceFormBase<TBaseForm>
 			{
-				Instance()
-					: InstanceChunkHeader { nullptr }
-				{ }
-
-				Instance(InstanceHeader* hdr)
-					: InstanceChunkHeader { hdr }
-				{ }
-
-			protected:
+				using BaseForm = InstanceFormBase<TBaseForm>;
+				using BaseForm::BaseForm;
 			};
 
 		public:
@@ -336,10 +365,24 @@ namespace syn
 			{
 				using Base = InstanceLibraryBase<TBase>;
 				using Base::Base;
-
 			};
 
-			using FinalInstance = InstanceLibrary<FinalizeInstanceForm<Instance>>;
+		public:
+			struct InstanceFormFactor
+				: public InstanceChunkHeader
+			{
+				InstanceFormFactor()
+					: InstanceChunkHeader { nullptr }
+				{ }
+
+				InstanceFormFactor(InstanceHeader* hdr)
+					: InstanceChunkHeader { hdr }
+				{ }
+			};
+
+			using FinalForm = InstanceForm<InstanceFormFactor>;
+
+			using FinalInstance = InstanceLibrary<FinalForm>;
 		};
 	}
 }
