@@ -29,4 +29,13 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
         CHECK(inst.isNull() == true);
         CHECK(inst == false);
     }
+
+    SECTION( "can be made" )
+    {
+        instance<std::string> inst;
+
+        CHECK(inst.get() == nullptr);
+        CHECK(inst.isNull() == true);
+        CHECK(inst == false);
+    }
 }

@@ -3,7 +3,10 @@
 
 namespace syn
 {
-	template<typename TType, template <typename> typename TPolicy>
+	template<
+		typename TType /* = void */,
+		template <typename> typename TPolicy /* = instance_policy::CppReferneceCountedActual */
+	>
 	struct instance final
 		: public TPolicy<TType>::FinalInstance
 	{

@@ -39,6 +39,10 @@ namespace syn
         };
     }
 
-	// Defined in `cpp/instance`
-	template<typename TType = void, template<typename> typename TPolicy = instance_policy::CppReferneceCountedActual> struct instance;
+	// Defined in `cpp/containers`
+	template <
+        typename TType = void,
+        template<typename> typename TPolicy = instance_policy::CppReferneceCountedActual
+    >
+    struct instance;
 }
