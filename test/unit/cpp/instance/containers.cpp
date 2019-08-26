@@ -21,6 +21,8 @@ TEST_CASE( "syn::instance<void>", "[syn::CppReferenceCounted]" )
 
 TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
 {
+    test_require_syn_boot();
+    
     SECTION( "starts empty" )
     {
         instance<std::string> inst;

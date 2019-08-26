@@ -6,7 +6,7 @@ using namespace syn;
 
 int main(int argc, char** argv)
 {
-	syn::boot();
+	syn::dll::boot();
 
 	for (;;)
 	{
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 				auto abs = std::filesystem::absolute(args);
 				std::filesystem::current_path(abs.remove_filename());
 
-				syn::load_dll(abs.string());
+				syn::dll::load(abs.string());
 				auto last_dll = system().getLastLibraryName();
 				auto end = system().getLibraryCount(last_dll);
 

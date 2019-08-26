@@ -25,7 +25,7 @@ cc_library(
     ],
     defines=[
         "CULTLANG_TYPES_DLL",
-        "CULT_CURRENT_PACKAGE=\\\"org_cultlang_" + "types" + "\\\""
+        'CULT_CURRENT_PACKAGE=\"org_cultlang_' + 'syndicate' + '\"'
     ],
     includes=[
         "src"
@@ -35,31 +35,45 @@ cc_library(
         "//conditions:default": ["-std=c++17"],
     }),
     
+    alwayslink = True,
     deps=[
         "@graph//:graph",
         "@stdext//:stdext",
         "@spdlog//:headers",
         "@boost//:callable_traits",
-    ]
+    ],
 )
 
 cc_binary(
     name = "Syndicate.dll",
-    deps = ["types"],
-    linkopts = ["/ENTRY:syn_DLLMAIN"],
-    linkshared = 1,
+    deps = [":types"],
+    linkopts = [
+        "/ENTRY:syn_DLLMAIN",
+        # /MD
+        "/DEFAULTLIB:msvcprt.lib",
+        "/DEFAULTLIB:ucrtd.lib",
+        "/DEFAULTLIB:vcruntimed.lib",
+        "/DEFAULTLIB:msvcrtd.lib",
+        "/DEFAULTLIB:libvcruntimed.lib",
+        "/DEFAULTLIB:msvcurtd.lib",
+        # system
+        "/DEFAULTLIB:user32.lib",
+        "/DEFAULTLIB:shell32.lib",
+        "/DEFAULTLIB:gdi32.lib",
+    ],
+    linkshared = True,
 )
 
 cc_binary(
     name = "libSyndicate.dylib",
     deps = ["types"],
-    linkshared = 1,
+    linkshared = True,
 )
 
 cc_binary(
     name = "libSyndicate.so",
     deps = ["types"],
-    linkshared = 1,
+    linkshared = True,
 )
 
 cc_binary(
@@ -73,6 +87,11 @@ cc_binary(
         "entry/*.c*",
         "entry/*.h*",
     ]),
+
+    copts = select({
+        "@bazel_tools//src/conditions:windows": ["/std:c++17"],
+        "//conditions:default": ["-std=c++17"],
+    }),
 )
 
 

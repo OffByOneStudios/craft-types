@@ -5,7 +5,7 @@
 namespace syn {
 namespace dll {
 
-	inline void _boot()
+	inline void boot()
 	{
 		system();
 		system()._init();
@@ -16,7 +16,7 @@ namespace dll {
 		return CppSystem::_begin(name);
 	}
 
-	inline void _finish(char const* save, char const* name = nullptr)
+	inline void _finish(char const* save, char const* name /* = nullptr */)
 	{
 		system()._finish(save, name);
 	}

@@ -9,9 +9,16 @@ extern "C" BOOLEAN __stdcall syn_DLLMAIN(LPVOID var1, DWORD var2, LPVOID var3)
 {
 	if (var2 == DLL_PROCESS_ATTACH)
 	{
-		auto save = ::syn::_begin(CULT_CURRENT_PACKAGE);
+		const char* pkg = 
+			#ifdef CULT_CURRENT_PACKAGE
+			CULT_CURRENT_PACKAGE
+			#else
+			"<undefined>"
+			#endif
+			;
+		auto save = ::syn::dll::_begin(pkg);
 		auto ret = _DllMainCRTStartup(var1, var2, var3);
-		::syn::_finish(save);
+		::syn::dll::_finish(save);
 		return ret;
 	}
 	else
@@ -33,4 +40,4 @@ void _syn_DLLMAIN_finish()
 {
 	::syn::_finish(nullptr, CULT_CURRENT_PACKAGE);
 }*/
-#endif 
+#endif

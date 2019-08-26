@@ -111,4 +111,4 @@ namespace syn { namespace details { template<typename T> class DefineHelper { pu
 ** Dll Stuff
 ******************************************************************************/
 
-//#include "dll_helpers.h"
+#include "dll_helpers.h"

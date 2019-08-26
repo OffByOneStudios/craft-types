@@ -17,4 +17,13 @@ namespace syn
 
 	inline TypeStore& static_store();
 	inline TypeStore& thread_store();
+
+	namespace dll
+	{
+		inline char const* _begin(char const* name);
+		inline void _finish(char const* save, char const* name = nullptr);
+
+		inline void boot();
+		inline void load(std::string const& path);
+	}
 }

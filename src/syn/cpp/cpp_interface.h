@@ -172,15 +172,19 @@ namespace syn
 		CppSystem();
 		~CppSystem();
 
-		friend inline void boot();
-		friend inline char const* _dll_begin(char const*);
-		friend inline void _dll_finish(char const*, char const*);
+	public:
+		CRAFT_TYPES_EXPORTED static CppSystem& global_instance();
 
-		friend inline void load_dll(std::string const&);
+	private:
+		friend inline void ::syn::dll::boot();
+		friend inline char const* ::syn::dll::_begin(char const*);
+		friend inline void ::syn::dll::_finish(char const*, char const*);
 
+		friend inline void ::syn::dll::load(std::string const&);
+
+		void _init_primeInternalEntries();
 		void _init_insertEntries(_Entries* entries, size_t start);
 		void _init_runEntries(_Entries* entries, size_t start);
-		void _init_primeInternalEntries();
 
 		static char const* __dll_region;
 
@@ -189,9 +193,6 @@ namespace syn
 		CRAFT_TYPES_EXPORTED static char const* _begin(char const* name);
 		CRAFT_TYPES_EXPORTED void _finish(char const* save, char const* name);
 		CRAFT_TYPES_EXPORTED void _update();
-
-	public:
-		CRAFT_TYPES_EXPORTED static CppSystem& global_instance();
 
 		//
 		// Registry
