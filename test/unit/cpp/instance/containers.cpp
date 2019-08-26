@@ -32,7 +32,8 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
 
     SECTION( "is a smart pointer" )
     {
-        instance<std::string> inst = instance<std::string>::make("hello");
+        instance<std::string> inst;
+        inst = instance<std::string>::make("hello");
 
         CHECK(inst.isNull() == false);
         CHECK((bool)inst == true);

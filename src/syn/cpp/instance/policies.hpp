@@ -88,8 +88,8 @@ namespace syn
 					assert((this->_header->lifecycle &= InstanceLifecycle::ModeReferenceCounted)
 						&& "Violation of instance template invariant");
 
-					auto ref = *(this->_header->lifecycle) -= 1 == 0;
-					if (ref)
+					auto ref = *(this->_header->lifecycle) -= 1;
+					if (ref == 0)
 						this->_destroy();
 					return ref;
 				}
@@ -112,8 +112,20 @@ namespace syn
 		{
 			inline static void _(TDst& dst, TSrc const& src)
 			{
+				if (dst._header != nullptr)
+					dst.decref();
 				dst._header = src._header;
 				dst.incref();
+			}
+		};
+		template<typename TDst, typename TSrc>
+		struct move<TDst, TSrc, typename std::enable_if<
+			_details::is_base_of_template<ReferenceCounted::InstanceLibrary, TDst>::value
+			&& _details::is_base_of_template<ReferenceCounted::InstanceLibrary, TSrc>::value, void>::type>
+		{
+			inline static void _(TDst& dst, TSrc&& src)
+			{
+				std::swap(dst._header, src._header);
 			}
 		};
 
@@ -313,10 +325,10 @@ namespace syn
 				inline static instance<TType> make(TArgs &&... args)
 				{
 					auto ptr = new TType(std::forward<TArgs>(args)...);
-					auto id = (uintptr_t)syn::type<TType>::desc().asId();
 					return {
 						new InstanceHeader(
-							ptr, id,
+							reinterpret_cast<void*>(ptr),
+							(uintptr_t)syn::type<TType>::desc().asId(),
 							InstanceLifecycle::ReferenceCounted(0) | InstanceLifecycle::DeleterDirect, 
 							reinterpret_cast<void*>(&_deleterPtr)
 						)};

@@ -121,7 +121,10 @@ namespace syn
 	public:
 		// In the default case only assume the manager is null
 		inline InstanceHeader()
-			: manager(nullptr)
+			: memory (nullptr)
+			, concrete(0)
+			, lifecycle(0)
+			, manager(nullptr)
 		{ }
 
 
