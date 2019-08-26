@@ -13,5 +13,12 @@ namespace syn
 		using FinalInstance = typename TPolicy<TType>::FinalInstance;
 
 		using FinalInstance::FinalInstance;
+
+		template<typename TSrc>
+		instance<TType, TPolicy>& operator=(TSrc const& src)
+		{
+			instance_policy::copy<instance<TType, TPolicy>, TSrc>::_(*this, src);
+			return *this;
+		}
 	};
 }

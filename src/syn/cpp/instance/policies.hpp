@@ -5,8 +5,25 @@
 
 namespace syn
 {
+	// todo, move this
+	namespace _details
+	{
+		template < template <typename...> class base,typename derived>
+		struct is_base_of_template_impl
+		{
+			template<typename... Ts>
+			static constexpr std::true_type  test(const base<Ts...> *);
+			static constexpr std::false_type test(...);
+			using type = decltype(test(std::declval<derived*>()));
+		};
+
+		template < template <typename...> class base,typename derived>
+		using is_base_of_template = typename is_base_of_template_impl<base,derived>::type;
+	}
+
 	namespace instance_policy
 	{
+		// The reference counted memory policy
 		class ReferenceCounted
 		{
 		public:
@@ -29,6 +46,17 @@ namespace syn
 				using BaseLibrary = TBaseLibrary;
 				using BaseLibrary::BaseLibrary;
 
+				template<typename TDst, typename TSrc, typename Enable> friend struct copy;
+				template<typename TDst, typename TSrc, typename Enable> friend struct move;
+
+			public:
+				inline ~InstanceLibrary()
+				{
+					if (this->_header != nullptr)
+						decref();
+				}
+
+			public:
 				inline InstanceLibrary(InstanceHeader* hdr)
 					: BaseLibrary (hdr)
 				{
@@ -39,15 +67,10 @@ namespace syn
 						incref();
 				}
 
+			public:
 				inline TypeId typeId() const
 				{
 					return (TypeId) this->_header->concrete;
-				}
-
-				// TODO... assignment rules
-				inline operator InstanceHeader*() const
-				{
-					return this->_header;
 				}
 
 				uint32_t incref()
@@ -82,6 +105,17 @@ namespace syn
 			};
 		};
 
+		template<typename TDst, typename TSrc>
+		struct copy<TDst, TSrc, typename std::enable_if<
+			_details::is_base_of_template<ReferenceCounted::InstanceLibrary, TDst>::value
+			&& _details::is_base_of_template<ReferenceCounted::InstanceLibrary, TSrc>::value, void>::type>
+		{
+			inline static void _(TDst& dst, TSrc const& src)
+			{
+				dst._header = src._header;
+				dst.incref();
+			}
+		};
 
 
 		class CppBase
@@ -109,7 +143,6 @@ namespace syn
 				}
 				inline bool _destroy_with_deleter()
 				{
-
 					if (this->_header->lifecycle &= InstanceLifecycle::Mask_Deleter)
 					{
 						switch (this->_header->lifecycle.deleterMode())
@@ -232,6 +265,7 @@ namespace syn
 				using BaseLibrary = InstanceLibraryBase<TBaseLibrary>;
 				using BaseLibrary::BaseLibrary;
 
+			public:
 				inline TType const* get() const
 				{
 					if (this->_header == nullptr)
@@ -266,12 +300,26 @@ namespace syn
 					return get();
 				}
 
+			protected:
+				inline static void _deleter(void* p)
+				{
+					delete (TType*)p;
+				}
+
+				inline static InstanceDirectDeleter _deleterPtr = &_deleter;
+
+			public:
 				template<typename... TArgs>
 				inline static instance<TType> make(TArgs &&... args)
 				{
 					auto ptr = new TType(std::forward<TArgs>(args)...);
 					auto id = (uintptr_t)syn::type<TType>::desc().asId();
-					return { new InstanceHeader(ptr, id, InstanceLifecycle::ReferenceCounted(1)) };
+					return {
+						new InstanceHeader(
+							ptr, id,
+							InstanceLifecycle::ReferenceCounted(0) | InstanceLifecycle::DeleterDirect, 
+							reinterpret_cast<void*>(&_deleterPtr)
+						)};
 				}
 			};
 		};

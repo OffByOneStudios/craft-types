@@ -1,7 +1,7 @@
 #pragma once
 #include "syn/syn.h"
 
-/* See section 2.4 of the manual.
+/* See section 2.3 of the manual.
 */
 
 #ifdef __clang__
@@ -12,13 +12,13 @@ namespace syn {
 namespace core
 {
 	/******************************************************************************
-	** PCppDefine (NReference)
+	** NDispatcher (NReference)
 	******************************************************************************/
 
-	struct PCppDefine final
+	struct NDispatcher final
 	{
     public:
-        CppDefine* define;
+        void* dispatcher;
 	};
 
 }}

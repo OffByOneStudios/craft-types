@@ -37,6 +37,9 @@ namespace syn
         {
 
         };
+
+        template<typename TDst, typename TSrc, typename Enable = void> struct copy { static_assert("Cannot copy between instances."); };
+        template<typename TDst, typename TSrc, typename Enable = void> struct move { static_assert("Cannot move between instances."); };
     }
 
 	// Defined in `cpp/containers`

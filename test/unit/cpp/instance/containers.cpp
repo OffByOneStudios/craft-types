@@ -50,7 +50,8 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
 
     SECTION( "smart pointer with type erase" )
     {
-        instance<> inst = instance<std::string>::make("hello");
+        instance<> inst;
+        inst = instance<std::string>::make("hello");
 
         CHECK(inst.isNull() == false);
         CHECK((bool)inst == true);

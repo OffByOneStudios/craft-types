@@ -8,7 +8,7 @@
             "name": "test",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bazel-bin/test.exe",
+            "program": "${workspaceFolder}/bazel-bin/unit.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
