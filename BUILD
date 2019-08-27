@@ -2,7 +2,8 @@
 
 
 cc_library(
-    name = "syndicate_hdrs",
+    name = "headers",
+    visibility = ["//visibility:public"],
 
     hdrs = glob([
         "src/**/*.h*",
@@ -14,7 +15,6 @@ cc_library(
 
     deps = [
         "@graph//:graph",
-        "@stdext//:stdext",
         "@spdlog//:headers",
         "@boost//:callable_traits",
     ],
@@ -30,10 +30,11 @@ cc_library(
 )
 
 cc_library(
-    name = "syndicate_core",
+    name = "code",
     
     deps = [
-        ":syndicate_hdrs"
+        ":headers",
+        "@stdext//:stdext",
     ],
 
     # temporary for development
@@ -59,7 +60,7 @@ cc_library(
     #    'CULT_CURRENT_PACKAGE=\"org_cultlang_' + 'syndicate' + '\"'
     #],
     copts = select({
-        "@bazel_tools//src/conditions:windows": ["/std:c++17", "/DCULTLANG_TYPES_DLL"],
+        "@bazel_tools//src/conditions:windows": ["/MT", "/std:c++17", "/DCULTLANG_TYPES_DLL"],
         "//conditions:default": ["-std=c++17", "-DCULTLANG_TYPES_DLL"],
     }),
     
@@ -68,7 +69,7 @@ cc_library(
 
 cc_binary(
     name = "Syndicate.dll",
-    deps = [":syndicate_core"],
+    deps = [":code"],
     linkopts = [
         "/ENTRY:syn_DLLMAIN",
     ],
@@ -77,13 +78,13 @@ cc_binary(
 
 cc_binary(
     name = "libSyndicate.dylib",
-    deps = [":syndicate_core"],
+    deps = [":code"],
     linkshared = True,
 )
 
 cc_binary(
     name = "libSyndicate.so",
-    deps = [":syndicate_core"],
+    deps = [":code"],
     linkshared = True,
 )
 
@@ -92,7 +93,7 @@ cc_library(
     visibility = ["//visibility:public"],
 
     deps = [
-        ":syndicate_hdrs"
+        ":headers"
     ],
 
     srcs = select({

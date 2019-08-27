@@ -16,19 +16,6 @@ load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 boost_deps()
 
 ########################
-# External CC
-
-http_archive(
-   name = "rules_foreign_cc",
-   strip_prefix = "rules_foreign_cc-master",
-   url = "https://github.com/bazelbuild/rules_foreign_cc/archive/master.zip",
-   sha256 = "353e41e99f93c0219994a7c4402a80cd04bd044703818d199c66ff82ec4ee85b"
-)
-
-load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
-rules_foreign_cc_dependencies()
-
-########################
 # Catch
 
 http_archive(

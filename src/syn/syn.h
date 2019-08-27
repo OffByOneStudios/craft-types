@@ -92,7 +92,7 @@
 // TODO move to file below
 namespace syn { namespace details { template<typename T> class DefineHelper { public: DefineHelper(CppDefine*) { } }; }}
 
-#include "cpp/DefineHelper.hpp"
+//#include "cpp/DefineHelper.hpp"
 //#include "boot/default_types_c.h"
 
 #include "boot/default_types_cpp.h"
