@@ -165,11 +165,11 @@ namespace syn
 								// intentially casting this to a pointer to a function pointer
 								// function pointers are not guarnteed to fit in pointers
 								// but pointers to function pointers are.
-								(*reinterpret_cast<InstanceDirectDeleter*>(this->_header->manager))(this->_header->memory);
+								(**reinterpret_cast<InstanceDirectDeleter*>(this->_header->manager))(this->_header->memory);
 								return true;
 							case InstanceLifecycle::DeleterHeader:
 								// ditto above
-								(*reinterpret_cast<InstanceHeaderDeleter*>(this->_header->manager))(this->_header);
+								(**reinterpret_cast<InstanceHeaderDeleter*>(this->_header->manager))(this->_header);
 								return true;
 							default:
 								assert(false && "unknown deleter");

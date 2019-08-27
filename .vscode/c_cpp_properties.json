@@ -6,17 +6,14 @@
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/entry",
                 "${workspaceFolder}/test",
-
-                "${workspaceFolder}/bazel-types/external/boost",
-                "${workspaceFolder}/bazel-types/external/catch/single_include",
-                "${workspaceFolder}/bazel-types/external/fmt/include",
-                "${workspaceFolder}/bazel-types/external/spdlog/include",
-                
-                "${workspaceFolder}/bazel-types/external/replxx/include",
-                "${workspaceFolder}/bazel-types/external/pegtl/include",
-                
-                "${workspaceFolder}/bazel-types/external/graph/src",
-                "${workspaceFolder}/bazel-types/external/stdext/src"
+                "${workspaceFolder}/bazel-syndicate/external/boost",
+                "${workspaceFolder}/bazel-syndicate/external/catch/single_include",
+                "${workspaceFolder}/bazel-syndicate/external/fmt/include",
+                "${workspaceFolder}/bazel-syndicate/external/spdlog/include",
+                "${workspaceFolder}/bazel-syndicate/external/replxx/include",
+                "${workspaceFolder}/bazel-syndicate/external/pegtl/include",
+                "${workspaceFolder}/bazel-syndicate/external/graph/src",
+                "${workspaceFolder}/bazel-syndicate/external/stdext/src"
             ],
             "defines": [
                 "_DEBUG",
@@ -28,6 +25,27 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "msvc-x64"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/entry",
+                "${workspaceFolder}/test",
+                "${workspaceFolder}/bazel-syndicate/external/boost",
+                "${workspaceFolder}/bazel-syndicate/external/catch/single_include",
+                "${workspaceFolder}/bazel-syndicate/external/fmt/include",
+                "${workspaceFolder}/bazel-syndicate/external/spdlog/include",
+                "${workspaceFolder}/bazel-syndicate/external/replxx/include",
+                "${workspaceFolder}/bazel-syndicate/external/pegtl/include",
+                "${workspaceFolder}/bazel-syndicate/external/graph/src",
+                "${workspaceFolder}/bazel-syndicate/external/stdext/src"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
         }
     ],
     "version": 4

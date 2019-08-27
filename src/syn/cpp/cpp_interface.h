@@ -287,7 +287,7 @@ namespace syn
 			// TODO? use a friend to initalize this thing?
 		}
 
-		inline operator Graph::Node*() const { return __id.node; }
+		inline operator Graph::Node*() const { return this->node; }
 
 	public:
 		template <typename ...TArgs>
