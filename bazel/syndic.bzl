@@ -4,7 +4,7 @@ def syndic(
         basename,
 
         dll_define,
-        
+
         codename="code",
         headersname="headers",
         modulename="module",
@@ -34,6 +34,7 @@ def syndic(
         deps = [":" + headersname] + code_deps,
 
         srcs = srcs,
+        # TODO: use local defines
         copts = select({
             "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17", "/D" + dll_define],
             "//conditions:default": ["-std=c++17", "-D" + dll_define],

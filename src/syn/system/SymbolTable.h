@@ -17,14 +17,14 @@ namespace syn
             std::map<Symbol, std::string> _idToStr;
 
         public:
-            SymbolTable();
+            CULTLANG_SYNDICATE_EXPORTED SymbolTable();
 
-            size_t count() const;
+            CULTLANG_SYNDICATE_EXPORTED size_t count() const;
 
-            std::string getString(Symbol) const;
-            Symbol getSymbol(std::string const&) const;
+            CULTLANG_SYNDICATE_EXPORTED std::string getString(Symbol) const;
+            CULTLANG_SYNDICATE_EXPORTED Symbol getSymbol(std::string const&) const;
 
-            Symbol require(std::string const&);
+            CULTLANG_SYNDICATE_EXPORTED Symbol require(std::string const&);
         
         public:
 

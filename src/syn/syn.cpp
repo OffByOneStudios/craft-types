@@ -4,6 +4,6 @@
 ** DLL ENTRY
 ******************************************************************************/
 
-#if !defined(SYNDICATE_NO_DLL_ENTRY)
+#if !defined(CULTLANG_SYNDICATE_NODLL)
 #include "syn/dll_entry.inc"
 #endif
