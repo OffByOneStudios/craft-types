@@ -51,7 +51,6 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
         CHECK(inst->size() == std::string("hello").size());
     }
 
-/*
     SECTION( "smart pointer with type erase" )
     {
         instance<> inst;
@@ -61,5 +60,5 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
         CHECK((bool)inst == true);
         REQUIRE(inst.get() != nullptr);
         CHECK(inst.typeId() == syn::type<std::string>::id());
-    }*/
+    }
 }

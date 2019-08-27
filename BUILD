@@ -2,16 +2,45 @@
 
 
 cc_library(
-    name="types",
-    visibility = ["//visibility:public"],
-    hdrs=glob([
+    name = "syndicate_hdrs",
+
+    hdrs = glob([
         "src/**/*.h*",
         "src/types/dll_entry.inc"
     ]),
+    includes = [
+        "src"
+    ],
+
+    deps = [
+        "@graph//:graph",
+        "@stdext//:stdext",
+        "@spdlog//:headers",
+        "@boost//:callable_traits",
+    ],
+
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": [],
+        "//conditions:default": [
+            "-ldl",
+            "-lpthread",
+            "-lstdc++fs",
+        ],
+    }),
+)
+
+cc_library(
+    name = "syndicate_core",
+    
+    deps = [
+        ":syndicate_hdrs"
+    ],
+
+    # temporary for development
     #srcs=glob([
     #    "src/**/*.c*"
     #]),
-    srcs=[
+    srcs = [
         "src/syn/system/SymbolTable.cpp",
         "src/syn/system/TypeStore.cpp",
         "src/syn/system/TypeId.cpp",
@@ -23,66 +52,61 @@ cc_library(
 
         "src/syn/boot/default_types_cpp.cpp",
     ],
-    defines=[
-        "CULTLANG_TYPES_DLL",
-        'CULT_CURRENT_PACKAGE=\"org_cultlang_' + 'syndicate' + '\"'
-    ],
-    includes=[
-        "src"
-    ],
+
+    # pending bazel 0.29 feature
+    #local_defines = [
+    #    "CULTLANG_TYPES_DLL",
+    #    'CULT_CURRENT_PACKAGE=\"org_cultlang_' + 'syndicate' + '\"'
+    #],
     copts = select({
-        "@bazel_tools//src/conditions:windows": ["/std:c++17"],
-        "//conditions:default": ["-std=c++17"],
+        "@bazel_tools//src/conditions:windows": ["/std:c++17", "/DCULTLANG_TYPES_DLL"],
+        "//conditions:default": ["-std=c++17", "-DCULTLANG_TYPES_DLL"],
     }),
     
     alwayslink = True,
-    deps=[
-        "@graph//:graph",
-        "@stdext//:stdext",
-        "@spdlog//:headers",
-        "@boost//:callable_traits",
-    ],
 )
 
 cc_binary(
     name = "Syndicate.dll",
-    deps = [":types"],
+    deps = [":syndicate_core"],
     linkopts = [
         "/ENTRY:syn_DLLMAIN",
-        # /MD
-        "/DEFAULTLIB:msvcprt.lib",
-        "/DEFAULTLIB:ucrtd.lib",
-        "/DEFAULTLIB:vcruntimed.lib",
-        "/DEFAULTLIB:msvcrtd.lib",
-        "/DEFAULTLIB:libvcruntimed.lib",
-        "/DEFAULTLIB:msvcurtd.lib",
-        # system
-        "/DEFAULTLIB:user32.lib",
-        "/DEFAULTLIB:shell32.lib",
-        "/DEFAULTLIB:gdi32.lib",
     ],
     linkshared = True,
 )
 
 cc_binary(
     name = "libSyndicate.dylib",
-    deps = ["types"],
+    deps = [":syndicate_core"],
     linkshared = True,
 )
 
 cc_binary(
     name = "libSyndicate.so",
-    deps = ["types"],
+    deps = [":syndicate_core"],
     linkshared = True,
 )
 
-cc_binary(
-    name = "syndicate_explorer",
-    deps = select({
+cc_library(
+    name = "syndicate",
+    visibility = ["//visibility:public"],
+
+    deps = [
+        ":syndicate_hdrs"
+    ],
+
+    srcs = select({
         "@bazel_tools//src/conditions:windows": ["Syndicate.dll"],
         "@bazel_tools//src/conditions:darwin": ["libSyndicate.dylib"],
         "//conditions:default": ["libSyndicate.so"],
     }),
+
+    alwayslink = True,
+)
+
+cc_binary(
+    name = "syndicate_explorer",
+    deps = [":syndicate"],
     srcs = glob([
         "entry/*.c*",
         "entry/*.h*",
@@ -103,7 +127,7 @@ cc_test(
         "test/unit/**/*.h*"
     ]),
     deps = [
-        "types",
+        ":syndicate",
         "@catch//:single_include",
     ],
     copts = select({
@@ -117,7 +141,7 @@ cc_test(
     includes = ["test"],
     srcs = glob(["test/literate/*.cpp"]),
     deps = [
-        "types",
+        ":syndicate",
        "@catch//:single_include",
     ],
 )
