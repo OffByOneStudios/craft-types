@@ -18,6 +18,9 @@ def syndic(
         includes=[],
         srcs=[],
         hdrs=[],
+
+        # if empty, does not add
+        supportname = "support",
     ):
 
     native.cc_library(
@@ -51,3 +54,18 @@ def syndic(
         module_deps = [":" + headersname],
         dll_linkopts = ["/ENTRY:syn_DLLMAIN"],
     )
+
+    if supportname != None:
+        native.cc_library(
+            name = supportname,
+            visibility = ["//visibility:public"],
+            deps = [":" + headersname] + code_deps,
+
+            srcs = srcs,
+            # TODO: use local defines
+            copts = select({
+                "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17", "/DCULTLANG_SYNDICATE_NODLL"],
+                "//conditions:default": ["-std=c++17", "-DCULTLANG_SYNDICATE_NODLL"],
+            }),
+            linkopts = code_linkopts,
+        )
