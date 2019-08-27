@@ -1,5 +1,27 @@
 # Bazel Build File For Type system
 
+# https://docs.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=vs-2019
+#   In case we have to link dlls ourselves apparently
+# runtime
+#"/DEFAULTLIB:ucrt.lib",
+#"/DEFAULTLIB:vcruntime.lib",
+#"/DEFAULTLIB:libvcruntime.lib",
+#"/DEFAULTLIB:msvcrt.lib",
+#"/DEFAULTLIB:msvcprt.lib",
+# runtime (debug)
+#"/DEFAULTLIB:ucrtd.lib",
+#"/DEFAULTLIB:vcruntimed.lib",
+#"/DEFAULTLIB:msvcrtd.lib",
+#"/DEFAULTLIB:msvcprtd.lib",
+#"/DEFAULTLIB:vcruntimed.lib",
+# system
+#"/DEFAULTLIB:kernel32.lib",
+#"/DEFAULTLIB:user32.lib",
+# other attempts
+#"/DEFAULTLIB:oldnames.lib",
+#"/clr"
+# Was resolved by correclty compiling the /ENTRY: function
+
 
 cc_library(
     name = "headers",
@@ -16,11 +38,13 @@ cc_library(
     deps = [
         "@graph//:graph",
         "@spdlog//:headers",
+        "@stdext//:headers",
         "@boost//:callable_traits",
     ],
 
     linkopts = select({
-        "@bazel_tools//src/conditions:windows": [],
+        "@bazel_tools//src/conditions:windows": [
+        ],
         "//conditions:default": [
             "-ldl",
             "-lpthread",
@@ -52,6 +76,8 @@ cc_library(
         "src/syn/cpp/cpp_interface.cpp",
 
         "src/syn/boot/default_types_cpp.cpp",
+
+        "src/syn/syn.cpp",
     ],
 
     # pending bazel 0.29 feature
@@ -60,7 +86,7 @@ cc_library(
     #    'CULT_CURRENT_PACKAGE=\"org_cultlang_' + 'syndicate' + '\"'
     #],
     copts = select({
-        "@bazel_tools//src/conditions:windows": ["/MT", "/std:c++17", "/DCULTLANG_TYPES_DLL"],
+        "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17", "/DCULTLANG_TYPES_DLL"],
         "//conditions:default": ["-std=c++17", "-DCULTLANG_TYPES_DLL"],
     }),
     
@@ -74,6 +100,17 @@ cc_binary(
         "/ENTRY:syn_DLLMAIN",
     ],
     linkshared = True,
+)
+# from: https://github.com/bazelbuild/bazel/blob/master/examples/windows/dll/windows_dll_library.bzl
+filegroup(
+    name = "Syndicate_import_lib",
+    srcs = [":Syndicate.dll"],
+    output_group = "interface_library",
+)
+cc_import(
+    name = "Syndicate_dll_import",
+    interface_library = ":Syndicate_import_lib",
+    shared_library = ":Syndicate.dll",
 )
 
 cc_binary(
@@ -89,25 +126,28 @@ cc_binary(
 )
 
 cc_library(
-    name = "syndicate",
+    name = "syndicatefoo",
     visibility = ["//visibility:public"],
 
     deps = [
         ":headers"
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:windows": ["Syndicate_dll_import"],
+        "//conditions:default": [],
+    }),
 
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["Syndicate.dll"],
+        "@bazel_tools//src/conditions:windows": [],
         "@bazel_tools//src/conditions:darwin": ["libSyndicate.dylib"],
         "//conditions:default": ["libSyndicate.so"],
     }),
 
-    alwayslink = True,
+    #alwayslink = True,
 )
 
 cc_binary(
     name = "syndicate_explorer",
-    deps = [":syndicate"],
+    deps = [":syndicatefoo"],
     srcs = glob([
         "entry/*.c*",
         "entry/*.h*",
