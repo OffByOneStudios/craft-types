@@ -23,7 +23,8 @@ namespace syn
 	{
 		template<typename T> class DefineHelper;
 
-		typedef void(*CppDefineRunner)(DefineHelper<void> _);
+		template<typename T = void>
+		using CppDefineRunner = void(*)(DefineHelper<T>& _);
 	}
 
 	// should always be static...
@@ -32,16 +33,16 @@ namespace syn
 	public:
 		Graph::Node* node;
 
-		details::CppDefineRunner initer;
+		details::CppDefineRunner<> initer;
 		CppDefineKind kind;
 
 		void* repr;
 
 		// TODO: ifdef debug (or trace?) add line numbers and file names
 
-		inline CppDefine(CppDefineKind kind_, void* repr_ = nullptr, details::CppDefineRunner initer_ = nullptr);
+		inline CppDefine(CppDefineKind kind_, void* repr_ = nullptr, details::CppDefineRunner<> initer_ = nullptr);
 
-		inline CppDefine& operator<< (details::CppDefineRunner initer_);
+		inline CppDefine& operator<< (details::CppDefineRunner<> initer_);
 	};
 
 
@@ -61,7 +62,7 @@ namespace syn
 			: desc(v) { }
 		inline TypePtr(TypeId const& tid)
 			// TODO this is a prop
-			: desc(static_cast<CppDefine const*>(static_cast<Graph::Node*>(tid)->data))
+			: desc(static_cast<CppDefine const*>(static_cast<Graph::Node const*>(tid)->data))
 		{
 			// TODO assert cpp type
 			//assert(identifiers().get(tid).ptr_type);
@@ -88,9 +89,6 @@ namespace syn
 		inline bool operator ==(TypePtr const& that) const { return this->desc == that.desc; }
 		inline bool operator !=(TypePtr const& that) const { return this->desc != that.desc; }
 
-		//
-		// Defined in to_string.cpp
-		//
 		inline std::string toString() const { return asId().toString(); }
 	};
 
@@ -111,7 +109,7 @@ namespace syn
 		static constexpr CppDefineKind kind = CppDefineKind::Unknown;
 		inline static TypePtr desc() { return nullptr; }
 		inline static TypeId id() { return nullptr; }
-		inline static Graph::Node* graphNode() { return nullptr; }
+		inline static Graph::Node const* graphNode() { return nullptr; }
 	};
 
 	template <typename TType>
@@ -120,96 +118,15 @@ namespace syn
 		static constexpr CppDefineKind kind = decltype(type_define<TType>::Definition)::kind;
 		inline static TypePtr desc() { return &type_define<TType>::Definition; }
 		inline static TypeId id() { return desc().asId(); }
-		inline static Graph::Node* graphNode() { return id(); }
+		inline static Graph::Node const* graphNode() { return id(); }
 	};
 
-	/******************************************************************************
-	** CppSystem
-	******************************************************************************/
+}
 
-	class CppSystem final
-	{
-	private:
+#include "CppSystem.h"
 
-		struct _Entry
-		{
-			enum class Kind
-			{
-				StaticDefine,
-				Marker,
-				Warning
-			};
-
-			void* ptr;
-			Kind kind;
-		};
-
-		struct _Entries
-		{
-			std::vector<_Entry> _entries;
-		};
-
-	private:
-		// These first for inlined functions
-		// Graph for this cpp-system (todo: invert this, graph is also a static)
-		TypeStore* _store;
-
-		std::recursive_mutex operation;
-
-		_Entries* _static_entries;
-
-		_Entries* _current_dll_entries;
-		std::map<std::string, _Entries*> _dll_entries;
-		std::set<std::string> _dllsToUpdate;
-		std::set<std::string> _dllsThatWereStatic;
-
-		std::string _lastLoadedDll;
-
-		// 
-		// Lifecycle
-		//
-	private:
-		CppSystem();
-		~CppSystem();
-
-	public:
-		CULTLANG_SYNDICATE_EXPORTED static CppSystem& global_instance();
-
-	private:
-		friend inline void ::syn::dll::boot();
-		friend inline char const* ::syn::dll::_begin(char const*);
-		friend inline void ::syn::dll::_finish(char const*, char const*);
-
-		friend inline void ::syn::dll::load(std::string const&);
-
-		void _init_primeInternalEntries();
-		void _init_insertEntries(_Entries* entries, size_t start);
-		void _init_runEntries(_Entries* entries, size_t start);
-
-		static char const* __dll_region;
-
-		CULTLANG_SYNDICATE_EXPORTED void _init();
-		CULTLANG_SYNDICATE_EXPORTED bool _hasInited();
-		CULTLANG_SYNDICATE_EXPORTED static char const* _begin(char const* name);
-		CULTLANG_SYNDICATE_EXPORTED void _finish(char const* save, char const* name);
-		CULTLANG_SYNDICATE_EXPORTED void _update();
-
-		//
-		// Registry
-		//
-	private:
-		void _addEntry(_Entry &&);
-
-	public:
-		inline TypeStore& types() { return *_store; }
-
-		CULTLANG_SYNDICATE_EXPORTED void _register(CppDefine const*);
-
-		CULTLANG_SYNDICATE_EXPORTED std::string getLastLibraryName();
-		CULTLANG_SYNDICATE_EXPORTED size_t getLibraryCount(std::string const& dll);
-		CULTLANG_SYNDICATE_EXPORTED TypePtr getLibraryEntry(std::string const& dll, size_t index);
-	};
-
+namespace syn
+{
 	inline CppSystem& system()
 	{
 		return CppSystem::global_instance();
@@ -223,14 +140,14 @@ namespace syn
 		return CppSystem::global_instance().types();
 	}
 
-	inline CppDefine::CppDefine(CppDefineKind kind_, void* repr_, details::CppDefineRunner initer_)
+	inline CppDefine::CppDefine(CppDefineKind kind_, void* repr_, details::CppDefineRunner<> initer_)
 	{
 		initer = initer_;
 		kind = kind_;
 		repr = repr_;
 		system()._register(this);
 	}
-	inline CppDefine& CppDefine::operator<< (details::CppDefineRunner initer_) { initer = initer_; return *this; }
+	inline CppDefine& CppDefine::operator<< (details::CppDefineRunner<> initer_) { initer = initer_; return *this; }
 
 	/******************************************************************************
 	** Define
@@ -245,24 +162,42 @@ namespace syn
 		: public CppDefine
 	{
 	public:
-		static const CppDefineKind kind = CppDefineKind::Unknown;
+		static constexpr CppDefineKind kind = CppDefineKind::Unknown;
 
-		Define(details::CppDefineRunner init)
+		Define(details::CppDefineRunner<> init)
 			: CppDefine(kind, this, init)
 			{ }
 	};
 
 	// should always be static...
+	// TODO do discrimination
 	template <typename TType>
 	class Define final
 		: public CppDefine
 	{
 	public:
-		static const CppDefineKind kind = CppDefineKind::Struct;
+		static constexpr CppDefineKind kind = CppDefineKind::Struct;
+		typedef TType Type;
 
-		Define(details::CppDefineRunner init)
-			: CppDefine(kind, this, init)
+		Define(details::CppDefineRunner<Define<TType>> init)
+			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
 			{ }
+	};
+
+	/******************************************************************************
+	** Module
+	******************************************************************************/
+
+	class Module final
+		: public CppDefine
+		, public ModuleBase
+	{
+	public:
+		static constexpr CppDefineKind kind = CppDefineKind::Module;
+
+		inline Module(details::CppDefineRunner<Module> init)
+			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
+		{ }
 	};
 
 	/******************************************************************************
@@ -278,10 +213,10 @@ namespace syn
 		TDispatcher _dispatch;
 
 	public:
-		static const CppDefineKind kind = CppDefineKind::Dispatcher;
+		static constexpr CppDefineKind kind = CppDefineKind::Dispatcher;
 
-		inline Multimethod(details::CppDefineRunner init)
-			: CppDefine(kind, this, init)
+		inline Multimethod(details::CppDefineRunner<Multimethod<TDispatcher>> init)
+			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
 		{
 			// TODO? throw exception if not static time
 			// TODO? use a friend to initalize this thing?

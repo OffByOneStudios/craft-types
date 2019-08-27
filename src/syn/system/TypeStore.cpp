@@ -23,6 +23,7 @@ std::string TypeStore::describeNode(Node const* n)
 	std::ostringstream ss;
 	//Node const* nt = (Node const*)n->type.node;
 
+				ss << "id             :  " << std::hex << TypeId(n) << std::endl;
 				ss << "__ptr          :  " << std::hex << n << std::endl;
 
 	/*
@@ -72,19 +73,12 @@ std::string TypeStore::describeNode(Node const* n)
 	_graph.forAllPropsOnNode(n, [&](auto p)
 	{
 		prop_count += 1;
-		//auto type_local_name = _graph.firstPropOfTypeOnNode<Type_Property_LocalIdentifier>((Node const*)p->type.node);
 		void* printer = nullptr;
 
-		ss << "   .";
-		//if (type_local_name == nullptr)
-			ss << "Unknown";
-		//else
-		//	ss << type_local_name->local_identifier;
-
-		ss << ":" << std::endl << "        ";
+		ss << "   ." << TypeId(p->type) << ": ";
 
 		if (printer == nullptr)
-			ss << "Error[Property Type does not have Edge to printer Implementation]";
+			ss << "error'Property Type does not have Edge to printer Implementation'";
 
 		ss << std::endl;
 	});

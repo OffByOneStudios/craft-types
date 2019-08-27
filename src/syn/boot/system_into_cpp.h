@@ -26,6 +26,14 @@ namespace syn
 }
 
 /******************************************************************************
+** /syn/core/module_graph.h
+******************************************************************************/
+namespace syn
+{
+    template<> struct type_define<::syn::core::PModuleSymbol> { CULTLANG_SYNDICATE_EXPORTED static syn::Define<::syn::core::PModuleSymbol> Definition; };
+}
+
+/******************************************************************************
 ** /syn/core/cpp_graph.h
 ******************************************************************************/
 namespace syn

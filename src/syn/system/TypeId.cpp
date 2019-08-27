@@ -29,13 +29,13 @@ std::string TypeId::toString() const
 
 	std::string from, name;
 
-	/*
-	auto cpp_name = thread_store().onlyPropOfTypeOnNode<Type_Property_CppIdentifier>(_node);
-	if (cpp_name)
+	auto module_name = thread_store().g().onlyPropOfTypeOnNode<core::PModuleSymbol>(_node);
+	if (module_name)
 	{
-		return cpp_name->cpp_identifier;
+		return fmt::format("<UnknownModule>:{0}", thread_store().s().getString(module_name->symbol));
 	}
 
+	/*
 	auto ns_name = thread_store().onlyPropOfTypeOnNode<Type_Property_NamespaceIdentifier>(_node);
 	if (ns_name)
 	{

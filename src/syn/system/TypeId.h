@@ -10,16 +10,16 @@ namespace syn
 	struct TypeId final
 	{
 	private:
-		Graph::Node* _node;
+		Graph::Node const* _node;
 
 	public:
 		inline TypeId() : _node(nullptr) {}
 		inline TypeId(details::TypeIdForwardDeclare t) : _node(reinterpret_cast<Graph::Node*>(t.node)) { }
-		inline TypeId(Graph::Node* n) : _node(n) { }
-		inline TypeId(uintptr_t v) : _node(reinterpret_cast<Graph::Node*>(v)) {}
+		inline TypeId(Graph::Node const* n) : _node(n) { }
+		inline TypeId(uintptr_t v) : _node(reinterpret_cast<Graph::Node const*>(v)) {}
 
-		inline operator Graph::Node*() const { return reinterpret_cast<Graph::Node*>(_node); }
-		inline operator details::TypeIdForwardDeclare() const { return { _node }; }
+		inline operator Graph::Node const*() const { return _node; }
+		inline operator details::TypeIdForwardDeclare() const { return { const_cast<Graph::Node*>(_node) }; }
 		inline operator uintptr_t() const { return (uintptr_t)_node; }
 
 		inline bool operator <(TypeId const& that) const { return this->_node < that._node; }
@@ -40,9 +40,6 @@ namespace syn
 			return isExactType(that_type);
 		}
 
-		//
-		// Defined in to_string.cpp
-		//
 		CULTLANG_SYNDICATE_EXPORTED std::string toString() const;
 	};
 

@@ -36,12 +36,28 @@ int main(int argc, char** argv)
 		{
 			if (input == "dump")
 			{
-				global_store().g().forAllNodes(
-					[](Graph::Node const* n)
+				if (has_args)
 				{
-					std::cout << std::string(80, '=') << std::endl;
-					std::cout << global_store().describeNode(n) << std::endl;
-				});
+
+				}
+				else
+				{
+					global_store().g().forAllNodes(
+						[](Graph::Node const* n)
+					{
+						std::cout << std::string(80, '=') << std::endl;
+						std::cout << global_store().describeNode(n) << std::endl;
+					});
+				}
+			}
+			if (input == "symbols")
+			{
+				std::cout << std::endl << "Symbols: ";
+				for (int i = 1; i <= global_store().s().count(); ++i)
+				{
+					std::cout << global_store().s().getString((Symbol)i);
+				}
+				std::cout << "." << std::endl;
 			}
 			else if (input == "load")
 			{

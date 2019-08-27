@@ -8,5 +8,5 @@ using namespace syn;
 
 decltype(syn::type_define<::syn::core::PCppDefine>::Definition) syn::type_define<::syn::core::PCppDefine>::Definition(
 	[](auto _) {
-
+		_.name("C++Define");
 	});

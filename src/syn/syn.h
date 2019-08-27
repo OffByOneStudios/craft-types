@@ -36,15 +36,17 @@
 #include "system/Symbol.hpp"
 #include "system/SymbolTable.h"
 
-#include "system/Graph.hpp" /* Graph (and dependents) */
+#include "system/Graph.hpp" /* Graph (and support machinery) */
 
-#include "system/TypeStore.h" /* TypeStore */
-#include "system/TypeId.h" /* TypeId */
+#include "system/TypeStore.h"
+#include "system/TypeId.h"
 
+#include "system/ModuleBase.h"
 
 // graph //////////////////////////////////////////////////////////////////////
 
 #include "core/system_graph.h"
+#include "core/module_graph.h"
 
 //#include "system/expression/expression.h"
 //#include "system/expression/queries.h"
@@ -89,10 +91,7 @@
 ** Boot Runtime Library
 ******************************************************************************/
 
-// TODO move to file below
-namespace syn { namespace details { template<typename T> class DefineHelper { public: DefineHelper(CppDefine*) { } }; }}
-
-//#include "cpp/DefineHelper.hpp"
+#include "cpp/DefineHelper.hpp"
 //#include "boot/default_types_c.h"
 
 #include "boot/default_types_cpp.h"

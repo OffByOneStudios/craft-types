@@ -1,15 +1,22 @@
 #pragma once
 #include "syn/syn.h"
 
-/* This is the description of the graph library and it's helpers.
+/* This is the instantiation of the graph library and it's helpers.
  * 
+ * Most of the interesting code lives in the graph library, the majority of this file is a song
+ * and dance to get the Grph to use self referencing types.
  */
 
 namespace syn
 {
+	/******************************************************************************
+	** prelude
+	******************************************************************************/
+
     namespace details
     {
         // A helper struct, so we can forward declare TypeId into the graph
+		// also provides *mutable* access.
         struct TypeIdForwardDeclare
         {
             void* node;
@@ -18,8 +25,8 @@ namespace syn
                 : node(nullptr)
             { }
 
-            inline TypeIdForwardDeclare(void* node)
-                : node(node)
+            inline TypeIdForwardDeclare(void const* node)
+                : node(const_cast<void*>(node))
             { }
 
             inline bool operator ==(TypeIdForwardDeclare const& that) const { return this->node == that.node; }
@@ -103,4 +110,16 @@ namespace syn
 			return (T*) v;
 		}
 	}
+
+	/******************************************************************************
+	** epilouge
+	******************************************************************************/
+
+    namespace details
+    {
+		inline Graph::Node* node(TypeIdForwardDeclare id)
+		{
+			return reinterpret_cast<Graph::Node*>(id.node);
+		}
+    }
 }
