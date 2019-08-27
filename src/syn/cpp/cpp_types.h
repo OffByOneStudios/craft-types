@@ -56,7 +56,7 @@ namespace types
 #pragma clang diagnostic pop
 #endif
 
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Node_CppFunction);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Property_CppIdentifier);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Property_CppStaticDescription);
-CRAFT_TYPE_DECLARE(CRAFT_TYPES_EXPORTED, syn::Type_Edge_CppLegacyImplements);
+CRAFT_TYPE_DECLARE(CULTLANG_SYNDICATE_EXPORTED, syn::Type_Node_CppFunction);
+CRAFT_TYPE_DECLARE(CULTLANG_SYNDICATE_EXPORTED, syn::Type_Property_CppIdentifier);
+CRAFT_TYPE_DECLARE(CULTLANG_SYNDICATE_EXPORTED, syn::Type_Property_CppStaticDescription);
+CRAFT_TYPE_DECLARE(CULTLANG_SYNDICATE_EXPORTED, syn::Type_Edge_CppLegacyImplements);

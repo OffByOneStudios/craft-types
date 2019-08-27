@@ -173,7 +173,7 @@ namespace syn
 		~CppSystem();
 
 	public:
-		CRAFT_TYPES_EXPORTED static CppSystem& global_instance();
+		CULTLANG_SYNDICATE_EXPORTED static CppSystem& global_instance();
 
 	private:
 		friend inline void ::syn::dll::boot();
@@ -188,11 +188,11 @@ namespace syn
 
 		static char const* __dll_region;
 
-		CRAFT_TYPES_EXPORTED void _init();
-		CRAFT_TYPES_EXPORTED bool _hasInited();
-		CRAFT_TYPES_EXPORTED static char const* _begin(char const* name);
-		CRAFT_TYPES_EXPORTED void _finish(char const* save, char const* name);
-		CRAFT_TYPES_EXPORTED void _update();
+		CULTLANG_SYNDICATE_EXPORTED void _init();
+		CULTLANG_SYNDICATE_EXPORTED bool _hasInited();
+		CULTLANG_SYNDICATE_EXPORTED static char const* _begin(char const* name);
+		CULTLANG_SYNDICATE_EXPORTED void _finish(char const* save, char const* name);
+		CULTLANG_SYNDICATE_EXPORTED void _update();
 
 		//
 		// Registry
@@ -203,11 +203,11 @@ namespace syn
 	public:
 		inline TypeStore& types() { return *_store; }
 
-		CRAFT_TYPES_EXPORTED void _register(CppDefine const*);
+		CULTLANG_SYNDICATE_EXPORTED void _register(CppDefine const*);
 
-		CRAFT_TYPES_EXPORTED std::string getLastLibraryName();
-		CRAFT_TYPES_EXPORTED size_t getLibraryCount(std::string const& dll);
-		CRAFT_TYPES_EXPORTED TypePtr getLibraryEntry(std::string const& dll, size_t index);
+		CULTLANG_SYNDICATE_EXPORTED std::string getLastLibraryName();
+		CULTLANG_SYNDICATE_EXPORTED size_t getLibraryCount(std::string const& dll);
+		CULTLANG_SYNDICATE_EXPORTED TypePtr getLibraryEntry(std::string const& dll, size_t index);
 	};
 
 	inline CppSystem& system()

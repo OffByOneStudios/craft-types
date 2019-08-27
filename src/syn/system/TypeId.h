@@ -43,7 +43,7 @@ namespace syn
 		//
 		// Defined in to_string.cpp
 		//
-		CRAFT_TYPES_EXPORTED std::string toString() const;
+		CULTLANG_SYNDICATE_EXPORTED std::string toString() const;
 	};
 
 	const static TypeId None = nullptr;

@@ -20,8 +20,8 @@ namespace syn
 		TypeStore(TypeStore const&) = delete;
 
 	public:
-		CRAFT_TYPES_EXPORTED TypeStore();
-		CRAFT_TYPES_EXPORTED ~TypeStore();
+		CULTLANG_SYNDICATE_EXPORTED TypeStore();
+		CULTLANG_SYNDICATE_EXPORTED ~TypeStore();
 
 		inline Graph& g() { return _graph; }
 		inline Graph const& g() const { return _graph; }
@@ -29,6 +29,6 @@ namespace syn
 		inline SymbolTable& s() { return _symbols; }
 		inline SymbolTable const& s() const { return _symbols; }
 
-		CRAFT_TYPES_EXPORTED std::string describeNode(Graph::Node const*);
+		CULTLANG_SYNDICATE_EXPORTED std::string describeNode(Graph::Node const*);
 	};
 }

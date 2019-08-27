@@ -34,16 +34,16 @@ namespace types
 		ExpressionAny() = default;
 		~ExpressionAny() = default;
 	public:
-		CRAFT_TYPES_EXPORTED static ExpressionAny Value;
+		CULTLANG_SYNDICATE_EXPORTED static ExpressionAny Value;
 
-		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
-		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual TypeId kind() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
-		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::string displayString() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
-		CRAFT_TYPES_EXPORTED virtual void destroy() override;
-		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void destroy() override;
+		CULTLANG_SYNDICATE_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	struct ExpressionVoid final
@@ -53,16 +53,16 @@ namespace types
 		ExpressionVoid() = default;
 		~ExpressionVoid() = default;
 	public:
-		CRAFT_TYPES_EXPORTED static ExpressionVoid Value;
+		CULTLANG_SYNDICATE_EXPORTED static ExpressionVoid Value;
 
-		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
-		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual TypeId kind() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
-		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::string displayString() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
-		CRAFT_TYPES_EXPORTED virtual void destroy() override;
-		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void destroy() override;
+		CULTLANG_SYNDICATE_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	struct ExpressionBottom final
@@ -72,16 +72,16 @@ namespace types
 		ExpressionBottom() = default;
 		~ExpressionBottom() = default;
 	public:
-		CRAFT_TYPES_EXPORTED static ExpressionBottom Value;
+		CULTLANG_SYNDICATE_EXPORTED static ExpressionBottom Value;
 
-		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
-		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual TypeId kind() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
-		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::string displayString() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
-		CRAFT_TYPES_EXPORTED virtual void destroy() override;
-		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void destroy() override;
+		CULTLANG_SYNDICATE_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	/******************************************************************************
@@ -94,18 +94,18 @@ namespace types
 	public:
 		Graph::Node* node;
 
-		CRAFT_TYPES_EXPORTED ExpressionConcrete(TypeId node);
-		CRAFT_TYPES_EXPORTED ~ExpressionConcrete();
+		CULTLANG_SYNDICATE_EXPORTED ExpressionConcrete(TypeId node);
+		CULTLANG_SYNDICATE_EXPORTED ~ExpressionConcrete();
 
 	public:
-		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
-		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual TypeId kind() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
-		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::string displayString() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
-		CRAFT_TYPES_EXPORTED virtual void destroy() override;
-		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void destroy() override;
+		CULTLANG_SYNDICATE_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	/******************************************************************************
@@ -119,18 +119,18 @@ namespace types
 		IExpression* input;
 		IExpression* output;
 
-		CRAFT_TYPES_EXPORTED ExpressionArrow(IExpression* input, IExpression* output);
-		CRAFT_TYPES_EXPORTED ~ExpressionArrow();
+		CULTLANG_SYNDICATE_EXPORTED ExpressionArrow(IExpression* input, IExpression* output);
+		CULTLANG_SYNDICATE_EXPORTED ~ExpressionArrow();
 
 	public:
-		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
-		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual TypeId kind() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
-		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::string displayString() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
-		CRAFT_TYPES_EXPORTED virtual void destroy() override;
-		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void destroy() override;
+		CULTLANG_SYNDICATE_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	/******************************************************************************
@@ -144,18 +144,18 @@ namespace types
 		std::vector<IExpression*> entries;
 		IExpression* varType;
 
-		CRAFT_TYPES_EXPORTED ExpressionTuple(std::vector<IExpression*> const&, IExpression* varType = nullptr);
-		CRAFT_TYPES_EXPORTED ~ExpressionTuple();
+		CULTLANG_SYNDICATE_EXPORTED ExpressionTuple(std::vector<IExpression*> const&, IExpression* varType = nullptr);
+		CULTLANG_SYNDICATE_EXPORTED ~ExpressionTuple();
 
 	public:
-		CRAFT_TYPES_EXPORTED virtual TypeId kind() const override;
-		CRAFT_TYPES_EXPORTED virtual void* ptr() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual TypeId kind() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void* ptr() const override;
 
-		CRAFT_TYPES_EXPORTED virtual std::string displayString() const override;
-		CRAFT_TYPES_EXPORTED virtual std::vector<IExpression*> const* children() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::string displayString() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual std::vector<IExpression*> const* children() const override;
 
-		CRAFT_TYPES_EXPORTED virtual void destroy() override;
-		CRAFT_TYPES_EXPORTED virtual IExpression* clone() const override;
+		CULTLANG_SYNDICATE_EXPORTED virtual void destroy() override;
+		CULTLANG_SYNDICATE_EXPORTED virtual IExpression* clone() const override;
 	};
 
 	/******************************************************************************
@@ -169,13 +169,13 @@ namespace types
 		bool _building;
 
 	public:
-		CRAFT_TYPES_EXPORTED ExpressionStore();
-		CRAFT_TYPES_EXPORTED ExpressionStore(IExpression* ptr);
-		CRAFT_TYPES_EXPORTED ExpressionStore(ExpressionStore const&);
-		CRAFT_TYPES_EXPORTED ~ExpressionStore();
+		CULTLANG_SYNDICATE_EXPORTED ExpressionStore();
+		CULTLANG_SYNDICATE_EXPORTED ExpressionStore(IExpression* ptr);
+		CULTLANG_SYNDICATE_EXPORTED ExpressionStore(ExpressionStore const&);
+		CULTLANG_SYNDICATE_EXPORTED ~ExpressionStore();
 
-		CRAFT_TYPES_EXPORTED void finish();
+		CULTLANG_SYNDICATE_EXPORTED void finish();
 
-		CRAFT_TYPES_EXPORTED IExpression const* root()  const;
+		CULTLANG_SYNDICATE_EXPORTED IExpression const* root()  const;
 	};
 }}

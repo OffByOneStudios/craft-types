@@ -1,3 +1,5 @@
+workspace(name = "cultlang_syndicate")
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
@@ -39,9 +41,9 @@ http_archive(
 # stdext
 http_archive(
     name = "stdext",
-    urls = ["https://github.com/cultlang/stdext/archive/v1.0.0.zip"],
-    strip_prefix = "stdext-1.0.0",
-    sha256 = "2c008ad1de4e520c2b7ef24ea6d20e677afd1cf411274cb89da7aa08e853b3f1",
+    urls = ["https://github.com/cultlang/stdext/archive/v1.0.1.zip"],
+    strip_prefix = "stdext-1.0.1",
+    sha256 = "342aa6f86d12e5e01262e3b2b15a3843ff6cd19c747bab6189a20c0e66754796",
 )
 
 ########################
