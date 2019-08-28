@@ -31,7 +31,14 @@ __attribute__ ((visibility ("internal")))
 __attribute__((constructor (1000)))
 void _syn_DLLMAIN_begin()
 {
-	::syn::_begin(CULT_CURRENT_PACKAGE);
+	const char* pkg = 
+		#ifdef CULT_CURRENT_PACKAGE
+		CULT_CURRENT_PACKAGE
+		#else
+		"<undefined>"
+		#endif
+		;
+	::syn::dll::_begin(pkg);
 }
 
 /*__attribute__ ((visibility ("internal"))) 

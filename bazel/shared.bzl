@@ -61,7 +61,7 @@ def crossplatform_shared(
         linkshared = True,
     )
 
-    so_name = basename + ".so"
+    so_name = "lib" + basename + ".so"
     native.cc_binary(
         name = so_name,
         deps = [":code"],
@@ -80,6 +80,6 @@ def crossplatform_shared(
         srcs = select({
             "@bazel_tools//src/conditions:windows": [],
             "@bazel_tools//src/conditions:darwin": [dylib_name],
-            "//conditions:default": [so_name],
+            "//conditions:default": [":" + so_name],
         }),
     )

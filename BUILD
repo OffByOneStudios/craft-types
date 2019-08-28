@@ -5,7 +5,7 @@ syndic(
     
     hdrs = glob([
         "src/**/*.h*",
-        "src/types/dll_entry.inc"
+        "src/syn/dll_entry.inc"
     ]),
     includes = [
         "src"

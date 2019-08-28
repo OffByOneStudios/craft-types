@@ -46,11 +46,16 @@ namespace details
     class DefineHelperLibraryNaming
         : protected DefineHelperLibraryBase<TFinal>
     {
+	protected:
+		using DefineHelperLibraryBase<TFinal>::g;
+		using DefineHelperLibraryBase<TFinal>::s;
+		using DefineHelperLibraryBase<TFinal>::node;
+
     public:
         inline DefineHelperLibraryNaming& name(std::string const& name)
         {
             auto sym = s().require(name);
-            g().addProp<core::PModuleSymbol>({ sym }, node());
+            g().template addProp<core::PModuleSymbol>({ sym }, node());
             return *this;
         }
         inline DefineHelperLibraryNaming& space(std::string const& name)
@@ -58,10 +63,9 @@ namespace details
             // TODO build namespace objects
             return *this;
         }
-        inline DefineHelperLibraryNaming& module(Module const&)
+        inline DefineHelperLibraryNaming& module(Module const& module)
         {
-            auto sym = s().require(name);
-            g().addProp<core::PModuleSymbol>({ sym }, node());
+			
             return *this;
         }
     };
