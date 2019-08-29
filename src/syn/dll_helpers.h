@@ -11,6 +11,16 @@ namespace dll {
 		system()._init();
 	}
 
+	inline void update()
+	{
+		system()._update();
+	}
+
+	inline void reset()
+	{
+		system()._clear();
+	}
+
 	inline char const* _begin(char const* name)
 	{
 		return CppSystem::_begin(name);

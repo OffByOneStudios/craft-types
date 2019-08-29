@@ -20,6 +20,17 @@ namespace core
     public:
         void* dispatcher;
 	};
+	
+	/******************************************************************************
+	** PCompositionalCast (typenode NStruct)
+	******************************************************************************/
+
+	// Placed on an IsA edge to describe how it can be casted between.
+	struct PCompositionalCast final
+	{
+	public:
+		ptrdiff_t offset;
+	};
 
 }}
 #ifdef __clang__

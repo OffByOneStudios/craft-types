@@ -24,6 +24,8 @@ namespace syn
 		inline void _finish(char const* save, char const* name = nullptr);
 
 		inline void boot();
+		inline void update();
+		inline void reset();
 		inline void load(std::string const& path);
 	}
 }

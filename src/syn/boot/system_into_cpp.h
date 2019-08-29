@@ -26,6 +26,15 @@ namespace syn
 }
 
 /******************************************************************************
+** /syn/core/syndicate_graph.h
+******************************************************************************/
+namespace syn
+{
+    template<> struct type_define<::syn::core::NDispatcher> { CULTLANG_SYNDICATE_EXPORTED static syn::Define<::syn::core::NDispatcher> Definition; };
+    template<> struct type_define<::syn::core::PCompositionalCast> { CULTLANG_SYNDICATE_EXPORTED static syn::Define<::syn::core::PCompositionalCast> Definition; };
+}
+
+/******************************************************************************
 ** /syn/core/module_graph.h
 ******************************************************************************/
 namespace syn

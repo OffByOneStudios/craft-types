@@ -54,7 +54,6 @@ Now we generate some system helpers:
 * `/Syndicate/Core/Void` a node for zero width types (`Bits` 0, is-a `Type`).
 
 * `syn::core::EPointsAt` (`/Syndicate/Core/PointsAt`) An edge which describes what a reference-esque type instance would point at in memory (e.g. for dereferenceability) can be repurposed by other single object dereferencable containers (`Empty`, is-a `MetaEdge`).
-* `syn::core::EComposedOf` (`/Syndicate/Core/ComposedOf`) An edge which describes what a chunk of memory is composed of type wise, contains an offset into the memory (`Struct`, is-a `MetaEdge`).
 
 * `/Syndicate/Core/UniversalReference` a node for an arbitrary pointer (`Reference`, is-a `Type`, points-at `Void`).
 

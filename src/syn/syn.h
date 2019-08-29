@@ -47,6 +47,7 @@
 
 #include "core/system_graph.h"
 #include "core/module_graph.h"
+#include "core/syndicate_graph.h"
 
 //#include "system/expression/expression.h"
 //#include "system/expression/queries.h"

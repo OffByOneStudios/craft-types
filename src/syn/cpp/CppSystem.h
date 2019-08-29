@@ -9,24 +9,25 @@ namespace syn
 
 	class CppSystem final
 	{
-	private:
+	public:
+		enum class EntryKind
+		{
+			StaticDefine,
+			Marker,
+			Warning
+		};
 
+	private:
 		struct _Entry
 		{
-			enum class Kind
-			{
-				StaticDefine,
-				Marker,
-				Warning
-			};
-
 			void* ptr;
-			Kind kind;
+			EntryKind kind;
 		};
 
 		struct _Entries
 		{
-			std::vector<_Entry> _entries;
+			std::string name;
+			std::vector<_Entry> entries;
 		};
 
 	private:
@@ -36,10 +37,11 @@ namespace syn
 
 		std::recursive_mutex operation;
 
-		_Entries* _static_entries;
+		_Entries* _staticEntries;
 
-		_Entries* _current_dll_entries;
-		std::map<std::string, _Entries*> _dll_entries;
+		_Entries* _currentDllEntries;
+		std::vector<_Entries*> _dllEntries;
+		std::map<std::string, size_t> _dllNames;
 		std::set<std::string> _dllsToUpdate;
 		std::set<std::string> _dllsThatWereStatic;
 
@@ -57,6 +59,8 @@ namespace syn
 
 	private:
 		friend inline void ::syn::dll::boot();
+		friend inline void ::syn::dll::update();
+		friend inline void ::syn::dll::reset();
 		friend inline char const* ::syn::dll::_begin(char const*);
 		friend inline void ::syn::dll::_finish(char const*, char const*);
 
@@ -72,7 +76,9 @@ namespace syn
 		CULTLANG_SYNDICATE_EXPORTED bool _hasInited();
 		CULTLANG_SYNDICATE_EXPORTED static char const* _begin(char const* name);
 		CULTLANG_SYNDICATE_EXPORTED void _finish(char const* save, char const* name);
+		
 		CULTLANG_SYNDICATE_EXPORTED void _update();
+		CULTLANG_SYNDICATE_EXPORTED void _clear();
 
 		//
 		// Registry
@@ -87,8 +93,21 @@ namespace syn
 
 		CULTLANG_SYNDICATE_EXPORTED void _register(CppDefine const*);
 
-		CULTLANG_SYNDICATE_EXPORTED std::string getLastLibraryName();
-		CULTLANG_SYNDICATE_EXPORTED size_t getLibraryCount(std::string const& dll);
-		CULTLANG_SYNDICATE_EXPORTED TypePtr getLibraryEntry(std::string const& dll, size_t index);
+		//
+		// Entries and DLLs
+		//
+	public:
+		struct Entry
+		{
+			EntryKind kind;
+			TypePtr type;
+			std::string message;
+		};
+
+		CULTLANG_SYNDICATE_EXPORTED size_t getLibraryCount() const;
+		CULTLANG_SYNDICATE_EXPORTED std::string getLibraryName(size_t dll_index) const;
+		CULTLANG_SYNDICATE_EXPORTED std::string getCurrentLibraryName() const;
+		CULTLANG_SYNDICATE_EXPORTED size_t getLibraryEntryCount(size_t dll_index) const;
+		CULTLANG_SYNDICATE_EXPORTED Entry getLibraryEntry(size_t dll_index, size_t entry_index) const;
 	};
 }

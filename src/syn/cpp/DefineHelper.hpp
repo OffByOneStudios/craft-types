@@ -14,10 +14,10 @@ namespace details
         { }
     };
 
-    template<typename TFinal>
+    template<typename TFinal, typename TLibrary>
     class DefineHelperLibraryBase
     {
-    protected:
+    public:
         inline DefineHelperActual& actual()
         {
             return *(DefineHelperActual*)(TFinal*)this;
@@ -38,18 +38,17 @@ namespace details
             return actual().define->node;
         }
 
-    public:
-
     };
 
     template<typename TFinal>
     class DefineHelperLibraryNaming
-        : protected DefineHelperLibraryBase<TFinal>
+        : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryNaming<TFinal>>
     {
 	protected:
-		using DefineHelperLibraryBase<TFinal>::g;
-		using DefineHelperLibraryBase<TFinal>::s;
-		using DefineHelperLibraryBase<TFinal>::node;
+        typedef DefineHelperLibraryBase<TFinal, DefineHelperLibraryNaming<TFinal>> Base;
+		using Base::g;
+		using Base::s;
+		using Base::node;
 
     public:
         inline DefineHelperLibraryNaming& name(std::string const& name)
@@ -70,16 +69,54 @@ namespace details
         }
     };
 
+    template<typename TFinal, typename TType>
+    class DefineHelperLibraryStructure
+        : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryStructure<TFinal, TType>>
+    {
+	protected:
+        typedef DefineHelperLibraryBase<TFinal, DefineHelperLibraryStructure<TFinal, TType>> Base;
+		using Base::g;
+		using Base::s;
+		using Base::node;
+
+    protected:
+        template<typename TType>
+        inline constexpr ptrdiff_t _inherits_offset()
+        {
+            auto original_pointer = uintptr_t(0x10000);
+            auto casted_pointer = reinterpret_cast<uintptr_t>((TType*)reinterpret_cast<TFinal*>(original_pointer));
+            return original_pointer - casted_pointer;
+        }
+
+    public:
+        template<typename TType>
+        inline typename std::enable_if<syn::type<TType>::kind == CppDefineKind::Struct,
+            void>::type inherits()
+        {
+            auto e = g().template addEdge<core::EIsA>({ }, { node(), syn::type<TType>::graphNode() });
+            g().template addProp<core::PCompositionalCast>({ _inherits_offset<TType>() }, e);
+        }
+    };
+
     template<typename TFinal, typename TDispatch, typename Enable=void>
     class DefineHelperPolicy
-        : public DefineHelperLibraryNaming<TFinal>
     {
         static_assert("No policy for that type pattern, try using Define<void> instead.");
     };
 
     template<typename TFinal>
-    class DefineHelperPolicy<TFinal, void, void> // TODO why is it dispatching here
-        : public DefineHelperLibraryNaming<TFinal>
+    class DefineHelperPolicy<TFinal, void, void>
+        : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, void, void>>
+    {
+
+    };
+
+    template<typename TFinal, typename TType>
+    class DefineHelperPolicy<TFinal, TType,
+        std::enable_if_t<TType::kind == CppDefineKind::Struct>>
+        : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
+        , public DefineHelperLibraryNaming<TFinal>
+        , public DefineHelperLibraryStructure<TFinal, typename TType::Type>
     {
 
     };

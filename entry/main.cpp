@@ -50,7 +50,34 @@ int main(int argc, char** argv)
 					});
 				}
 			}
-			if (input == "symbols")
+			else if (input == "system-entries")
+			{
+				auto dll_count = system().getLibraryCount();
+				for (int i = 0; i < dll_count; ++i)
+				{
+					auto dll_name = system().getLibraryName(i);
+					std::cout << std::endl << "=== DLL: " << dll_name << std::endl;
+
+					auto entry_count = system().getLibraryEntryCount(i);
+					for (int j = 0; j < entry_count; ++j)
+					{
+						auto entry = system().getLibraryEntry(i, j);
+						switch (entry.kind)
+						{
+							case CppSystem::EntryKind::Marker:
+								std::cout << "INFO: " << entry.message << std::endl;
+								break;
+							case CppSystem::EntryKind::Warning:
+								std::cout << "WARN: " << entry.message << std::endl;
+								break;
+							case CppSystem::EntryKind::StaticDefine:
+								std::cout << "TYPE: " << entry.type << std::endl;
+								break;
+						}
+					}
+				}
+			}
+			else if (input == "symbols")
 			{
 				std::cout << std::endl << "Symbols: ";
 				for (int i = 1; i <= global_store().s().count(); ++i)
@@ -65,13 +92,12 @@ int main(int argc, char** argv)
 				std::filesystem::current_path(abs.remove_filename());
 
 				syn::dll::load(abs.string());
-				auto last_dll = system().getLastLibraryName();
-				auto end = system().getLibraryCount(last_dll);
 
-				for (size_t i =0; i < end; ++i)
-					std::cout << global_store().describeNode(system().getLibraryEntry(last_dll, i).asId()) << std::endl;
+				auto last_dll_index = system().getLibraryCount() - 1;
+				auto last_dll_name = system().getLibraryName(last_dll_index);
+				auto last_dll_count = system().getLibraryEntryCount(last_dll_index);
 
-				std::cout << std::endl << "loaded " << (end) << " types." << std::endl;
+				std::cout << std::endl << "loaded " << last_dll_name << " with " << last_dll_count << " types." << std::endl;
 			}
 			else
 				throw stdext::exception("unknown command `{0}`", input);

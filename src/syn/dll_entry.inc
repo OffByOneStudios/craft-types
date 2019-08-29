@@ -27,9 +27,11 @@ extern "C" BOOLEAN __stdcall syn_DLLMAIN(LPVOID var1, DWORD var2, LPVOID var3)
 #endif
 
 #ifdef __GNUC__
-__attribute__ ((visibility ("internal"))) 
+__attribute__((visibility ("internal"))) 
 __attribute__((constructor (1000)))
-void _syn_DLLMAIN_begin()
+// runs after other static initalizers
+// we use a "clean up after other initializers" strategy here.
+void _syn_DLLMAIN_finish()
 {
 	const char* pkg = 
 		#ifdef CULT_CURRENT_PACKAGE
@@ -38,13 +40,6 @@ void _syn_DLLMAIN_begin()
 		"<undefined>"
 		#endif
 		;
-	::syn::dll::_begin(pkg);
+	::syn::dll::_finish(nullptr, pkg);
 }
-
-/*__attribute__ ((visibility ("internal"))) 
-__attribute__((constructor (2000))) 
-void _syn_DLLMAIN_finish()
-{
-	::syn::_finish(nullptr, CULT_CURRENT_PACKAGE);
-}*/
 #endif

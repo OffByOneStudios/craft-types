@@ -95,7 +95,6 @@ namespace core
 	public:
 		void (*fptr)();
 	};
-
 }}
 #ifdef __clang__
 #pragma clang diagnostic pop

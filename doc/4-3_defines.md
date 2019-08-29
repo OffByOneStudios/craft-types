@@ -79,6 +79,10 @@ A variant of `_.method` which:
 * Adds an edge property to mark it as a `Constructor` if the given function returns a pointer (or smart pointer) to the object.
 * Adds an edge property to mark it as a `MemoryInitalizer` if the given function takes a `void*`, this would require the size of the object to be set. This could be done through a lambda calling placement new.
 
+### inherits
+
+Creats an is-a edge and add an edge propety to mark it as structural inheritence.
+
 ## Module
 
 The module syntax has a number of important helpers. But most importantly, the module is the only set of helpers that get guarantees about *when* they run. All other define helpers are run in arbitrary order (often lazily).
