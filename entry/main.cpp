@@ -89,9 +89,14 @@ int main(int argc, char** argv)
 			else if (input == "load")
 			{
 				auto abs = std::filesystem::absolute(args);
-				std::filesystem::current_path(abs.remove_filename());
+				auto filename = abs.filename();
 
-				syn::dll::load(abs.string());
+				std::cout << std::endl << "changing directory to " << abs.string() << std::endl;
+				abs.remove_filename();
+				std::filesystem::current_path(abs);
+
+				std::cout << std::endl << "attempting load of " << filename.string() << std::endl;
+				syn::dll::load(filename.string());
 
 				auto last_dll_index = system().getLibraryCount() - 1;
 				auto last_dll_name = system().getLibraryName(last_dll_index);
