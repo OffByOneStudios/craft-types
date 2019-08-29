@@ -25,6 +25,8 @@ This places the symbol into the named namespace.
 
 Some conventions may prefer to do this in the module definition instead.
 
+This function can be called multiple times to place the object in multiple namespaces. However it is recommended to do this using modules or information defines instead.
+
 ### detectLifecycle
 
 ```c++

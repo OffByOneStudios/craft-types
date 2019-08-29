@@ -80,21 +80,21 @@ namespace details
 		using Base::node;
 
     protected:
-        template<typename TType>
+        template<typename TOtherType>
         inline constexpr ptrdiff_t _inherits_offset()
         {
             auto original_pointer = uintptr_t(0x10000);
-            auto casted_pointer = reinterpret_cast<uintptr_t>((TType*)reinterpret_cast<TFinal*>(original_pointer));
+            auto casted_pointer = reinterpret_cast<uintptr_t>((TOtherType*)reinterpret_cast<TType*>(original_pointer));
             return original_pointer - casted_pointer;
         }
 
     public:
-        template<typename TType>
-        inline typename std::enable_if<syn::type<TType>::kind == CppDefineKind::Struct,
+        template<typename TOtherType>
+        inline typename std::enable_if<syn::type<TOtherType>::kind == CppDefineKind::Struct,
             void>::type inherits()
         {
-            auto e = g().template addEdge<core::EIsA>({ }, { node(), syn::type<TType>::graphNode() });
-            g().template addProp<core::PCompositionalCast>({ _inherits_offset<TType>() }, e);
+            auto e = g().template addEdge<core::EIsA>({ }, { node(), syn::type<TOtherType>::graphNode() });
+            g().template addProp<core::PCompositionalCast>({ _inherits_offset<TOtherType>() }, e);
         }
     };
 
