@@ -27,26 +27,6 @@ Some conventions may prefer to do this in the module definition instead.
 
 This function can be called multiple times to place the object in multiple namespaces. However it is recommended to do this using modules or information defines instead.
 
-### detectLifecycle
-
-```c++
-_.detectLifecycle();
-```
-
-This automatically detects the lifecycle of the object. It is strongly recommended for all users to prefer this method of lifecycle definition.
-
-* Calls `_.destructor` with a wrapper around the destructor if found (e.g. not deleted). Handles virtual destructors.
-* Calls `_.copier` with a wrapper around the copy constructor if found.
-* Calls `_.mover` with a wrapper around the move constructer if found.
-* Calls `_.assigner` with a wrapper around the `=` operator (both moveable and non-moveable, with appropriate modifiers) if found.
-* Calls `_.constructor` with a wrapper around the *default constructor* if found.
-* Calls `_.abstract` if the class is abstract.
-* Calls `_.final` if the class is final.
-* If none of the above are found (besides final), sets the type as a plain old data type, with initial memory zero (e.g. as if `_.plainOldData()` was called).
-* This also sets the memory size of the object with `_.size`. This behavior is optional by passing in `syn::define::DetectLifecycleFlags::NoSize`. The runtime uses size as a minimum size, and for allocation of memory. Pointers to types do not use it, and hence it is safe for a derived type to masquerade as a base type as long as the base type does not expose copy, move, or assignment operators that will break if used on the derived type.
-
-**Note**: Users must still call `_.constructor` if they have custom constructors they want to expose (including named static ones).
-
 ### member
 
 ```c++
@@ -83,7 +63,53 @@ A variant of `_.method` which:
 
 ### inherits
 
-Creats an is-a edge and add an edge propety to mark it as structural inheritence.
+Creates an is-a edge and add an edge propety to mark it as structural inheritence. The other type must be a structure type.
+
+### implements
+
+Creates an is-a edge and add an edge propety to mark it as implementation.
+
+#### byCasting
+
+Tells the system that a pointer casting operation (on the existing memory) is enough to get the implementation.
+
+#### byBuilding
+
+Tells the system that an arbitrary build operation (potentially resulting in a new instance) must be done.
+
+### plainOldData
+
+```c++
+_.plainOldData();
+```
+
+This informs the system that the type has no special construction, copy, move, or destruction rules and the memory may be freely copied, deleted and written over. By default the system assumes it may only perform the operations that it finds in the system (e.g. movers, copiers, and so on). With this flag, the assumption is reversed, and it instead assumes it can do anything it wants *except* those that are in the system.
+
+#### strict
+
+```c++
+_.plainOldData().strict();
+```
+
+This will register errors if the given type is *not* plain old data.
+
+### detectLifecycle
+
+```c++
+_.detectLifecycle();
+```
+
+This automatically detects the lifecycle of the object. It is strongly recommended for all users to prefer this method of lifecycle definition.
+
+* Calls `_.destructor` with a wrapper around the destructor if found (e.g. not deleted). Handles virtual destructors.
+* Calls `_.assigner` with a wrapper around the `=` operator (both moveable and non-moveable, with appropriate modifiers) if found.
+* Calls `_.constructor` with a wrapper around the *default constructor* if found. As well as the copy and move constructors.
+* Calls `_.abstract` if the class is abstract.
+* Calls `_.final` if the class is final.
+* If all of the above are trivial sets the type as a plain old data type (e.g. as if `_.plainOldData()` was called).
+* This also sets the memory size of the object with `_.size`. This behavior is optional by passing in `syn::define::DetectLifecycleFlags::NoSize`. The runtime uses size as a minimum size, and for allocation of memory. Pointers to types do not use it, and hence it is safe for a derived type to masquerade as a base type as long as the base type does not expose copy, move, or assignment operators that will break if used on the derived type.
+
+**Note**: Users must still call `_.constructor` if they have custom constructors they want to expose (including named static ones).
 
 ## Module
 

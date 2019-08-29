@@ -89,12 +89,98 @@ namespace details
         }
 
     public:
+        template<typename TMemberType>
+        inline typename std::enable_if<true,
+            void>::type member(std::string const& name, TMemberType TType::* memptr)
+        {
+
+        }
+
+        template<typename FMethod>
+        inline typename std::enable_if<true,
+            void>::type method(std::string const& name, FMethod methptr)
+        {
+            
+        }
+
+    public:
         template<typename TOtherType>
         inline typename std::enable_if<syn::type<TOtherType>::kind == CppDefineKind::Struct,
             void>::type inherits()
         {
             auto e = g().template addEdge<core::EIsA>({ }, { node(), syn::type<TOtherType>::graphNode() });
             g().template addProp<core::PCompositionalCast>({ _inherits_offset<TOtherType>() }, e);
+        }
+
+        template<typename TOtherType>
+        inline typename std::enable_if<syn::type<TOtherType>::kind == CppDefineKind::Struct,
+            void>::type implements()
+        {
+            auto e = g().template addEdge<core::EIsA>({ }, { node(), syn::type<TOtherType>::graphNode() });
+            //g().template addProp<core::PCompositionalCast>({ _inherits_offset<TOtherType>() }, e);
+        }
+
+    public:
+        template<typename FConstructor>
+        inline void constructor(FConstructor constructor)
+        {
+
+        }
+
+        template<typename... TArgs>
+        inline void constructor()
+        {
+
+        }
+
+        inline void destructor()
+        {
+
+        }
+        
+        template<typename TOtherType>
+        inline void assigner()
+        {
+
+        }
+
+    public:
+        inline void detectLifecycle()
+        {
+            if constexpr (std::is_default_constructible_v<TType>) constructor();
+            if constexpr (std::is_destructible_v<TType>) destructor();
+
+            if constexpr (std::is_copy_constructible_v<TType>) constructor<TType const&>();
+            if constexpr (std::is_move_constructible_v<TType>) constructor<TType &&>();
+            if constexpr (std::is_copy_assignable_v<TType>) assigner<TType const&>();
+            if constexpr (std::is_move_constructible_v<TType>) assigner<TType &&>();
+
+            
+
+        }
+
+        inline void plainOldData()
+        {
+            
+        }
+    };
+
+    template<typename TFinal, typename TType>
+    class DefineHelperLibraryMultimethod
+        : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal, TType>>
+    {
+	protected:
+        typedef DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal, TType>> Base;
+		using Base::g;
+		using Base::s;
+		using Base::node;
+
+    public:
+        template<typename TMethodType>
+        inline typename std::enable_if<true,
+            void>::type method(TMethodType methptr)
+        {
+            
         }
     };
 
@@ -113,10 +199,33 @@ namespace details
 
     template<typename TFinal, typename TType>
     class DefineHelperPolicy<TFinal, TType,
-        std::enable_if_t<TType::kind == CppDefineKind::Struct>>
+        std::enable_if_t<
+            TType::kind == CppDefineKind::Struct
+            && !std::is_class<typename TType::Type>::value>>
+        : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
+        , public DefineHelperLibraryNaming<TFinal>
+    {
+
+    };
+
+    template<typename TFinal, typename TType>
+    class DefineHelperPolicy<TFinal, TType,
+        std::enable_if_t<
+            TType::kind == CppDefineKind::Struct
+            && std::is_class<typename TType::Type>::value>>
         : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
         , public DefineHelperLibraryNaming<TFinal>
         , public DefineHelperLibraryStructure<TFinal, typename TType::Type>
+    {
+
+    };
+
+    template<typename TFinal, typename TType>
+    class DefineHelperPolicy<TFinal, TType,
+        std::enable_if_t<TType::kind == CppDefineKind::Dispatcher>>
+        : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
+        , public DefineHelperLibraryNaming<TFinal>
+        , public DefineHelperLibraryMultimethod<TFinal, typename TType::Type>
     {
 
     };
