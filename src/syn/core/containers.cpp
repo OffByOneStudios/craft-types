@@ -27,7 +27,7 @@ decltype(syn::type_define<::syn::core::Vector>::Definition) syn::type_define<::s
 		_.name("Vector");
         _.subtypes(AbstractVector);
 
-        _.method<&Vector::size>(count);
+        _.template method<&Vector::size>(count);
 	});
 
 decltype(syn::type_define<::syn::core::ByteVector>::Definition) syn::type_define<::syn::core::ByteVector>::Definition(
@@ -35,7 +35,7 @@ decltype(syn::type_define<::syn::core::ByteVector>::Definition) syn::type_define
 		_.name("ByteVector");
         _.subtypes(AbstractVector);
         
-        _.method<&ByteVector::size>(count);
+        _.template method<&ByteVector::size>(count);
 	});
 
 decltype(syn::core::AbstractDictionary) syn::core::AbstractDictionary(
@@ -49,7 +49,7 @@ decltype(syn::type_define<::syn::core::Dictionary>::Definition) syn::type_define
 		_.name("Dictionary");
         _.subtypes(AbstractDictionary);
 
-        _.method<&Dictionary::size>(count);
+        _.template method<&Dictionary::size>(count);
 	});
 
 decltype(syn::type_define<::syn::core::StringDictionary>::Definition) syn::type_define<::syn::core::StringDictionary>::Definition(
@@ -57,7 +57,7 @@ decltype(syn::type_define<::syn::core::StringDictionary>::Definition) syn::type_
 		_.name("StringDictionary");
         _.subtypes(AbstractDictionary);
 
-        _.method<&StringDictionary::size>(count);
+        _.template method<&StringDictionary::size>(count);
 	});
 
 decltype(syn::type_define<::syn::core::SymbolDictionary>::Definition) syn::type_define<::syn::core::SymbolDictionary>::Definition(
@@ -65,7 +65,7 @@ decltype(syn::type_define<::syn::core::SymbolDictionary>::Definition) syn::type_
 		_.name("SymbolDictionary");
         _.subtypes(AbstractDictionary);
 
-        _.method<&SymbolDictionary::size>(count);
+        _.template method<&SymbolDictionary::size>(count);
 	});
 
 decltype(syn::core::AbstractSet) syn::core::AbstractSet(
@@ -79,5 +79,5 @@ decltype(syn::type_define<::syn::core::Set>::Definition) syn::type_define<::syn:
 		_.name("Set");
         _.subtypes(AbstractSet);
 
-        _.method<&Set::size>(count);
+        _.template method<&Set::size>(count);
 	});

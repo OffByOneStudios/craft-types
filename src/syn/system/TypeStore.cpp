@@ -24,6 +24,7 @@ std::string TypeStore::describeNode(Node const* n)
 	//Node const* nt = (Node const*)n->type.node;
 
 				ss << "id             :  " << std::hex << TypeId(n) << std::endl;
+				ss << "__meta         :  " << std::hex << TypeId(n->type) << std::endl;
 				ss << "__ptr          :  " << std::hex << n << std::endl;
 
 	/*
@@ -49,24 +50,48 @@ std::string TypeStore::describeNode(Node const* n)
 	{
 		label_count += 1;
 	});
-				ss << "   #Labels     :  " << label_count << std::endl;
+				ss << "#Labels     :  " << label_count << std::endl;
 
 	ss << std::endl << "--------------------------------- Edges ----------" << std::endl;
 	int edge_count = 0;
-	_graph.forAllEdgesOnNode(n, [&](auto e)
+	_graph.forAllEdgesOnNode(n, [&](auto* e)
 	{
 		edge_count += 1;
-		//auto type_local_name = _graph.firstPropOfTypeOnNode<Type_Property_LocalIdentifier>((Node const*)e->type.node);
-		
-		ss << "   >";
-		//if (type_local_name == nullptr)
-			ss << "Unknown";
-		//else
-		//	ss << type_local_name->local_identifier;
+		void* printer = nullptr;
 
+		if (graph::edgeIsOutgoing<Graph>(n, e)) ss << "   ----- [";
+		else if (graph::edgeIsIncoming<Graph>(n, e)) ss << "   <---- [";
+		else ss << "   ????? [";
+		
+		ss << TypeId(e->type) << ": ";
+
+		if (printer == nullptr)
+			ss << "error'Property Type does not have Edge to printer Implementation'";
+
+		if (graph::edgeIsOutgoing<Graph>(n, e)) ss << "] ---->   ";
+		else if (graph::edgeIsIncoming<Graph>(n, e)) ss << "] -----   ";
+		else ss << "] ?????   ";
+
+
+		if (e->nodes.size() == 2)
+		{
+			if (e->nodes[0] == n) ss << TypeId((Graph::Node*)e->nodes[1]);
+			else if (e->nodes[1] == n) ss << TypeId((Graph::Node*)e->nodes[0]);
+			else ss << " -?";
+		}
+		else
+		{
+			_graph.forAllNodesInEdge(e, [&](auto en)
+			{
+				if (en != n)
+				{
+					ss << std::endl << "      - " << TypeId(en->type);
+				}
+			});
+		}
 		ss << std::endl;
 	});
-				ss << "   #Edges      :  " << edge_count << std::endl;
+				ss << "#Edges      :  " << edge_count << std::endl;
 
 	ss << std::endl << "--------------------------------- Properties -----" << std::endl;
 	int prop_count = 0;
@@ -82,7 +107,7 @@ std::string TypeStore::describeNode(Node const* n)
 
 		ss << std::endl;
 	});
-				ss << "   #Props      :  " << prop_count << std::endl;
+				ss << "#Props      :  " << prop_count << std::endl;
 
 	ss << std::endl;
 

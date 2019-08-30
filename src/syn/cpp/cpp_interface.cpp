@@ -110,6 +110,8 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 					}
 				}
 			} break;
+
+			default: break;
 		}
 	}
 }

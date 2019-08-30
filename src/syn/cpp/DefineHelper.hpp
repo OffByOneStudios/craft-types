@@ -89,40 +89,44 @@ namespace details
 		using Base::node;
 
     public:
-        inline void subtypes(syn::Abstract& abstract)
+        inline void subtypes(syn::Abstract const& abstract_)
         {
-            g().template addEdge<core::EIsA>({ }, { node(), abstract.node });
+            g().template addEdge<core::EIsA>({ }, { node(), abstract_.node });
         }
     };
 
     namespace _details
     {
-        template<typename TType, typename TReturn = void, typename TArgs = void> struct _t_register_class_function;
+        template<typename TClassType, typename TReturn = void, typename TArgs = void> struct _t_register_class_function;
 
-        template<typename TType, typename TReturn, typename TCallee, typename... TArgs>
-        struct _t_register_class_function <TType, TReturn, std::tuple<TCallee, TArgs...>>
+        template<typename TClassType, typename TReturn, typename TThat, typename... TArgs>
+        struct _t_register_class_function <TClassType, TReturn, std::tuple<TThat, TArgs...>>
         {
-            template<TReturn ( TType::*PFunc ) ( TArgs... )>
-            static inline void _exec()
+			typedef TReturn ( TClassType::* TPFunc ) ( TArgs... );
+            template<auto PFunc>
+			static inline TReturn _trampoline(TClassType* ttype, TArgs... args)
+			{
+				return (ttype->*PFunc)( std::forward<TArgs>(args)... );
+			}
+
+            template<auto PFunc, typename TDefine>
+            static inline void _exec(TDefine* define)
             {
-                auto n = g().template addNode<core::NFunction>({
-                    reinterpret_cast<void (*)()>((TReturn (*)(TType*, TArgs...))
-                        [](TType *ttype, TArgs args...) -> TReturn {
-                            return ttype->*PFunc(std::forward<TArgs>(args)...)
-                        }) });
+				void (*fnptr)() = reinterpret_cast<void (*)()>( (TReturn (*)(TClassType*, TArgs...))&_trampoline<PFunc> );
+                auto n = define->g().template addNode<core::NFunction>({ fnptr });
             }
         };
-        template<typename TType>
-        struct _t_register_class_function <TType, void, void>
+        template<typename TClassType>
+        struct _t_register_class_function <TClassType, void, void>
         {
-            template<auto PFunc>
-            static inline void _exec()
+            template<auto PFunc, typename TDefine>
+            static inline void _exec(TDefine* define)
             {
                 return _t_register_class_function<
-                        TType,
-                        typename boost::callable_traits::return_type<decltype(PFunc)>::type,
-                        typename boost::callable_traits::args<decltype(PFunc)>::type
-                    >::_exec<PFunc>();
+                        TClassType,
+                        boost::callable_traits::return_type_t<decltype(PFunc)>,
+                        boost::callable_traits::args_t<decltype(PFunc)>
+                    >::template _exec<PFunc, TDefine>(define);
             }
         };
     }
@@ -136,6 +140,8 @@ namespace details
 		using Base::g;
 		using Base::s;
 		using Base::node;
+
+		template<typename TClassType, typename TReturn, typename TArgs> friend struct _details::_t_register_class_function;
 
     protected:
         template<typename TOtherType>
@@ -154,17 +160,17 @@ namespace details
 
         }
 
-        template<typename PMethod>
+        template<auto PMethod>
         inline typename std::enable_if<true,
             void>::type method(std::string const& name)
         {
-            _details::_t_register_class_function<TType>::_exec<decltype(PMethod), PMethod>()
+            _details::_t_register_class_function<TType>::template _exec<PMethod>(this);
         }
         template<auto PMethod, typename TMulti>
         inline typename std::enable_if<TMulti::kind == CppDefineKind::Dispatcher,
             void>::type method(TMulti& method)
         {
-            //_details::_t_register_class_function<TType>::_exec<PMethod>();
+            _details::_t_register_class_function<TType>::template _exec<PMethod>(this);
         }
         
         template<typename FMethod>

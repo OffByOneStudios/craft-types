@@ -42,7 +42,9 @@
                 "${workspaceFolder}/bazel-syndicate/external/graph/src",
                 "${workspaceFolder}/bazel-syndicate/external/stdext/src"
             ],
-            "defines": [],
+            "defines": [
+                "CULTLANG_SYNDICATE_DLL"
+            ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17",
