@@ -98,8 +98,14 @@ namespace syn
 	** type definitions
 	******************************************************************************/
 
-	template<typename TType>
+	template<typename TType, typename Enable = void>
 	struct type_define;
+
+    template<typename T>
+    struct type_define<typename T, std::void_t<typename T::Definition>>
+    {
+        inline static decltype(T::Definition)& Definition = T::Definition;
+    };
 
 	template<>
 	struct type<void>
@@ -120,7 +126,6 @@ namespace syn
 		inline static TypeId id() { return desc().asId(); }
 		inline static Graph::Node const* graphNode() { return id(); }
 	};
-
 }
 
 #include "CppSystem.h"
