@@ -7,6 +7,14 @@
 */
 
 /******************************************************************************
+** /syn/system/Symbol.h
+******************************************************************************/
+namespace syn
+{
+    // Defined in /syn/system/SymbolTable.cpp
+    template<> struct type_define<::syn::Symbol> { CULTLANG_SYNDICATE_EXPORTED static syn::Define<::syn::Symbol> Definition; };
+}
+/******************************************************************************
 ** /syn/core/system_graph.h
 ******************************************************************************/
 namespace syn

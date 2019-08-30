@@ -58,3 +58,13 @@ CRAFT_TYPE_DEFINE(syn::TypeStore)
 	_.defaults();
 }
 */
+
+/******************************************************************************
+** Symbol
+******************************************************************************/
+syn::Define<syn::Symbol> syn::type_define<syn::Symbol>::Definition(
+	[](auto _) {
+		_.name("Symbol");
+        
+        _.detectLifecycle();
+	});

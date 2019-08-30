@@ -94,8 +94,8 @@
 ******************************************************************************/
 
 #include "cpp/DefineHelper.hpp"
-//#include "boot/default_types_c.h"
 
+#include "boot/default_types_c.h"
 #include "boot/default_types_cpp.h"
 
 #include "boot/system_into_cpp.h"

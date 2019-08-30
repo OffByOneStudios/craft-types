@@ -27,6 +27,7 @@ syndic(
 
         "src/syn/cpp/cpp_interface.cpp",
 
+        "src/syn/boot/default_types_c.cpp",
         "src/syn/boot/default_types_cpp.cpp",
 
         "src/syn/syn.cpp",
