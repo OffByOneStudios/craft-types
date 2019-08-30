@@ -12,13 +12,24 @@ namespace syn {
 namespace core
 {
 	/******************************************************************************
-	** NDispatcher (NReference)
+	** NDispatcher (typenode NReference)
 	******************************************************************************/
 
 	struct NDispatcher final
 	{
     public:
-        void* dispatcher;
+        void* dispatcher_state;
+	};
+
+	/******************************************************************************
+	** EUsingDispatcherFunction (typenode NEmpty)
+	******************************************************************************/
+
+	struct EUsingDispatcherFunction final
+	{
+	private:
+		// Unused
+		uintptr_t _reserved;
 	};
 	
 	/******************************************************************************

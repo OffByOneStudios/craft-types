@@ -225,6 +225,12 @@ namespace syn
 			// TODO? throw exception if not static time
 			// TODO? use a friend to initalize this thing?
 		}
+
+		template<typename TReturn = void, typename... TArgs>
+		TReturn invoke(TArgs &&... args)
+		{
+
+		}
 	};
 
 	/******************************************************************************

@@ -73,7 +73,7 @@ namespace syn
 					return (TypeId) this->_header->concrete;
 				}
 
-				uint32_t incref()
+				inline uint32_t incref()
 				{
 					assert(this->_header != nullptr && "Can only incref live instances");
 					assert((this->_header->lifecycle &= InstanceLifecycle::ModeReferenceCounted)
@@ -82,7 +82,7 @@ namespace syn
 					return *(this->_header->lifecycle) += 1;
 				}
 
-				uint32_t decref()
+				inline uint32_t decref()
 				{
 					assert(this->_header != nullptr && "Can only decref live instances");
 					assert((this->_header->lifecycle &= InstanceLifecycle::ModeReferenceCounted)
@@ -101,6 +101,26 @@ namespace syn
 						return *this->_header->lifecycle;
 					else
 						return -1;
+				}
+
+			public:
+				template<typename T>
+				inline instance<T> as()
+				{
+					if (is_a(this->_header->type, type<T>::id()))
+						return instance<T>(this->_header);
+					else
+						return instance<>();
+				}
+
+				template<typename T>
+				inline instance<T> cast()
+				{
+					auto res = as<T>();
+					if (res)
+						return res;
+					else
+						throw stdext::exception("Bad cast of {0} to {1}.", this->_header->type, type<T>::id());
 				}
 			};
 		};

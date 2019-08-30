@@ -1,1 +1,0 @@
-This folder contains all the expression types. Where the graph holds entries of types, methods, traits, and generic information for those. The expression library allows for the description of sets of types.

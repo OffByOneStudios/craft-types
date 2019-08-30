@@ -12,8 +12,8 @@
                 "${workspaceFolder}/bazel-syndicate/external/spdlog/include",
                 "${workspaceFolder}/bazel-syndicate/external/replxx/include",
                 "${workspaceFolder}/bazel-syndicate/external/pegtl/include",
-                "${workspaceFolder}/bazel-syndicate/external/graph/src",
-                "${workspaceFolder}/bazel-syndicate/external/stdext/src"
+                "${workspaceFolder}/bazel-syndicate/external/cultlang_graph/src",
+                "${workspaceFolder}/bazel-syndicate/external/cultlang_stdext/src"
             ],
             "defines": [
                 "_DEBUG",
@@ -39,8 +39,8 @@
                 "${workspaceFolder}/bazel-syndicate/external/spdlog/include",
                 "${workspaceFolder}/bazel-syndicate/external/replxx/include",
                 "${workspaceFolder}/bazel-syndicate/external/pegtl/include",
-                "${workspaceFolder}/bazel-syndicate/external/graph/src",
-                "${workspaceFolder}/bazel-syndicate/external/stdext/src"
+                "${workspaceFolder}/bazel-syndicate/external/cultlang_graph/src",
+                "${workspaceFolder}/bazel-syndicate/external/cultlang_stdext/src"
             ],
             "defines": [
                 "CULTLANG_SYNDICATE_DLL"

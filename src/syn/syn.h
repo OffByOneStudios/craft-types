@@ -41,6 +41,8 @@
 #include "system/TypeStore.h"
 #include "system/TypeId.h"
 
+#include "system/dispatch.h"
+
 #include "system/ModuleBase.h"
 
 // graph //////////////////////////////////////////////////////////////////////
@@ -48,9 +50,6 @@
 #include "core/system_graph.h"
 #include "core/module_graph.h"
 #include "core/syndicate_graph.h"
-
-//#include "system/expression/expression.h"
-//#include "system/expression/queries.h"
 
 #include "system/epilogue.h"
 
@@ -78,10 +77,13 @@
 #include "core/cpp_graph.h"
 #include "core/containers.h"
 
-/*#include "system/runtime/GenericInvoke.hpp"
+// dispatch ///////////////////////////////////////////////////////////////////
 
-#include "system/SimpleDispatcher.hpp"
+#include "cpp/dispatch/GenericInvoke.hpp"
+#include "cpp/dispatch/BasicDispatcher.hpp"
+//#include "cpp/dispatch/SimpleDispatcher.hpp"
 
+/*
 
 //#include "cpp/graph.hpp"
 #include "cpp/cpp_types.h"
