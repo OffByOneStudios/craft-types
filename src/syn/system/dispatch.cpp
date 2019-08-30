@@ -5,10 +5,10 @@ using namespace syn;
 
 bool syn::is_a(TypeId most_specific, TypeId less_specific)
 {
-    auto res = graph::query(&thread_store().g())
-        .v(most_specific)
-        .in([](auto e) { return e->type == type<core::EIsA>::id(); })
-        .run();
+    //auto res = graph::query(&thread_store().g())
+    //    .v(most_specific)
+        //.in([](auto e) { return e->type == type<core::EIsA>::id(); })
+    //    .run();
 
     return most_specific == less_specific;
 }

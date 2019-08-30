@@ -105,9 +105,15 @@ namespace syn
 
 			public:
 				template<typename T>
+				inline bool is()
+				{
+					return is_a(this->_header->concrete, type<T>::id());
+				}
+
+				template<typename T>
 				inline instance<T> as()
 				{
-					if (is_a(this->_header->type, type<T>::id()))
+					if (is<T>())
 						return instance<T>(this->_header);
 					else
 						return instance<>();
@@ -120,7 +126,7 @@ namespace syn
 					if (res)
 						return res;
 					else
-						throw stdext::exception("Bad cast of {0} to {1}.", this->_header->type, type<T>::id());
+						throw stdext::exception("Cannot cast {0} to {1}.", TypeId(this->_header->concrete), type<T>::id());
 				}
 			};
 		};

@@ -62,3 +62,19 @@ TEST_CASE( "syn::instance<T>", "[syn::CppReferenceCounted]" )
         CHECK(inst.typeId() == syn::type<std::string>::id());
     }
 }
+
+TEST_CASE( "syn::instance<> casting", "[syn::CppReferenceCounted]" )
+{
+    test_require_syn_boot();
+    
+    SECTION( "can cast to direct" )
+    {
+        instance<> inst = instance<std::string>::make("hello");
+
+        REQUIRE(inst.isNull() == false);
+        REQUIRE(inst.typeId() == syn::type<std::string>::id());
+        CHECK(inst.is<std::string>());
+        CHECK(inst.as<std::string>().isNull() == false);
+        CHECK(inst.cast<std::string>().isNull() == false);
+    }
+}

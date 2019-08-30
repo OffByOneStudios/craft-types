@@ -17,6 +17,7 @@ syndic(
         "src/syn/system/SymbolTable.cpp",
         "src/syn/system/TypeStore.cpp",
         "src/syn/system/TypeId.cpp",
+        "src/syn/system/dispatch.cpp",
         "src/syn/system/ModuleBase.cpp",
 
         "src/syn/core/system_graph.cpp",
