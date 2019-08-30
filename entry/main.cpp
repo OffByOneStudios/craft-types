@@ -79,10 +79,10 @@ int main(int argc, char** argv)
 			}
 			else if (input == "symbols")
 			{
-				std::cout << std::endl << "Symbols: ";
+				std::cout << std::endl << "Symbols:";
 				for (int i = 1; i <= global_store().s().count(); ++i)
 				{
-					std::cout << global_store().s().getString((Symbol)i);
+					std::cout << " " << global_store().s().getString((Symbol)i);
 				}
 				std::cout << "." << std::endl;
 			}

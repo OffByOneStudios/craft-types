@@ -23,6 +23,7 @@ syndic(
         "src/syn/core/module_graph.cpp",
         "src/syn/core/syndicate_graph.cpp",
         "src/syn/core/cpp_graph.cpp",
+        "src/syn/core/containers.cpp",
 
         "src/syn/cpp/cpp_interface.cpp",
 

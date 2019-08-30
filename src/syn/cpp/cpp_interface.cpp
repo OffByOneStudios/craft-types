@@ -90,7 +90,7 @@ void CppSystem::_init_insertEntries(_Entries* entries, size_t start)
 					} break;
 					case CppDefineKind::Dispatcher:
 					{
-						//sd->node = _store->g().addNode<Type_Node_Multimethod>({ });
+						sd->node = _store->g().addNode<core::NDispatcher>({ });
 					} break;
 					case CppDefineKind::Module:
 					{

@@ -4,6 +4,12 @@
 namespace syn {
 namespace details
 {
+    struct define_error
+        : stdext::exception
+    {
+        using exception::exception;
+    };
+
     class DefineHelperActual
     {
     public:
@@ -35,7 +41,10 @@ namespace details
 
         inline Graph::Node* node()
         {
-            return actual().define->node;
+            auto n = actual().define->node;
+            if (n == nullptr)
+                throw define_error("node not pre-created...");
+            return n;
         }
 
     };
@@ -69,6 +78,55 @@ namespace details
         }
     };
 
+    template<typename TFinal>
+    class DefineHelperLibraryTyping
+        : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryTyping<TFinal>>
+    {
+	protected:
+        typedef DefineHelperLibraryBase<TFinal, DefineHelperLibraryTyping<TFinal>> Base;
+		using Base::g;
+		using Base::s;
+		using Base::node;
+
+    public:
+        inline void subtypes(syn::Abstract& abstract)
+        {
+            g().template addEdge<core::EIsA>({ }, { node(), abstract.node });
+        }
+    };
+
+    namespace _details
+    {
+        template<typename TType, typename TReturn = void, typename TArgs = void> struct _t_register_class_function;
+
+        template<typename TType, typename TReturn, typename TCallee, typename... TArgs>
+        struct _t_register_class_function <TType, TReturn, std::tuple<TCallee, TArgs...>>
+        {
+            template<TReturn ( TType::*PFunc ) ( TArgs... )>
+            static inline void _exec()
+            {
+                auto n = g().template addNode<core::NFunction>({
+                    reinterpret_cast<void (*)()>((TReturn (*)(TType*, TArgs...))
+                        [](TType *ttype, TArgs args...) -> TReturn {
+                            return ttype->*PFunc(std::forward<TArgs>(args)...)
+                        }) });
+            }
+        };
+        template<typename TType>
+        struct _t_register_class_function <TType, void, void>
+        {
+            template<auto PFunc>
+            static inline void _exec()
+            {
+                return _t_register_class_function<
+                        TType,
+                        typename boost::callable_traits::return_type<decltype(PFunc)>::type,
+                        typename boost::callable_traits::args<decltype(PFunc)>::type
+                    >::_exec<PFunc>();
+            }
+        };
+    }
+
     template<typename TFinal, typename TType>
     class DefineHelperLibraryStructure
         : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryStructure<TFinal, TType>>
@@ -96,9 +154,28 @@ namespace details
 
         }
 
+        template<typename PMethod>
+        inline typename std::enable_if<true,
+            void>::type method(std::string const& name)
+        {
+            _details::_t_register_class_function<TType>::_exec<decltype(PMethod), PMethod>()
+        }
+        template<auto PMethod, typename TMulti>
+        inline typename std::enable_if<TMulti::kind == CppDefineKind::Dispatcher,
+            void>::type method(TMulti& method)
+        {
+            //_details::_t_register_class_function<TType>::_exec<PMethod>();
+        }
+        
         template<typename FMethod>
         inline typename std::enable_if<true,
             void>::type method(std::string const& name, FMethod methptr)
+        {
+            
+        }
+        template<typename TMulti, typename FMethod>
+        inline typename std::enable_if<TMulti::kind == CppDefineKind::Dispatcher,
+            void>::type method(TMulti& method, FMethod methptr)
         {
             
         }
@@ -155,7 +232,7 @@ namespace details
             if constexpr (std::is_copy_assignable_v<TType>) assigner<TType const&>();
             if constexpr (std::is_move_constructible_v<TType>) assigner<TType &&>();
 
-            
+
 
         }
 
@@ -165,12 +242,12 @@ namespace details
         }
     };
 
-    template<typename TFinal, typename TType>
+    template<typename TFinal>
     class DefineHelperLibraryMultimethod
-        : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal, TType>>
+        : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal>>
     {
 	protected:
-        typedef DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal, TType>> Base;
+        typedef DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal>> Base;
 		using Base::g;
 		using Base::s;
 		using Base::node;
@@ -200,10 +277,22 @@ namespace details
     template<typename TFinal, typename TType>
     class DefineHelperPolicy<TFinal, TType,
         std::enable_if_t<
+            TType::kind == CppDefineKind::Abstract>>
+        : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
+        , public DefineHelperLibraryNaming<TFinal>
+        , public DefineHelperLibraryTyping<TFinal>
+    {
+
+    };
+
+    template<typename TFinal, typename TType>
+    class DefineHelperPolicy<TFinal, TType,
+        std::enable_if_t<
             TType::kind == CppDefineKind::Struct
             && !std::is_class<typename TType::Type>::value>>
         : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
         , public DefineHelperLibraryNaming<TFinal>
+        , public DefineHelperLibraryTyping<TFinal>
     {
 
     };
@@ -215,6 +304,7 @@ namespace details
             && std::is_class<typename TType::Type>::value>>
         : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
         , public DefineHelperLibraryNaming<TFinal>
+        , public DefineHelperLibraryTyping<TFinal>
         , public DefineHelperLibraryStructure<TFinal, typename TType::Type>
     {
 
@@ -225,7 +315,7 @@ namespace details
         std::enable_if_t<TType::kind == CppDefineKind::Dispatcher>>
         : public DefineHelperLibraryBase<TFinal, DefineHelperPolicy<TFinal, TType, void>>
         , public DefineHelperLibraryNaming<TFinal>
-        , public DefineHelperLibraryMultimethod<TFinal, typename TType::Type>
+        , public DefineHelperLibraryMultimethod<TFinal>
     {
 
     };

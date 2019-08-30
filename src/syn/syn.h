@@ -76,6 +76,7 @@
 // graph //////////////////////////////////////////////////////////////////////
 
 #include "core/cpp_graph.h"
+#include "core/containers.h"
 
 /*#include "system/runtime/GenericInvoke.hpp"
 

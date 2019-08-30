@@ -185,6 +185,44 @@ namespace syn
 	};
 
 	/******************************************************************************
+	** Abstract
+	******************************************************************************/
+
+	class Abstract final
+		: public CppDefine
+	{
+	public:
+		static constexpr CppDefineKind kind = CppDefineKind::Abstract;
+
+		inline Abstract(details::CppDefineRunner<Abstract> init)
+			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
+		{ }
+	};
+
+	/******************************************************************************
+	** Multimethod
+	******************************************************************************/
+
+	// should always be static...
+	template <typename TDispatcher = void>
+	class Multimethod final
+		: CppDefine
+	{
+	private:
+		TDispatcher* _dispatch;
+
+	public:
+		static constexpr CppDefineKind kind = CppDefineKind::Dispatcher;
+
+		inline Multimethod(details::CppDefineRunner<Multimethod<TDispatcher>> init)
+			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
+		{
+			// TODO? throw exception if not static time
+			// TODO? use a friend to initalize this thing?
+		}
+	};
+
+	/******************************************************************************
 	** Module
 	******************************************************************************/
 
@@ -199,63 +237,4 @@ namespace syn
 			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
 		{ }
 	};
-
-	/******************************************************************************
-	** Multimethod
-	******************************************************************************/
-
-	// should always be static...
-	template <typename TDispatcher>
-	class Multimethod final
-		: CppDefine
-	{
-	private:
-		TDispatcher _dispatch;
-
-	public:
-		static constexpr CppDefineKind kind = CppDefineKind::Dispatcher;
-
-		inline Multimethod(details::CppDefineRunner<Multimethod<TDispatcher>> init)
-			: CppDefine(kind, this, reinterpret_cast<details::CppDefineRunner<>>(init))
-		{
-			// TODO? throw exception if not static time
-			// TODO? use a friend to initalize this thing?
-		}
-
-		inline operator Graph::Node*() const { return this->node; }
-
-	public:
-		template <typename ...TArgs>
-		inline typename TDispatcher::InvokeResult operator() (TArgs &&... args) const
-		{
-			// This may return an arbitrary invoke structure that forwards types and arguments
-			return _dispatch.invoke( std::move(typename TDispatcher::cppArgumentsToInvoke(std::forward<TArgs>(args)...)) );
-		}
-
-		template <typename TInvoke>
-		inline typename TDispatcher::InvokeResult invoke (TInvoke && invoke) const
-		{
-			typename TDispatcher::Dispatch d;
-
-			TDispatcher::invokeIntoDispatch(invoke, d);
-
-			auto res = _dispatch.dispatchWithRecord(d);
-			auto callable = std::get<0>(res);
-			if (callable == nullptr) throw stdext::exception("bad dispatch");
-			auto dispatchRecord = std::get<1>(res);
-
-			return TDispatcher::invoke(callable, dispatchRecord, std::move(invoke));
-		}
-
-	public:
-		template<typename T>
-		inline void add(T fn)
-		{
-			// TODO: add to the graph
-			auto res = TDispatcher::cppFunctionToRecordAndFunction(fn);
-
-			_dispatch.add(std::get<0>(res), std::get<1>(res));
-		}
-	};
-
 }
