@@ -102,7 +102,7 @@ namespace syn
 	struct type_define;
 
     template<typename T>
-    struct type_define<typename T, std::void_t<typename T::Definition>>
+    struct type_define<typename T, std::void_t<decltype(T::Definition)>>
     {
         inline static decltype(T::Definition)& Definition = T::Definition;
     };
@@ -121,7 +121,7 @@ namespace syn
 	template <typename TType>
 	struct type<TType, std::void_t<type_define<TType>>>
 	{
-		static constexpr CppDefineKind kind = decltype(type_define<TType>::Definition)::kind;
+		static constexpr CppDefineKind kind = std::decay_t<decltype(type_define<TType>::Definition)>::kind;
 		inline static TypePtr desc() { return &type_define<TType>::Definition; }
 		inline static TypeId id() { return desc().asId(); }
 		inline static Graph::Node const* graphNode() { return id(); }
