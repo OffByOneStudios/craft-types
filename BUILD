@@ -33,13 +33,13 @@ syndic(
     ],
 
     headers_deps = [
-        "@graph//:graph",
         "@spdlog//:headers",
-        "@stdext//:headers",
         "@boost//:callable_traits",
+        "@cultlang_stdext//:headers",
+        "@cultlang_graph//:graph",
     ],
     code_deps = [
-        "@stdext//:stdext",
+        "@cultlang_stdext//:stdext",
     ],
 
     headers_linkopts = select({
