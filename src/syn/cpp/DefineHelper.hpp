@@ -270,7 +270,8 @@ namespace details
     template<typename TFinal, typename TDispatch, typename Enable=void>
     class DefineHelperPolicy
     {
-        static_assert("No policy for that type pattern, try using Define<void> instead.");
+    public:
+        DefineHelperPolicy() { static_assert(false, "No policy for that type pattern, try using Define<void> instead."); }
     };
 
     template<typename TFinal>

@@ -1,7 +1,6 @@
 
 #include "syn/syn.h"
 #include "conversions.h"
-#include "syn/boot/system_into_cpp.h"
 
 using namespace syn;
 using namespace syn::core;

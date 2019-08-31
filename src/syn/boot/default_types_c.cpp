@@ -1,5 +1,4 @@
-#include "../common.h"
-
+#include "syn/syn.h"
 #include "default_types_c.h"
 
 // CRAFT_TYPE_DEFINE(void*)
@@ -124,55 +123,66 @@
 // 	_.use<PConstructor>().singleton<DefaultConstructor>();
 // };
 
+using namespace syn;
 
-syn::Define<uint8_t> syn::type_define<uint8_t>::Definition(
+decltype(syn::type_define<uint8_t>::Definition) syn::type_define<uint8_t>::Definition(
 	[](auto _) {
-		_.name("uint8_t");
+		_.name("UInt8");
+        _.subtypes(core::Unsigned);
 	});
 
-syn::Define<uint16_t> syn::type_define<uint16_t>::Definition(
+decltype(syn::type_define<uint16_t>::Definition) syn::type_define<uint16_t>::Definition(
 	[](auto _) {
-		_.name("uint16_t");
+		_.name("UInt16");
+        _.subtypes(core::Unsigned);
 	});
 
-syn::Define<uint32_t> syn::type_define<uint32_t>::Definition(
+decltype(syn::type_define<uint32_t>::Definition) syn::type_define<uint32_t>::Definition(
 	[](auto _) {
-		_.name("uint32_t");
+		_.name("UInt32");
+        _.subtypes(core::Unsigned);
 	});
 
-syn::Define<uint64_t> syn::type_define<uint64_t>::Definition(
+decltype(syn::type_define<uint64_t>::Definition) syn::type_define<uint64_t>::Definition(
 	[](auto _) {
-		_.name("uint64_t");
-	});
-
-
-syn::Define<int8_t> syn::type_define<int8_t>::Definition(
-	[](auto _) {
-		_.name("int8_t");
-	});
-
-syn::Define<int16_t> syn::type_define<int16_t>::Definition(
-	[](auto _) {
-		_.name("int16_t");
-	});
-
-syn::Define<int32_t> syn::type_define<int32_t>::Definition(
-	[](auto _) {
-		_.name("int32_t");
-	});
-
-syn::Define<int64_t> syn::type_define<int64_t>::Definition(
-	[](auto _) {
-		_.name("int64_t");
+		_.name("UInt64");
+        _.subtypes(core::Unsigned);
 	});
 
 
-syn::Define<float> syn::type_define<float>::Definition(
+decltype(syn::type_define<int8_t>::Definition) syn::type_define<int8_t>::Definition(
+	[](auto _) {
+		_.name("Int8");
+        _.subtypes(core::Signed);
+	});
+
+decltype(syn::type_define<int16_t>::Definition) syn::type_define<int16_t>::Definition(
+	[](auto _) {
+		_.name("Int16");
+        _.subtypes(core::Signed);
+	});
+
+decltype(syn::type_define<int32_t>::Definition) syn::type_define<int32_t>::Definition(
+	[](auto _) {
+		_.name("Int32");
+        _.subtypes(core::Signed);
+	});
+
+decltype(syn::type_define<int64_t>::Definition) syn::type_define<int64_t>::Definition(
+	[](auto _) {
+		_.name("Int64");
+        _.subtypes(core::Signed);
+	});
+
+
+decltype(syn::type_define<float>::Definition) syn::type_define<float>::Definition(
 	[](auto _) {
 		_.name("float");
+        _.subtypes(core::Floating);
 	});
 
-syn::Define<double> syn::type_define<double>::Definition(
+decltype(syn::type_define<double>::Definition) syn::type_define<double>::Definition(
 	[](auto _) {
 		_.name("double");
+        _.subtypes(core::Floating);
 	});

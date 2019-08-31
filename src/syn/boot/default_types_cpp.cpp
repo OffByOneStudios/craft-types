@@ -2,7 +2,7 @@
 #include "default_types_cpp.h"
 
 // stdlib
-syn::Define<::std::string> syn::type_define<::std::string>::Definition(
+decltype(syn::type_define<::std::string>::Definition) syn::type_define<::std::string>::Definition(
 	[](auto _) {
 		_.name("string");
 	});
