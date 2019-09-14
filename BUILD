@@ -41,7 +41,7 @@ syndic(
         "@cultlang_graph//:graph",
     ],
     code_deps = [
-        "@cultlang_stdext//:stdext",
+        "@cultlang_stdext//:code",
     ],
 
     headers_linkopts = select({
@@ -94,6 +94,6 @@ cc_test(
     srcs = glob(["test/literate/*.cpp"]),
     deps = [
         ":module",
-       "@catch//:single_include",
+        "@catch//:single_include",
     ],
 )

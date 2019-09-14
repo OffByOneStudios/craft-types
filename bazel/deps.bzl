@@ -30,9 +30,9 @@ def cultlang_syndicate_deps():
     if "cultlang_stdext" not in native.existing_rules():
         http_archive(
             name = "cultlang_stdext",
-            urls = ["https://github.com/cultlang/stdext/archive/6d4fcad6f3b4972bf33100bd170c3c4abc784296.zip"],
-            strip_prefix = "stdext-6d4fcad6f3b4972bf33100bd170c3c4abc784296",
-            sha256 = "2722d410c711008861e72cd11fcd347a7b4c8ae53c16262eb600eae9090466f4",
+            urls = ["https://github.com/cultlang/stdext/archive/22ea15ff2a05013d1e15717479b17329a48b385c.zip"],
+            strip_prefix = "stdext-22ea15ff2a05013d1e15717479b17329a48b385c",
+            sha256 = "efa575c5b2aa035ee3d88d93de92803de0a95e74d6cc7615746672f8bcebce68",
         )
 
     if "cultlang_graph" not in native.existing_rules():
