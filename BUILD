@@ -13,18 +13,14 @@ syndic(
 
     dll_define = "CULTLANG_SYNDICATE_DLL",
     # todo: use glob again
-    srcs = [
+    srcs = glob([
         "src/syn/system/SymbolTable.cpp",
         "src/syn/system/TypeStore.cpp",
         "src/syn/system/TypeId.cpp",
         "src/syn/system/dispatch.cpp",
         "src/syn/system/ModuleBase.cpp",
 
-        "src/syn/core/system_graph.cpp",
-        "src/syn/core/module_graph.cpp",
-        "src/syn/core/syndicate_graph.cpp",
-        "src/syn/core/cpp_graph.cpp",
-        "src/syn/core/containers.cpp",
+        "src/syn/core/*",
 
         "src/syn/cpp/cpp_interface.cpp",
 
@@ -32,7 +28,7 @@ syndic(
         "src/syn/boot/default_types_cpp.cpp",
 
         "src/syn/syn.cpp",
-    ],
+    ]),
 
     headers_deps = [
         "@spdlog//:headers",

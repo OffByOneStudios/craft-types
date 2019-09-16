@@ -30,15 +30,15 @@ def cultlang_syndicate_deps():
     if "cultlang_stdext" not in native.existing_rules():
         http_archive(
             name = "cultlang_stdext",
-            urls = ["https://github.com/cultlang/stdext/archive/22ea15ff2a05013d1e15717479b17329a48b385c.zip"],
-            strip_prefix = "stdext-22ea15ff2a05013d1e15717479b17329a48b385c",
-            sha256 = "efa575c5b2aa035ee3d88d93de92803de0a95e74d6cc7615746672f8bcebce68",
+            urls = ["https://github.com/cultlang/stdext/archive/4cc13150915535fea70e651934d0a9a76c8311a2.zip"],
+            strip_prefix = "stdext-4cc13150915535fea70e651934d0a9a76c8311a2",
+            sha256 = "4783a81e350e6e04657d696cd0e54692b56ff25e2962295ac84f3f69ae1eaea7",
         )
 
     if "cultlang_graph" not in native.existing_rules():
         http_archive(
             name = "cultlang_graph",
-            urls = ["https://github.com/cultlang/graph/archive/239d98004cf1fceab88beab23d99574c98857688.zip"],
-            strip_prefix = "graph-239d98004cf1fceab88beab23d99574c98857688",
-            sha256 = "891a488ce012295a2d8343f08797187c0a9c6882b96ca74413252f7b5fe44b4b",
+            urls = ["https://github.com/cultlang/graph/archive/746fbc4155631a6b3a80fe64950ac4feb36e9f47.zip"],
+            strip_prefix = "graph-746fbc4155631a6b3a80fe64950ac4feb36e9f47",
+            sha256 = "3696878cc43c3af274a8092e50015994f300f3bd40c0bc245f29c29401302616",
         )

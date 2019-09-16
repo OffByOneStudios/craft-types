@@ -9,7 +9,7 @@ decltype(syn::core::parse) syn::core::parse(
 	[](auto _) {
 		_.name("parse");
 
-        _.method([](TypeId type, instance<syn::String> str){
+        _.method([](TypeId type, instance<std::string> str){
             return instance<>();
         });
 	});

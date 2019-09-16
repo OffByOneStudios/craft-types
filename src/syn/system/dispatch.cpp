@@ -13,16 +13,15 @@ bool syn::is_a(TypeId most_specific, TypeId less_specific)
     // TODO sort this and save to cache
     auto res = graph::query(&thread_store().g())
         .v(most_specific)
-        .repeat_until(
-            [](auto sq) { return sq
-                .in([](auto e) { return e->type == type<core::EIsA>::id(); })
-                .unique()
-                ; },
-            [&](auto n) { n == less_specific; }
+        .repeat_breadth(
+            [](auto sq) { return sq.out([](auto e) { return e->type == type<core::EIsA>::id(); }); },
+            []() { return true; },
+            [&](auto n) { return n == less_specific; }
         )
+        .take(1)
         .run();
 
-    return most_specific == less_specific;
+    return res.size() == 1 && res[0] == less_specific;
 }
 
 TypeId syn::basic_dispatch(TypeId dispatcher, TypeId* type_args, size_t count, void* value_args /* = nullptr */, TypeId previous_call /* = nullptr */)
@@ -34,5 +33,6 @@ TypeId syn::basic_dispatch(TypeId dispatcher, TypeId* type_args, size_t count, v
 
     }
 
-
+    // no dispatch
+    return None;
 }

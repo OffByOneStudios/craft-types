@@ -43,6 +43,8 @@ namespace syn
 		inline CppDefine(CppDefineKind kind_, void* repr_ = nullptr, details::CppDefineRunner<> initer_ = nullptr);
 
 		inline CppDefine& operator<< (details::CppDefineRunner<> initer_);
+
+		inline operator TypeId() const { return node; }
 	};
 
 

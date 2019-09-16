@@ -3,10 +3,8 @@ workspace(name = "cultlang_syndicate")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
-local_repository(
-    name="cultlang_graph",
-    path="../graph"
-)
+#local_repository( name="cultlang_stdext", path="../stdext" )
+#local_repository( name="cultlang_graph", path="../graph" )
 
 ########################
 # BOOST:
