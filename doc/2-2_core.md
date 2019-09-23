@@ -1,25 +1,23 @@
 
 
-The first collection of types we describe are meant to be simple as possible, while being expressive enough to describe themselves.
+The first collection of types we describe are meant to be simple as possible, while being expressive enough to describe themselves. This is to allow us to create the self hosting type system in as few constructs as possible.
 
 ## Core
 
 We place these types in `syn::core` which is the core graph of the syndicate system. We also place these types in the runtime namespace `/Syndicate/Core/` (which is later forwarded to `/Syndicate/`).
 
-Because our we have a meta type system, we need a way to describe the element type of our initial additions to the type graph. We create a node called empties because these have no information in them, merely their existence is the information.
+Because we have a meta type system, we need a way to describe the element type of our initial additions to the type graph. We create a node called `Empty` because these initial types have no information in them, merely their existence is the information. Relationships can be made to them later to make them meta-interperable.
 
 * `syn::core::NEmpty` (`/Syndicate/Core/Empty`) Empty.
 
 ### Abstract
 
-First we must describe an abstract type. These are simply nodes which we can attach symbols to later. They are our first representation of a type, and the primary representation of types that can be filled in later.
+Our first real type descriptions are abstract types. These are simply nodes which we can attach symbols and logic to later. These are the primary representation of generally generic types (e.g. interfaces). Relationships to complex rules can be added to them later which can enforce what can and can not be considered a part of the abstract type. Because we boot this part of the system manually we will have to be careful to not violate any of these future rules for the types we add here.
 
-In the future they can have complex rules associated with what can and can not be considered a part of the abstract type. At the moment we will have to be careful to ensure we do not violate any rules we rely on because of these abstracts.
-
-For now we use a simple rule, if a type can find a path between itself and the target abstract node then it fits.
+In general we assume a pretty simple rule: if a type can find a path between itself and the target abstract node then it fits. This rule moves the implementation burden to extensions to ensure they add their functionality correctly, but it simplifies bootstraping, self-hosting, and the core of the meta graph.
 
 * `syn::core::NAbstract` (`/Syndicate/Core/Abstract`) an abstract type. Empty.
-* `syn::core::EIsA` (`/Syndicate/Core/IsA`) An edge which points from a type to the other types it can be used in place of (note that this says *nothing* about structural inheritence, casting memory, or the like, simply that the type - interpreted correctly - can be use in the place of another), can only point from a "type" (instance-inheriter of `Meta`) to an abstract. Empty.
+* `syn::core::EIsA` (`/Syndicate/Core/IsA`) An edge which points from a type to the other types it can be used in place of (note that this says *nothing* about structural inheritence, casting memory, or the like, simply that the type - interpreted correctly - can be use in the place of another), can only point from a "type" (instance-inheriter of `Meta`) to an abstract (e.g. two concrete types can not support an IsA relationship by default; and *never should even by extensions*, extension of IsA is reserved only to create new forms of abstract types, concrete to concrete IsA relationships should instead be represented by a more complex relationship (perhaps structural or virtual inheritence?) and the `is-a` dispatcher overloaded to support it). Empty.
 
 We also generate some system abstracts and add them to the graph:
 
@@ -31,19 +29,19 @@ We also generate some system abstracts and add them to the graph:
 * `/Syndicate/Core/Type`  (`Abstract`) The actual types, these describe types potentially outside the typegraph.
 * `/Syndicate/Core/Subroutine`  (`Abstract`) The actual potentially executable subroutines.
 
-Let's briefly describe our graph structure at this point (as the recursive structure can be confusing):
+Let's briefly describe our graph structure at this point (as the self-supporting structure can be confusing, and laying it out illuminating):
 * `Abstract` is a node and the node's typenode is `Empty`
 * `Meta` is a node and the node's typenode is `Abstract`.
-  * ditto `MetaNode`, `MetaEdge`, `MetaLabel`, and `MetaProp`.
+  * ditto `MetaNode`, `MetaEdge`, `MetaLabel`, and `MetaProp` (in place of `Meta`).
 * There is a node `IsA` and the node's typenode is `Empty`
 * There is an edge from `MetaNode` to `Meta` and the edge's typenode is `IsA`.
-  * ditto `MetaEdge`, `MetaLabel`, and `MetaProp`.
+  * ditto `MetaEdge`, `MetaLabel`, and `MetaProp` (in place of `MetaNode`).
 * There is an edge from `Abstract` to `MetaNode` and the edge's typenode is `IsA`.
 * There is an edge from `IsA` to `MetaEdge` and the edge's typenode is `IsA`.
 
 ### C Memory
 
-Now we can support C style memory. This involves a node that represents structures, and one for bits types. As well as an initial population of pointer types.
+Now we can describe C style memory. This involves a node that represents structures, one for bits types, and one for pointers (references). As well as an initial population of pointer types.
 
 * `syn::core::NBits` (`/Syndicate/Core/Bits`) a node for a bits type (that is any type that takes up some number of bits), this is our first concrete type (`Struct`, is-a `MetaNode`).
 * `syn::core::NStruct` (`/Syndicate/Core/Struct`) a node for a struct type (that is any type that takes up a chunk of memory via composition) (`Struct`, is-a `Bits`).
@@ -51,20 +49,23 @@ Now we can support C style memory. This involves a node that represents structur
 
 Now we generate some system helpers:
 
-* `/Syndicate/Core/Void` a node for zero width types (`Bits` 0, is-a `Type`).
-
-* `syn::core::EPointsAt` (`/Syndicate/Core/PointsAt`) An edge which describes what a reference-esque type instance would point at in memory (e.g. for dereferenceability) can be repurposed by other single object dereferencable containers (`Empty`, is-a `MetaEdge`).
-
-* `/Syndicate/Core/UniversalReference` a node for an arbitrary pointer (`Reference`, is-a `Type`, points-at `Void`).
+* `/Syndicate/Core/Void` a node for zero width types (`Bits` 0, is-a `Type`). This is not a none-type. A reference to any type with memory can be casted to a reference of this because all memory based types have at least 0 bits of memory. May have special behaviour when used as an argument or return type (is removed from the argument list) however one should consult their ABI (C++ ABIs may not erase 0 width types). In general 0 width types may be decayed to this node during optimization, failure to do so may result in perforamnce penalities.
+* `syn::core::EPointsAt` (`/Syndicate/Core/PointsAt`) An edge (`Empty`, is-a `MetaEdge`) which describes what a reference-esque type instance would point at in memory (e.g. for dereferenceability) may be repurposed through extension by other single object dereferencable containers as long as they aren't of typenode `Reference`.
+* `/Syndicate/Core/UniversalReference` a node for an arbitrary pointer (`Reference`, is-a `Type`, points-at `Void`) this works because the pointed at type has 0-sized memory.
 
 ### C Function
 
-Now we can support C style functions.
+Now we can describe C style functions.
+
+* `syn::core::NFunction` (`/Syndicate/Core/Function`) a node for a c-style function, this is our first subroutine node type (`Reference`, is-a `Subroutine`, points-at "native assembly").
+
+### Composite Typing
+
+Now we construct the mostly universal signature and compisitional relationships (for example in the future a we might have a `RestRpc` of memory type `RestRoute` or even `String` that then is-a subroutine but uses the following relationships).
 
 * `syn::core::NSignature` (`/Syndicate/Core/Signature`) a node for function signatures, all arguments and returns are considered part of the signature (though their meta data may not be, for example varargs and kwargs are merely recognized for existence, not for shape) however calling convention, type safety, and other features are not (`Empty`, is-a `MetaNode`).
-* `syn::core::NFunction` (`/Syndicate/Core/Function`) a node for a c-style function, this is our first subroutine node type (`Reference`, is-a `Subroutine`, points-at "assembly").
+* `syn::core::NLayout` (`/Syndicate/Core/Signature`) a node for structural layout, all fields are considered part of the layout (though their metadata may not be, alignment is included in layout, const-ness as purely an access rule is not).
 
-(for example in the future a we might have a `RestRpc` of memory type `RestRoute` or even `String` that then is-a subroutine)
 
 * `syn::core::EHasSignature` (`/Syndicate/Core/HasSignature`) An edge which describes what the signature of a function is, points from a subroutine descendent to a signture (`Empty`, is-a `MetaEdge`).
 * `syn::core::EWithArgument` (`/Syndicate/Core/WithArgument`) An edge which describes the argument of a function signature (`Struct`, is-a `MetaEdge`).
