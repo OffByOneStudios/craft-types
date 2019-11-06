@@ -63,10 +63,10 @@ std::string TypeStore::describeNode(Node const* n)
 		else if (graph::edgeIsIncoming<Graph>(n, e)) ss << "   <---- [";
 		else ss << "   ????? [";
 		
-		ss << TypeId(e->type) << ": ";
+		ss << TypeId(e->type) << " ";
 
 		if (printer == nullptr)
-			ss << "error'Property Type does not have Edge to printer Implementation'";
+			ss << "-" /*"error'Edge Type does not have Edge to printer Implementation'"*/;
 
 		if (graph::edgeIsOutgoing<Graph>(n, e)) ss << "] ---->   ";
 		else if (graph::edgeIsIncoming<Graph>(n, e)) ss << "] -----   ";
@@ -100,10 +100,10 @@ std::string TypeStore::describeNode(Node const* n)
 		prop_count += 1;
 		void* printer = nullptr;
 
-		ss << "   ." << TypeId(p->type) << ": ";
+		ss << "   ." << TypeId(p->type) << " ";
 
 		if (printer == nullptr)
-			ss << "error'Property Type does not have Edge to printer Implementation'";
+			ss << "-" /*"error'Property Type does not have Edge to printer Implementation'"*/;
 
 		ss << std::endl;
 	});

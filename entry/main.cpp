@@ -12,7 +12,11 @@ int main(int argc, char** argv)
 	{
 		std::cout << ">>> ";
 		std::string input;
-		std::getline(std::cin, input);
+		do
+		{
+			std::getline(std::cin, input);
+		} while (input.size() == 0);
+		
 
 		bool has_args = true;
 
@@ -111,6 +115,7 @@ int main(int argc, char** argv)
 		{
 			std::cout << ex.what() << std::endl;
 		}
+
 		std::filesystem::current_path(curcwd);
 
 		std::cout << std::endl;

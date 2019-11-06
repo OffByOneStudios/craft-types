@@ -57,14 +57,16 @@ def crossplatform_shared(
     dylib_name = basename + ".dylib"
     native.cc_binary(
         name = dylib_name,
-        deps = [":code"],
+        deps = deps,
+        linkopts = dylib_linkopts,
         linkshared = True,
     )
 
     so_name = "lib" + basename + ".so"
     native.cc_binary(
         name = so_name,
-        deps = [":code"],
+        deps = deps,
+        linkopts = so_linkopts,
         linkshared = True,
     )
 

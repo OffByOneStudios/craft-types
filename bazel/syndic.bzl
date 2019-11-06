@@ -37,10 +37,13 @@ def syndic(
         deps = [":" + headersname] + code_deps,
 
         srcs = srcs,
-        # TODO: use local defines
+        local_defines = [
+            dll_define,
+            "CULT_CURRENT_PACKAGE=\\\"" + basename + "\\\""
+        ],
         copts = select({
-            "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17", "/D" + dll_define],
-            "//conditions:default": ["-std=c++17", "-D" + dll_define],
+            "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17"],
+            "//conditions:default": ["-std=c++17"],
         }),
         linkopts = code_linkopts,
 
@@ -62,10 +65,10 @@ def syndic(
             deps = [":" + headersname] + code_deps,
 
             srcs = srcs,
-            # TODO: use local defines
+            local_defines = ["CULTLANG_SYNDICATE_NODLL"],
             copts = select({
-                "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17", "/DCULTLANG_SYNDICATE_NODLL"],
-                "//conditions:default": ["-std=c++17", "-DCULTLANG_SYNDICATE_NODLL"],
+                "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17"],
+                "//conditions:default": ["-std=c++17"],
             }),
             linkopts = code_linkopts,
         )
