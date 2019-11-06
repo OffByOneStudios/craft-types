@@ -52,7 +52,7 @@
 /* Core Graph (section 2.2) */
 #include "core/system_graph.h"
 
-/* Core Graph (section 2.3) */
+/* Syndicate Graph (section 2.3) */
 #include "core/module_graph.h"
 #include "core/syndicate_graph.h"
 
@@ -60,7 +60,7 @@
 
 
 /******************************************************************************
-** C++ Support/Adaptor
+** C++ Support
 ******************************************************************************/
 
 // prelude ////////////////////////////////////////////////////////////////////
@@ -113,13 +113,6 @@
 
 #include "boot/system_into_cpp.h"
 
-// TODO:
-// * Rework objects to manage their own instance meta stuff (rather than from_raw) via SLifecycle
-// * Hookup ->byConfiguring
-// * Finish ObjectComposite and ObjectManipulation capabilities.
-// * Rename ObjectDefineDetails to take into account types
-// * Add default c_types
-// * Add default cpp_types
 
 /******************************************************************************
 ** Dll Stuff

@@ -1,3 +1,7 @@
+Reorganize manual into new parts to more closely match the folder structure. Importantly need a new section on the structure of the Type Graph and initialization system being used.
+
+---
+
 New definition syntax. Based off of literate programming being turned into ASTs (more or less...).
 
 Contained within `syn::def` see `defines_v2.md`.
