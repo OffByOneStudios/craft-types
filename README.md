@@ -1,3 +1,3 @@
-# craft-types
+# Syndicate
 
-A runtime type system. [See the literate-programming-esque intro](https://github.com/cultlang/craft-types/tree/master/test/examples).
+[Read the manual](https://github.com/cultlang/syndicate/tree/master/doc).
