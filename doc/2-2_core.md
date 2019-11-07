@@ -16,34 +16,34 @@ Our first real type descriptions are abstract types. These are simply nodes whic
 
 In general we assume a pretty simple rule: if a type can find a path between itself and the target abstract node then it fits. This rule moves the implementation burden to extensions to ensure they add their functionality correctly, but it simplifies bootstraping, self-hosting, and the core of the meta graph.
 
-* `syn::core::NAbstract` (`/Syndicate/Core/Abstract`) an abstract type. Empty.
-* `syn::core::EIsA` (`/Syndicate/Core/IsA`) An edge which points from a type to the other types it can be used in place of (note that this says *nothing* about structural inheritence, casting memory, or the like, simply that the type - interpreted correctly - can be use in the place of another), can only point from a "type" (instance-inheriter of `Meta`) to an abstract (e.g. two concrete types can not support an IsA relationship by default; and *never should even by extensions*, extension of IsA is reserved only to create new forms of abstract types, concrete to concrete IsA relationships should instead be represented by a more complex relationship (perhaps structural or virtual inheritence?) and the `is-a` dispatcher overloaded to support it). Empty.
+* `syn::core::NAbstract` (`/Syndicate/Core/Abstract`) an abstract type (`Empty`, is-a `Type`)
+* `syn::core::EIsA` (`/Syndicate/Core/IsA`) An edge which points from a type to the abstract types it can be used as (note that this says *nothing* about structural inheritance, casting memory, or the like, simply that the type - interpreted correctly - can be use in the place of another), can only point to an abstract (e.g. two concrete types can not support an IsA relationship by default; and *never should even by extensions*, extension of IsA is reserved only to create new forms of abstract types, concrete to concrete IsA relationships should instead be represented by a more complex relationship (perhaps structural or virtual inheritance?) and the `is-a` dispatcher overloaded to support it). (`Empty`)
 
 We also generate some system abstracts and add them to the graph:
 
-* `/Syndicate/Core/Meta`  (`Abstract`) The meta type graph, these describes types found with in the type graph.
-* `/Syndicate/Core/MetaNode` (`Abstract`, is-a `Meta`)
-* `/Syndicate/Core/MetaEdge` (`Abstract`, is-a `Meta`)
-* `/Syndicate/Core/MetaLabel` (`Abstract`, is-a `Meta`)
-* `/Syndicate/Core/MetaProp` (`Abstract`, is-a `Meta`)
-* `/Syndicate/Core/Type`  (`Abstract`) The actual types, these describe types potentially outside the typegraph.
-* `/Syndicate/Core/Subroutine`  (`Abstract`) The actual potentially executable subroutines.
+* `/Syndicate/Core/Meta` (`Abstract`) The meta types, these represent types intended primarily for usage within the type graph itself.
+    * `/Syndicate/Core/MetaNode` (`Abstract`, is-a `Meta`) The meta type marking a type as used for Nodes.
+    * `/Syndicate/Core/MetaEdge` (`Abstract`, is-a `Meta`) The meta type marking a type as used for Edges.
+    * `/Syndicate/Core/MetaLabel` (`Abstract`, is-a `Meta`) The meta type marking a type as used for Labels.
+    * `/Syndicate/Core/MetaProp` (`Abstract`, is-a `Meta`) The meta type marking a type as used for Props.
+* `/Syndicate/Core/Type` (`Abstract`) The actual types, these describe types potentially outside the typegraph. This could be considered the top type.
+* `/Syndicate/Core/Subroutine` (`Abstract`) The actual potentially executable subroutines.
 
 Let's briefly describe our graph structure at this point (as the self-supporting structure can be confusing, and laying it out illuminating):
 * `Abstract` is a node and the node's typenode is `Empty`
-* `Meta` is a node and the node's typenode is `Abstract`.
-  * ditto `MetaNode`, `MetaEdge`, `MetaLabel`, and `MetaProp` (in place of `Meta`).
+* `Type` is a node and the node's typenode is `Abstract`.
+  * ditto `Subroutine`, `MetaEdge`, `MetaLabel`, and `MetaProp` (in place of `Type`).
 * There is a node `IsA` and the node's typenode is `Empty`
 * There is an edge from `MetaNode` to `Meta` and the edge's typenode is `IsA`.
   * ditto `MetaEdge`, `MetaLabel`, and `MetaProp` (in place of `MetaNode`).
-* There is an edge from `Abstract` to `MetaNode` and the edge's typenode is `IsA`.
+* There is an edge from `Empty` to `MetaNode` and the edge's typenode is `IsA`.
 * There is an edge from `IsA` to `MetaEdge` and the edge's typenode is `IsA`.
 
 ### C Memory
 
 Now we can describe C style memory. This involves a node that represents structures, one for bits types, and one for pointers (references). As well as an initial population of pointer types.
 
-* `syn::core::NBits` (`/Syndicate/Core/Bits`) a node for a bits type (that is any type that takes up some number of bits), this is our first concrete type (`Struct`, is-a `MetaNode`).
+* `syn::core::NBits` (`/Syndicate/Core/Bits`) a node for a bits type (that is any type that takes up some number of bits), this is our first concrete type (`Struct`, is-a `Type`).
 * `syn::core::NStruct` (`/Syndicate/Core/Struct`) a node for a struct type (that is any type that takes up a chunk of memory via composition) (`Struct`, is-a `Bits`).
 * `syn::core::NReference` (`/Syndicate/Core/Reference`) a node for an in memory reference type (that is any type points to memory of another) (`Empty`, is-a `Bits`).
 
