@@ -46,7 +46,7 @@ def syndic(
             "//conditions:default": ["-std=c++17"],
         }),
         linkopts = code_linkopts,
-        features = ["static_link_msvcrt"],
+        features = [],
 
         alwayslink = True,
     )
@@ -72,5 +72,5 @@ def syndic(
                 "//conditions:default": ["-std=c++17"],
             }),
             linkopts = code_linkopts,
-            features = ["static_link_msvcrt"],
+            features = [],
         )

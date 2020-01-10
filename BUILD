@@ -14,20 +14,7 @@ syndic(
     dll_define = "CULTLANG_SYNDICATE_DLL",
     # todo: use glob again
     srcs = glob([
-        "src/syn/system/SymbolTable.cpp",
-        "src/syn/system/TypeStore.cpp",
-        "src/syn/system/TypeId.cpp",
-        "src/syn/system/dispatch.cpp",
-        "src/syn/system/ModuleBase.cpp",
-
-        "src/syn/core/*",
-
-        "src/syn/cpp/cpp_interface.cpp",
-
-        "src/syn/boot/default_types_c.cpp",
-        "src/syn/boot/default_types_cpp.cpp",
-
-        "src/syn/syn.cpp",
+        "src/syn/**/*.c*",
     ]),
 
     headers_deps = [
