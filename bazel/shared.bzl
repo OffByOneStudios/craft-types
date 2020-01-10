@@ -65,4 +65,6 @@ def crossplatform_shared(
             "@bazel_tools//src/conditions:darwin": [dylib_name],
             "//conditions:default": [":" + so_name],
         }),
+
+        features = ["copy_dynamic_libraries_to_binary"]
     )

@@ -42,10 +42,11 @@ def syndic(
             "CULT_CURRENT_PACKAGE=\\\"" + basename + "\\\""
         ],
         copts = select({
-            "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17"],
+            "@bazel_tools//src/conditions:windows": ["/std:c++17"],
             "//conditions:default": ["-std=c++17"],
         }),
         linkopts = code_linkopts,
+        features = ["static_link_msvcrt"],
 
         alwayslink = True,
     )
@@ -67,8 +68,9 @@ def syndic(
             srcs = srcs,
             local_defines = ["CULTLANG_SYNDICATE_NODLL"],
             copts = select({
-                "@bazel_tools//src/conditions:windows": ["/MD", "/std:c++17"],
+                "@bazel_tools//src/conditions:windows": ["/std:c++17"],
                 "//conditions:default": ["-std=c++17"],
             }),
             linkopts = code_linkopts,
+            features = ["static_link_msvcrt"],
         )
