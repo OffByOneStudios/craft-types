@@ -2,25 +2,6 @@
 
 # https://docs.microsoft.com/en-us/cpp/c-runtime-library/crt-library-features?view=vs-2019
 #   In case we have to link dlls ourselves apparently
-# runtime
-#"/DEFAULTLIB:ucrt.lib",
-#"/DEFAULTLIB:vcruntime.lib",
-#"/DEFAULTLIB:libvcruntime.lib",
-#"/DEFAULTLIB:msvcrt.lib",
-#"/DEFAULTLIB:msvcprt.lib",
-# runtime (debug)
-#"/DEFAULTLIB:ucrtd.lib",
-#"/DEFAULTLIB:vcruntimed.lib",
-#"/DEFAULTLIB:msvcrtd.lib",
-#"/DEFAULTLIB:msvcprtd.lib",
-#"/DEFAULTLIB:vcruntimed.lib",
-# system
-#"/DEFAULTLIB:kernel32.lib",
-#"/DEFAULTLIB:user32.lib",
-# other attempts
-#"/DEFAULTLIB:oldnames.lib",
-#"/clr"
-# Was resolved by correclty compiling the /ENTRY: function
 
 def crossplatform_shared(
         basename,
@@ -54,7 +35,7 @@ def crossplatform_shared(
         shared_library = ":" + dll_name,
     )
 
-    dylib_name = basename + ".dylib"
+    dylib_name = "lib" + basename + ".dylib"
     native.cc_binary(
         name = dylib_name,
         deps = deps,
