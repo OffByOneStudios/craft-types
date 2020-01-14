@@ -4,11 +4,19 @@
 namespace syn {
 namespace details
 {
+	/******************************************************************************
+	** Exceptions
+	******************************************************************************/
+
     struct define_error
         : stdext::exception
     {
         using exception::exception;
     };
+
+	/******************************************************************************
+	** Base Type
+	******************************************************************************/
 
     class DefineHelperActual
     {
@@ -19,6 +27,11 @@ namespace details
             : define(define)
         { }
     };
+
+
+	/******************************************************************************
+	** Library Base
+	******************************************************************************/
 
     template<typename TFinal, typename TLibrary>
     class DefineHelperLibraryBase
@@ -49,6 +62,10 @@ namespace details
 
     };
 
+	/******************************************************************************
+	** Library: Naming
+	******************************************************************************/
+
     template<typename TFinal>
     class DefineHelperLibraryNaming
         : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryNaming<TFinal>>
@@ -78,6 +95,10 @@ namespace details
         }
     };
 
+	/******************************************************************************
+	** Library: Typing
+	******************************************************************************/
+
     template<typename TFinal>
     class DefineHelperLibraryTyping
         : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryTyping<TFinal>>
@@ -94,6 +115,10 @@ namespace details
             g().template addEdge<core::EIsA>({ }, { node(), abstract_.node });
         }
     };
+
+	/******************************************************************************
+	** Library: Structure
+	******************************************************************************/
 
     namespace _details
     {
@@ -248,6 +273,10 @@ namespace details
         }
     };
 
+	/******************************************************************************
+	** Library: Multimethod
+	******************************************************************************/
+
     template<typename TFinal>
     class DefineHelperLibraryMultimethod
         : protected DefineHelperLibraryBase<TFinal, DefineHelperLibraryMultimethod<TFinal>>
@@ -266,6 +295,12 @@ namespace details
             
         }
     };
+
+
+
+	/******************************************************************************
+	** Policies
+	******************************************************************************/
 
     template<typename TFinal, typename TDispatch, typename Enable=void>
     class DefineHelperPolicy
@@ -326,6 +361,10 @@ namespace details
     {
 
     };
+
+	/******************************************************************************
+	** Final name
+	******************************************************************************/
 
     template<typename T>
     class DefineHelper

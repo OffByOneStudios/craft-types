@@ -8,6 +8,14 @@
 namespace syn {
 namespace core
 {
+	/******************************************************************************
+	** type conversion
+	******************************************************************************/
+
+	// Takes two (or more) arguments and returns a common type for all of them
+	// Arguments:
+	//     - *
+	CULTLANG_SYNDICATE_EXPORTED extern Multimethod<> promote;
 
 	/******************************************************************************
 	** stringly

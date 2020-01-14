@@ -87,7 +87,7 @@ namespace core
 	};
 	
 	/******************************************************************************
-	** NFunction (typenode NReference)
+	** NFunction (typenode NStruct)
 	******************************************************************************/
 
 	struct NFunction final

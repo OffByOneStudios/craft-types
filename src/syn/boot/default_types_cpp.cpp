@@ -4,11 +4,11 @@
 // stdlib
 decltype(syn::type_define<::std::string>::Definition) syn::type_define<::std::string>::Definition(
 	[](auto _) {
-		_.name("string");
+		_.name("String");
 	});
 
 decltype(syn::type_define<bool>::Definition) syn::type_define<bool>::Definition(
 	[](auto _) {
-		_.name("bool");
+		_.name("Bool");
 	});
 

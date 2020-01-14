@@ -73,8 +73,11 @@ TEST_CASE( "syn::instance<> casting", "[syn::CppReferenceCounted]" )
 
         REQUIRE(inst.isNull() == false);
         REQUIRE(inst.typeId() == syn::type<std::string>::id());
+
         CHECK(inst.is<std::string>());
         CHECK(inst.as<std::string>().isNull() == false);
         CHECK(inst.cast<std::string>().isNull() == false);
+
+        CHECK(inst.cast<std::string>()->size() == std::string("hello").size());
     }
 }

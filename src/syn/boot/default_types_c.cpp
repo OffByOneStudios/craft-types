@@ -177,12 +177,12 @@ decltype(syn::type_define<int64_t>::Definition) syn::type_define<int64_t>::Defin
 
 decltype(syn::type_define<float>::Definition) syn::type_define<float>::Definition(
 	[](auto _) {
-		_.name("float");
+		_.name("Float");
         _.subtypes(core::Floating);
 	});
 
 decltype(syn::type_define<double>::Definition) syn::type_define<double>::Definition(
 	[](auto _) {
-		_.name("double");
+		_.name("Double");
         _.subtypes(core::Floating);
 	});

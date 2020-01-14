@@ -11,6 +11,10 @@ We make some decisions about the structure of the graph:
   * `LFooBar` is a label, and should be a noun phrase.
   * `PFooBar` is a property, and should be a statement.
 
+### On Graph Types
+
+The type field on graph objects describe the memory layout of the object in the graph. Which is to say the type of a node of the graph is a type in the system itself, and the node is then an **instance** of that type.
+
 ## Definitions
 
 There are two crucial kinds of definitions: **types** and **subroutines**. These represent the core of any system, **types** are descriptions of objects, and **subroutines** are some sort of computation (in general something executable). Other nodes can be placed in the graph, but in general they will at least have either a type label or a subroutine label.

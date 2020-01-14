@@ -94,7 +94,8 @@
         "shared_mutex": "cpp",
         "strstream": "cpp",
         "unordered_set": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "*.rh": "cpp"
     },
     "files.exclude": {
         "bazel-*": true
